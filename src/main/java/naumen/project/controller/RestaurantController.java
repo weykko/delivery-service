@@ -32,7 +32,7 @@ public class RestaurantController {
 
     @DeleteMapping("/menu/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public MenuItemResponseDto deleteMenuItem(@PathVariable Long id) {
-        return menuService.deleteMenuItem(id);
+    public void deleteMenuItem(@PathVariable Long id) {
+        menuService.deleteMenuItem(id);
     }
 }

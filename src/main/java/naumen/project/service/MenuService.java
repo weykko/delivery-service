@@ -15,5 +15,5 @@ public interface MenuService {
 
     MenuItemResponseDto updateMenuItem(Long id, MenuItemRequestDto menuItemRequestDto);
 
-    MenuItemResponseDto deleteMenuItem(Long id);
+    void deleteMenuItem(Long id);
 }
