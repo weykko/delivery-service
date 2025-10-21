@@ -3,7 +3,6 @@ package naumen.project.mapper;
 import naumen.project.dto.menu.MenuItemRequestDto;
 import naumen.project.dto.menu.MenuItemResponseDto;
 import naumen.project.entity.MenuItem;
-import naumen.project.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

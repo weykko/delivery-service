@@ -1,6 +1,5 @@
 package naumen.project.service.impl;
 
-import jakarta.persistence.EntityNotFoundException;
 import naumen.project.dto.menu.MenuItemRequestDto;
 import naumen.project.dto.menu.MenuItemResponseDto;
 import naumen.project.entity.MenuItem;

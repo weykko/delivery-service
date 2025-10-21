@@ -17,7 +17,7 @@ public class MenuItem {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "description", nullable = false)
+    @Column(name = "price", nullable = false)
     private BigDecimal price;
 
     @ManyToOne(fetch = FetchType.LAZY)
