@@ -1,6 +1,7 @@
 package naumen.project.entity;
 
 import jakarta.persistence.*;
+import naumen.project.entity.enums.Role;
 
 /**
  * Модель данных в бд пользователя
