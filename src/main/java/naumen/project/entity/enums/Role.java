@@ -1,4 +1,4 @@
-package naumen.project.entity;
+package naumen.project.entity.enums;
 
 /**
  * Роли пользователей

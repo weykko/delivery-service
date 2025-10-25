@@ -1,9 +1,11 @@
-package naumen.project.exception;
+package naumen.project.exception.handler;
 
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletRequest;
 import naumen.project.dto.error.ErrorResponseDto;
 import naumen.project.dto.error.ViolationConstraintDto;
+import naumen.project.exception.MenuItemNotFoundException;
+import naumen.project.exception.WebException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -70,6 +72,21 @@ public class GlobalExceptionHandler {
                 ex.getBindingResult().getFieldErrors().stream()
                         .map(error -> new ViolationConstraintDto(error.getField(), error.getDefaultMessage()))
                         .toList()
+        );
+    }
+
+
+    @ExceptionHandler({
+            MenuItemNotFoundException.class
+    })
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponseDto handleNotFoundException(RuntimeException ex, HttpServletRequest request) {
+        return new ErrorResponseDto(
+                Instant.now(),
+                HttpStatus.NOT_FOUND.value(),
+                ex.getMessage(),
+                request.getServletPath(),
+                null
         );
     }
 }
