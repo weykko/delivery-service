@@ -1,5 +1,7 @@
 package naumen.project.mapper;
 
+import naumen.project.dto.auth.RegisterRequestDto;
+import naumen.project.dto.auth.RegisterResponseDto;
 import naumen.project.dto.user.UpdateUserRequestDto;
 import naumen.project.dto.user.UserResponseDto;
 import naumen.project.entity.User;
@@ -31,5 +33,24 @@ public class UserMapper {
         user.setName(dto.name());
         user.setPhone(dto.phone());
         return user;
+    }
+
+    public User toUser(RegisterRequestDto dto, String password) {
+        User user = new User();
+        user.setEmail(dto.email());
+        user.setName(dto.name());
+        user.setPhone(dto.phone());
+        user.setRole(dto.role());
+        user.setPassword(password);
+        return user;
+    }
+
+    public RegisterResponseDto toRegisterResponse(User user) {
+        return new RegisterResponseDto(
+                user.getId(),
+                user.getEmail(),
+                user.getName(),
+                user.getRole()
+        );
     }
 }
