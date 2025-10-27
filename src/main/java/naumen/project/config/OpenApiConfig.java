@@ -11,8 +11,8 @@ import io.swagger.v3.oas.annotations.servers.Server;
  */
 @OpenAPIDefinition(
         info = @Info(
-                title = "Flash",
-                description = "API мессенджера Flash"
+                title = "Delivery",
+                description = "API сервиса доставки"
         ),
         servers = @Server(url = "/")
 )
