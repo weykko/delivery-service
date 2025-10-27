@@ -8,3 +8,12 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+
+security:
+  jwt:
+    access:
+      token: ${ACCESS_TOKEN:uS7i2cNNyKZFPUMRFc0iE8Wt7auExNs80oHrb+ja5lI=}
+      lifetime: ${ACCESS_LIFETIME:1800}
+    refresh:
+      token: ${REFRESH_TOKEN:mZC9IH5LDQ0F9kq6ruhTovNshk4HNHTXq1ng8n/fuJg=}
+      lifetime: ${REFRESH_LIFETIME:86400}
