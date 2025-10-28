@@ -2,9 +2,9 @@ package naumen.project.exception.handler;
 
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import naumen.project.dto.error.ErrorResponseDto;
 import naumen.project.dto.error.ViolationConstraintDto;
-import naumen.project.exception.MenuItemNotFoundException;
 import naumen.project.exception.WebException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +76,24 @@ public class GlobalExceptionHandler {
         );
     }
 
+    /**
+     * Обработка ошибок валидации
+     */
+    @Hidden
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler
+    public ErrorResponseDto handleMethodArgumentNotValidException(ConstraintViolationException ex, HttpServletRequest request) {
+        return new ErrorResponseDto(
+                Instant.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Входные данные не соответствуют заданным ограничениям",
+                request.getServletPath(),
+                ex.getConstraintViolations().stream()
+                        .map(e -> new ViolationConstraintDto(e.getPropertyPath().toString(), e.getMessage()))
+                        .toList()
+        );
+    }
+
     @Hidden
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler
@@ -84,21 +102,6 @@ public class GlobalExceptionHandler {
                 Instant.now(),
                 HttpStatus.UNAUTHORIZED.value(),
                 "Неверный логин / пароль",
-                request.getServletPath(),
-                null
-        );
-    }
-
-
-    @ExceptionHandler({
-            MenuItemNotFoundException.class
-    })
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponseDto handleNotFoundException(RuntimeException ex, HttpServletRequest request) {
-        return new ErrorResponseDto(
-                Instant.now(),
-                HttpStatus.NOT_FOUND.value(),
-                ex.getMessage(),
                 request.getServletPath(),
                 null
         );

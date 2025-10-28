@@ -8,15 +8,15 @@ import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 
 public record MenuItemRequestDto(
-        @NotBlank(message = "Title is required")
-        @Size(min = 3, max = 30, message = "Title must be between 3 and 30 characters")
+        @NotBlank
+        @Size(min = 3, max = 30)
         String title,
 
-        @Size(max = 120, message = "Description should not exceed 120 characters")
+        @Size(max = 120)
         String description,
 
-        @NotNull(message = "Price is required")
-        @Positive(message = "Price must be positive")
+        @NotNull
+        @Positive
         BigDecimal price
 ) {
 }

@@ -36,7 +36,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserResponseDto getInfoById(Long id) {
         User user = getById(id);
-        return userMapper.toInfoDto(user);
+        return userMapper.toResponse(user);
     }
 
     /**
@@ -45,9 +45,9 @@ public class UserService {
     @Transactional
     public UserResponseDto updateInfoById(Long id, UpdateUserRequestDto request) {
         User user = getById(id);
-        User updatedUser = userMapper.updateUser(user, request);
+        User updatedUser = userMapper.updateUserEntityFromRequest(request, user);
         save(updatedUser);
-        return userMapper.toInfoDto(updatedUser);
+        return userMapper.toResponse(updatedUser);
     }
 
     /**

@@ -21,8 +21,7 @@ public class MenuItem {
     private BigDecimal price;
 
     @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "restaurant_id", nullable = false)
-    @JoinColumn(name = "restaurant_id")
+    @JoinColumn(name = "restaurant_id", nullable = false)
     private User restaurant;
 
     public void setId(Long id) {

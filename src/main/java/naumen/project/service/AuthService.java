@@ -47,7 +47,9 @@ public class AuthService {
     public RegisterResponseDto register(RegisterRequestDto request) {
         checkUniqueFields(request);
         String password = passwordEncoder.encode(request.password());
-        User user = userMapper.toUser(request, password);
+        User user = userMapper.toEntity(request);
+        user.setPassword(password);
+
         userRepository.save(user);
 
         return userMapper.toRegisterResponse(user);

@@ -1,13 +1,15 @@
 package naumen.project.controller;
 
+import jakarta.validation.constraints.Size;
 import naumen.project.dto.menu.MenuItemResponseDto;
+import naumen.project.dto.paged.PagedResponseDto;
 import naumen.project.service.MenuService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+@Validated
 @RestController
 @RequestMapping("/api/v1/menu")
 public class MenuController {
@@ -20,10 +22,12 @@ public class MenuController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public Page<MenuItemResponseDto> getMenuItems(
+    public PagedResponseDto<MenuItemResponseDto> getMenuItems(
             @RequestParam(required = false) Long restaurantId,
+            @Size(min = 3, max = 30)
             @RequestParam(required = false) String title,
-            @PageableDefault(size = 10) Pageable pageable) {
-        return menuService.getMenuItems(restaurantId, title, pageable);
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return menuService.getMenuItems(restaurantId, title, PageRequest.of(page, size));
     }
 }
