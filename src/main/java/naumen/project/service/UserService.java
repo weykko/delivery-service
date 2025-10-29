@@ -31,31 +31,27 @@ public class UserService {
     }
 
     /**
-     * Получить информацию о пользователе по id
+     * Возвращает информацию о переданном пользователе
      */
-    @Transactional(readOnly = true)
-    public UserResponseDto getInfoById(Long id) {
-        User user = getById(id);
+    public UserResponseDto getInfoForUser(User user) {
         return userMapper.toInfoDto(user);
     }
 
     /**
-     * Обновить информацию о пользователе по id
+     * Обновление информации пользователя
      */
     @Transactional
-    public UserResponseDto updateInfoById(Long id, UpdateUserRequestDto request) {
-        User user = getById(id);
+    public UserResponseDto updateInfo(User user, UpdateUserRequestDto request) {
         User updatedUser = userMapper.updateUser(user, request);
         save(updatedUser);
         return userMapper.toInfoDto(updatedUser);
     }
 
     /**
-     * Удалить пользователя по id
+     * Удалить пользователя
      */
     @Transactional
-    public void deleteById(Long id) {
-        User user = getById(id);
+    public void deleteUser(User user) {
         userRepository.delete(user);
     }
 

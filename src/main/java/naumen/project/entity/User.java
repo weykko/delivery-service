@@ -3,6 +3,8 @@ package naumen.project.entity;
 import jakarta.persistence.*;
 import naumen.project.entity.enums.Role;
 
+import java.util.List;
+
 /**
  * Модель данных в бд пользователя
  */
@@ -28,6 +30,9 @@ public class User {
 
     @Column(name = "password", nullable = false)
     private String password;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<AuthToken> authTokens;
 
     public Long getId() {
         return id;

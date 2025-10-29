@@ -1,15 +1,19 @@
 package naumen.project.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import naumen.project.dto.user.UpdateUserRequestDto;
 import naumen.project.dto.user.UserResponseDto;
+import naumen.project.entity.User;
 import naumen.project.service.UserService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 /**
  * Операции с пользователями
  */
+@SecurityRequirement(name = "JWT")
 @RestController
 @RequestMapping("/api/v1/users")
 public class UserController {
@@ -24,28 +28,30 @@ public class UserController {
     }
 
     /**
-     * Получение информации о пользователе по id
+     * Получение информации о текущем авторизованном пользователе
      */
-    @GetMapping("/{id}")
-    public UserResponseDto getUser(@PathVariable Long id) {
-        return userService.getInfoById(id);
+    @GetMapping("/me")
+    public UserResponseDto getMyUser(@AuthenticationPrincipal User user) {
+        return userService.getInfoForUser(user);
     }
 
     /**
-     * Обновление пользователя по id
+     * Обновление текущего авторизованного пользователя
      */
-    @PutMapping("/{id}")
-    public UserResponseDto updateUser(@PathVariable Long id,
-                                      @RequestBody @Valid UpdateUserRequestDto request) {
-        return userService.updateInfoById(id, request);
+    @PutMapping("/me")
+    public UserResponseDto updateUser(
+            @AuthenticationPrincipal User user,
+            @RequestBody @Valid UpdateUserRequestDto request
+    ) {
+        return userService.updateInfo(user, request);
     }
 
     /**
-     * Удаление пользователя по id
+     * Удаление текущего авторизованного пользователя
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/me")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteUser(@PathVariable Long id) {
-        userService.deleteById(id);
+    public void deleteUser(@AuthenticationPrincipal User user) {
+        userService.deleteUser(user);
     }
 }
