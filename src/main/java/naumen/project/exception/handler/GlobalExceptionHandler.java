@@ -82,7 +82,7 @@ public class GlobalExceptionHandler {
     @Hidden
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler
-    public ErrorResponseDto handleMethodArgumentNotValidException(ConstraintViolationException ex, HttpServletRequest request) {
+    public ErrorResponseDto handleConstraintViolationException(ConstraintViolationException ex, HttpServletRequest request) {
         return new ErrorResponseDto(
                 Instant.now(),
                 HttpStatus.BAD_REQUEST.value(),

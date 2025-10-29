@@ -1,5 +1,6 @@
 package naumen.project.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import naumen.project.dto.menu.MenuItemRequestDto;
 import naumen.project.dto.menu.MenuItemResponseDto;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+@SecurityRequirement(name = "JWT")
 @RestController
 @RequestMapping("/api/v1/restaurant")
 public class RestaurantController {

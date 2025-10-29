@@ -1,5 +1,6 @@
 package naumen.project.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import naumen.project.dto.user.UpdateUserRequestDto;
 import naumen.project.dto.user.UserResponseDto;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * Операции с пользователями
  */
+@SecurityRequirement(name = "JWT")
 @RestController
 @RequestMapping("/api/v1/users")
 public class UserController {
