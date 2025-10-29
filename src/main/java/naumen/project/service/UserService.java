@@ -56,16 +56,6 @@ public class UserService {
     }
 
     /**
-     * Получить пользователя из бд
-     */
-    private User getById(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() ->
-                        new WebException(HttpStatus.NOT_FOUND, "Пользователь с id '%d' не найден", id)
-                );
-    }
-
-    /**
      * Сохранить пользователя
      */
     private void save(User user) {
