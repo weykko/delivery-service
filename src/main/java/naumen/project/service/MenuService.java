@@ -78,7 +78,7 @@ public class MenuService {
     }
 
     private void assertBelongsToRestaurant(MenuItem menuItem, User user) {
-        if (menuItem.getRestaurant().equals(user)) {
+        if (!menuItem.getRestaurant().getId().equals(user.getId())) {
             throw new WebException(
                     HttpStatus.FORBIDDEN,
                     "Позиция меню с id '%d' не принадлежит вашему ресторану",
