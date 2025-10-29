@@ -11,7 +11,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Логика по работе с пользователями
+ * Сервис для операций с пользователями.
+ * Предоставляет методы для получения, обновления и удаления пользователей.
+ *
+ * @see UserRepository
+ * @see UserMapper
  */
 @Service
 public class UserService {
@@ -31,7 +35,10 @@ public class UserService {
     }
 
     /**
-     * Получить информацию о пользователе по id
+     * Получает информацию о переданном пользователе.
+     *
+     * @param user пользователь
+     * @return данные пользователя
      */
     @Transactional(readOnly = true)
     public UserResponseDto getInfoById(Long id) {
@@ -40,7 +47,11 @@ public class UserService {
     }
 
     /**
-     * Обновить информацию о пользователе по id
+     * Обновляет информацию о пользователе.
+     *
+     * @param user пользователь
+     * @param request новые данные пользователя
+     * @return обновленные данные пользователя
      */
     @Transactional
     public UserResponseDto updateInfoById(Long id, UpdateUserRequestDto request) {
@@ -51,7 +62,9 @@ public class UserService {
     }
 
     /**
-     * Удалить пользователя по id
+     * Удаляет переданного пользователя.
+     *
+     * @param user пользователь
      */
     @Transactional
     public void deleteById(Long id) {
@@ -60,7 +73,10 @@ public class UserService {
     }
 
     /**
-     * Получить пользователя из бд
+     * Находит пользователя в базе данных по идентификатору.
+     *
+     * @param id идентификатор пользователя
+     * @return найденный пользователь
      */
     private User getById(Long id) {
         return userRepository.findById(id)
@@ -70,7 +86,9 @@ public class UserService {
     }
 
     /**
-     * Сохранить пользователя
+     * Сохраняет пользователя в базе данных.
+     *
+     * @param user сохраняемый пользователь
      */
     private void save(User user) {
         userRepository.save(user);

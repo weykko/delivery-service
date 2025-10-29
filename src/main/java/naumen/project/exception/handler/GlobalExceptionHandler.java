@@ -25,7 +25,8 @@ import java.time.Instant;
 import java.util.Objects;
 
 /**
- * Глобальный обработчик ошибок
+ * Глобальный обработчик исключений для REST API.
+ * Перехватывает и обрабатывает исключения на уровне всего приложения, возвращая структурированные ответы.
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -33,7 +34,7 @@ public class GlobalExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     /**
-     * Общий обработчик ошибок
+     * Обрабатывает все непредвиденные исключения.
      */
     @Hidden
     @ExceptionHandler
@@ -50,7 +51,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Обработка {@link WebException}
+     * Обрабатывает кастомные исключения приложения {@link WebException}
      */
     @ExceptionHandler
     public ResponseEntity<ErrorResponseDto> handleWebException(WebException ex, HttpServletRequest request) {
@@ -65,7 +66,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Обработка ошибок валидации
+     * Обрабатывает ошибки валидации данных запроса.
      */
     @Hidden
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -83,7 +84,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Обработка ошибок валидации
+     * Обрабатывает нарушения ограничений валидации.
      */
     @Hidden
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -101,7 +102,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Обработка ошибок валидации
+     * Обрабатывает ошибки валидации параметров методов.
      */
     @Hidden
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -121,6 +122,9 @@ public class GlobalExceptionHandler {
         );
     }
 
+    /**
+     * Обрабатывает ошибки аутентификации.
+     */
     @Hidden
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler
@@ -134,6 +138,9 @@ public class GlobalExceptionHandler {
         );
     }
 
+    /**
+     * Обрабатывает неподдерживаемые HTTP методы.
+     */
     @Hidden
     @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
@@ -147,6 +154,9 @@ public class GlobalExceptionHandler {
         );
     }
 
+    /**
+     * Обрабатывает ошибки чтения JSON запроса.
+     */
     @Hidden
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler
@@ -160,6 +170,9 @@ public class GlobalExceptionHandler {
         );
     }
 
+    /**
+     * Обрабатывает несоответствие типов аргументов для параметров.
+     */
     @Hidden
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler
@@ -174,6 +187,9 @@ public class GlobalExceptionHandler {
         );
     }
 
+    /**
+     * Обрабатывает запросы к несуществующим ресурсам.
+     */
     @Hidden
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler

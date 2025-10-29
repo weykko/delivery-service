@@ -4,6 +4,9 @@ import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
 
+/**
+ * Запрос позиции меню
+ */
 public record MenuItemRequestDto(
         @NotBlank
         @Size(min = 3, max = 30)

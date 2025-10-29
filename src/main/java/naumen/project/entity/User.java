@@ -4,7 +4,10 @@ import jakarta.persistence.*;
 import naumen.project.entity.enums.Role;
 
 /**
- * Модель данных в бд пользователя
+ * Сущность пользователя системы.
+ * Представляет общую сущность для клиентов, ресторанов и курьеров.
+ *
+ * @see Role
  */
 @Entity
 @Table(name = "\"user\"")

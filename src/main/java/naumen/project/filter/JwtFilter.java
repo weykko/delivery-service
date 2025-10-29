@@ -16,7 +16,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 /**
- * Фильтр, отвечающий за авторизацию запроса
+ * Фильтр аутентификации JWT, обрабатывающий заголовок Authorization в HTTP запросах.
+ * Извлекает и валидирует JWT токен, устанавливает аутентификацию в контекст безопасности.
+ *
+ * @see JwtUtil
+ * @see AuthTokenService
+ * @see JwtAuthenticationService
  */
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -38,6 +43,13 @@ public class JwtFilter extends OncePerRequestFilter {
         this.jwtAuthenticationService = jwtAuthenticationService;
     }
 
+    /**
+     * Обрабатывает каждый HTTP запрос для JWT аутентификации.
+     *
+     * @param request HTTP запрос
+     * @param response HTTP ответ
+     * @param filterChain цепочка фильтров
+     */
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
@@ -55,6 +67,12 @@ public class JwtFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    /**
+     * Извлекает JWT токен из заголовка Authorization.
+     *
+     * @param request HTTP запрос
+     * @return JWT токен или null если токен не найден
+     */
     private String resolveToken(HttpServletRequest request) {
         String token = request.getHeader(HEADER_NAME);
         if (token == null || !token.startsWith(BEARER_PREFIX)) {
@@ -64,6 +82,12 @@ public class JwtFilter extends OncePerRequestFilter {
         return token.substring(BEARER_PREFIX.length());
     }
 
+    /**
+     * Проверяет валидность JWT токена.
+     *
+     * @param token JWT токен для проверки
+     * @return true если токен валиден и разрешен к использованию
+     */
     private boolean isTokenValid(String token) {
         return token != null
                && jwtUtil.validateAccessToken(token)

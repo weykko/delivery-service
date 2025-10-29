@@ -18,7 +18,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Сервис, отвечающий за аутентификацию и регистрацию
+ * Сервис для обработки операций аутентификации и регистрации пользователей.
+ * Отвечает за регистрацию новых пользователей и их вход в систему.
+ *
+ * @see UserRepository
+ * @see AuthTokenService
  */
 @Service
 public class AuthService {
@@ -43,6 +47,12 @@ public class AuthService {
         this.authTokenService = authTokenService;
     }
 
+    /**
+     * Регистрирует нового пользователя в системе.
+     *
+     * @param request данные для регистрации
+     * @return информация о зарегистрированном пользователе
+     */
     @Transactional
     public RegisterResponseDto register(RegisterRequestDto request) {
         checkUniqueFields(request);
@@ -55,6 +65,12 @@ public class AuthService {
         return userMapper.toRegisterResponse(user);
     }
 
+    /**
+     * Выполняет аутентификацию пользователя и генерирует токены.
+     *
+     * @param request учетные данные пользователя
+     * @return сгенерированные access и refresh токены
+     */
     @Transactional
     public TokenResponseDto login(LoginRequestDto request) {
         Authentication authentication = authenticationManager.authenticate(
@@ -65,6 +81,11 @@ public class AuthService {
         return authTokenService.generateAndSave(userDetails.getUser());
     }
 
+    /**
+     * Выполняет проверку на уникальность полей запроса.
+     *
+     * @param request запрос
+     */
     private void checkUniqueFields(RegisterRequestDto request) {
         if (userRepository.existsByEmail(request.email())) {
             throw new WebException(HttpStatus.BAD_REQUEST, "Email уже занят");

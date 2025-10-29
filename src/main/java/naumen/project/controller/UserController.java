@@ -9,7 +9,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * Операции с пользователями
+ * Контроллер для операций с пользователями.
+ * Предоставляет endpoints для получения, обновления и удаления данных текущего пользователя.
+ * Требует аутентификации с JWT токеном.
+ *
+ * @see UserService
  */
 @SecurityRequirement(name = "JWT")
 @RestController
@@ -26,7 +30,10 @@ public class UserController {
     }
 
     /**
-     * Получение информации о пользователе по id
+     * Получает информацию о текущем аутентифицированном пользователе.
+     *
+     * @param user аутентифицированный пользователь
+     * @return данные пользователя
      */
     @GetMapping("/{id}")
     public UserResponseDto getUser(@PathVariable Long id) {
@@ -34,7 +41,11 @@ public class UserController {
     }
 
     /**
-     * Обновление пользователя по id
+     * Обновляет информацию текущего пользователя.
+     *
+     * @param user аутентифицированный пользователь
+     * @param request новые данные пользователя
+     * @return обновленные данные пользователя
      */
     @PutMapping("/{id}")
     public UserResponseDto updateUser(@PathVariable Long id,
@@ -43,7 +54,9 @@ public class UserController {
     }
 
     /**
-     * Удаление пользователя по id
+     * Удаляет текущего пользователя из системы.
+     *
+     * @param user аутентифицированный пользователь
      */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

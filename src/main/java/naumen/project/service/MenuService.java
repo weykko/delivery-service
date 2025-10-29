@@ -15,6 +15,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Сервис для управления меню ресторанов.
+ * Обеспечивает операции создания, чтения, обновления и удаления позиций меню.
+ *
+ * @see MenuRepository
+ * @see MenuMapper
+ * @see PageMapper
+ */
 @Service
 public class MenuService {
 
@@ -28,6 +36,14 @@ public class MenuService {
         this.pageMapper = pageMapper;
     }
 
+    /**
+     * Получает позиции меню с пагинацией и с возможностью фильтрации по ресторану и названию.
+     *
+     * @param restaurantId идентификатор ресторана для фильтрации
+     * @param title текст для поиска в названиях позиций меню
+     * @param pageable параметры пагинации
+     * @return страница позиций меню
+     */
     @Transactional(readOnly = true)
     public PagedResponseDto<MenuItemResponseDto> getMenuItems(Long restaurantId, String title, Pageable pageable) {
         Page<MenuItemResponseDto> menuPages = menuRepository
@@ -37,6 +53,13 @@ public class MenuService {
         return pageMapper.toResponse(menuPages);
     }
 
+    /**
+     * Создает новую позицию в меню для указанного пользователя-ресторана.
+     *
+     * @param request данные для создания позиции меню
+     * @param user пользователь-ресторан, для которого создается позиция
+     * @return созданная позиция меню
+     */
     @Transactional
     public MenuItemResponseDto createMenuItem(MenuItemRequestDto request, User user) {
         MenuItem menuItem = menuMapper.toEntity(request);
@@ -47,6 +70,14 @@ public class MenuService {
         return menuMapper.toResponse(menuItem);
     }
 
+    /**
+     * Обновляет существующую позицию меню.
+     *
+     * @param id идентификатор обновляемой позиции
+     * @param request новые данные для позиции меню
+     * @param user пользователь, выполняющий обновление
+     * @return обновленная позиция меню
+     */
     @Transactional
     public MenuItemResponseDto updateMenuItem(Long id, MenuItemRequestDto request, User user) {
         MenuItem menuItem = getMenuItemById(id);
@@ -59,6 +90,12 @@ public class MenuService {
         return menuMapper.toResponse(menuItem);
     }
 
+    /**
+     * Удаляет позицию меню.
+     *
+     * @param id идентификатор удаляемой позиции
+     * @param user пользователь, выполняющий удаление
+     */
     @Transactional
     public void deleteMenuItem(Long id, User user) {
         MenuItem menuItem = getMenuItemById(id);
@@ -68,6 +105,12 @@ public class MenuService {
         menuRepository.delete(menuItem);
     }
 
+    /**
+     * Находит позицию меню по идентификатору.
+     *
+     * @param id идентификатор позиции меню
+     * @return найденная позиция меню
+     */
     private MenuItem getMenuItemById(Long id) {
         return menuRepository
                 .findById(id)
@@ -77,6 +120,12 @@ public class MenuService {
                         id));
     }
 
+    /**
+     * Проверяет, принадлежит ли позиция меню указанному пользователю-ресторану.
+     *
+     * @param menuItem проверяемая позиция меню
+     * @param user пользователь для проверки принадлежности
+     */
     private void assertBelongsToRestaurant(MenuItem menuItem, User user) {
         if (!menuItem.getRestaurant().getId().equals(user.getId())) {
             throw new WebException(

@@ -10,61 +10,43 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 /**
- * Маппер для пользователей
+ * Маппер для преобразования между сущностью User и DTO.
+ * Обеспечивает маппинг данных пользователя для регистрации, обновления и отображения.
  */
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
+    /**
+     * Преобразует сущность User в DTO ответа.
+     *
+     * @param user сущность пользователя
+     * @return DTO с данными пользователя
+     */
     UserResponseDto toResponse(User user);
 
+    /**
+     * Обновляет сущность User данными из DTO запроса.
+     *
+     * @param request DTO с обновленными данными пользователя
+     * @param user сущность для обновления
+     * @return обновленная сущность пользователя
+     */
     User updateUserEntityFromRequest(UpdateUserRequestDto request, @MappingTarget User user);
 
+    /**
+     * Преобразует DTO регистрации в сущность User.
+     *
+     * @param request DTO с данными для регистрации
+     * @return сущность пользователя
+     */
     @Mapping(target = "password", ignore = true)
     User toEntity(RegisterRequestDto request);
 
+    /**
+     * Преобразует сущность User в DTO ответа регистрации.
+     *
+     * @param user сущность пользователя
+     * @return DTO с данными зарегистрированного пользователя
+     */
     RegisterResponseDto toRegisterResponse(User user);
 }
-
-//public class UserMapper {
-//
-//    /**
-//     * Замапить в dto с информацией пользователя
-//     */
-//    public UserResponseDto toInfoDto(User user) {
-//        return new UserResponseDto(
-//                user.getId(),
-//                user.getEmail(),
-//                user.getName(),
-//                user.getPhone(),
-//                user.getRole().name()
-//        );
-//    }
-//
-//    /**
-//     * Обновить поля пользователя
-//     */
-//    public User updateUser(User user, UpdateUserRequestDto dto) {
-//        user.setName(dto.name());
-//        user.setPhone(dto.phone());
-//        return user;
-//    }
-//
-//    public User toUser(RegisterRequestDto dto, String password) {
-//        User user = new User();
-//        user.setEmail(dto.email());
-//        user.setName(dto.name());
-//        user.setPhone(dto.phone());
-//        user.setRole(dto.role());
-//        user.setPassword(password);
-//        return user;
-//    }
-//
-//    public RegisterResponseDto toRegisterResponse(User user) {
-//        return new RegisterResponseDto(
-//                user.getId(),
-//                user.getEmail(),
-//                user.getName(),
-//                user.getRole()
-//        );
-//    }
-//}

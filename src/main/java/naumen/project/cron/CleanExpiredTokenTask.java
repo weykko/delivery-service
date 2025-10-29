@@ -9,7 +9,10 @@ import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Cron по очистке истекших токенов из бд
+ * Планировщик задач для очистки истекших токенов из базы данных.
+ * Выполняет периодическое удаление просроченных JWT токенов для поддержания чистоты данных.
+ *
+ * @see AuthTokenRepository
  */
 @Component
 public class CleanExpiredTokenTask {
@@ -17,14 +20,15 @@ public class CleanExpiredTokenTask {
     private final AuthTokenRepository authTokenRepository;
 
     /**
-     * Инициализация крона
+     * Инициализация планировщика очистки токенов.
      */
     public CleanExpiredTokenTask(AuthTokenRepository authTokenRepository) {
         this.authTokenRepository = authTokenRepository;
     }
 
     /**
-     * Метод, вызывающийся раз в 12 часов
+     * Выполняет очистку истекших токенов из базы данных.
+     * Метод запускается автоматически каждые 12 часов.
      */
     @Scheduled(fixedDelay = 12, timeUnit = TimeUnit.HOURS)
     @Transactional

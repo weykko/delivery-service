@@ -10,6 +10,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Контроллер для работы с меню ресторанов.
+ * Предоставляет endpoint для получения списка блюд с фильтрацией и пагинацией.
+ * Требует аутентификации с JWT токеном.
+ *
+ * @see MenuService
+ */
 @SecurityRequirement(name = "JWT")
 @RestController
 @RequestMapping("/api/v1/menu")
@@ -21,6 +28,15 @@ public class MenuController {
         this.menuService = menuService;
     }
 
+    /**
+     * Получает список позиций меню с возможностью фильтрации и пагинации.
+     *
+     * @param restaurantId идентификатор ресторана для фильтрации
+     * @param title текст для поиска по названиям блюд
+     * @param page номер страницы
+     * @param size количество элементов на странице
+     * @return страница с результатами поиска
+     */
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @Validated
