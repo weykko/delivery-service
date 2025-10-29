@@ -24,8 +24,7 @@ public record RegisterRequestDto(
         @Size(max = 255)
         String name,
 
-        @Pattern(regexp = "^\\d+$", message = "должны быть только цифры")
-        @Size(min = 11, max = 11, message = "длина должна равняться 11")
+        @Pattern(regexp = "^(\\+7|8)\\d{10}$", message = "номер должен начинаться с +7 или 8 и содержать только 11 цифер")
         @NotNull
         String phone
 ) {
