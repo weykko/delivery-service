@@ -1,6 +1,7 @@
 package naumen.project.service;
 
-import naumen.project.dto.menu.MenuItemRequestDto;
+import naumen.project.dto.menu.CreateMenuItemRequestDto;
+import naumen.project.dto.menu.UpdateMenuItemRequestDto;
 import naumen.project.dto.menu.MenuItemResponseDto;
 import naumen.project.dto.paged.PagedResponseDto;
 import naumen.project.entity.MenuItem;
@@ -61,7 +62,7 @@ public class MenuService {
      * @return созданная позиция меню
      */
     @Transactional
-    public MenuItemResponseDto createMenuItem(MenuItemRequestDto request, User user) {
+    public MenuItemResponseDto createMenuItem(CreateMenuItemRequestDto request, User user) {
         MenuItem menuItem = menuMapper.toEntity(request);
         menuItem.setRestaurant(user);
 
@@ -79,7 +80,7 @@ public class MenuService {
      * @return обновленная позиция меню
      */
     @Transactional
-    public MenuItemResponseDto updateMenuItem(Long id, MenuItemRequestDto request, User user) {
+    public MenuItemResponseDto updateMenuItem(Long id, UpdateMenuItemRequestDto request, User user) {
         MenuItem menuItem = getMenuItemById(id);
 
         assertBelongsToRestaurant(menuItem, user);

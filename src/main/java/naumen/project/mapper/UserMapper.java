@@ -5,9 +5,7 @@ import naumen.project.dto.auth.RegisterResponseDto;
 import naumen.project.dto.user.UpdateUserRequestDto;
 import naumen.project.dto.user.UserResponseDto;
 import naumen.project.entity.User;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import org.mapstruct.*;
 
 /**
  * Маппер для преобразования между сущностью User и DTO.
@@ -31,6 +29,7 @@ public interface UserMapper {
      * @param user сущность для обновления
      * @return обновленная сущность пользователя
      */
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     User updateUserEntityFromRequest(UpdateUserRequestDto request, @MappingTarget User user);
 
     /**

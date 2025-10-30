@@ -37,6 +37,9 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<AuthToken> authTokens;
 
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<MenuItem> menuItems;
+
     public Long getId() {
         return id;
     }

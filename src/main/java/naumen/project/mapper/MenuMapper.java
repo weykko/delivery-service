@@ -1,11 +1,10 @@
 package naumen.project.mapper;
 
-import naumen.project.dto.menu.MenuItemRequestDto;
+import naumen.project.dto.menu.CreateMenuItemRequestDto;
 import naumen.project.dto.menu.MenuItemResponseDto;
+import naumen.project.dto.menu.UpdateMenuItemRequestDto;
 import naumen.project.entity.MenuItem;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import org.mapstruct.*;
 
 /**
  * Маппер для преобразования между сущностью MenuItem и DTO.
@@ -22,7 +21,7 @@ public interface MenuMapper {
      */
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "restaurant", ignore = true)
-    MenuItem toEntity(MenuItemRequestDto request);
+    MenuItem toEntity(CreateMenuItemRequestDto request);
 
     /**
      * Преобразует сущность MenuItem в DTO ответа.
@@ -42,5 +41,6 @@ public interface MenuMapper {
      */
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "restaurant", ignore = true)
-    void updateEntityFromRequest(MenuItemRequestDto request, @MappingTarget MenuItem menuItem);
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void updateEntityFromRequest(UpdateMenuItemRequestDto request, @MappingTarget MenuItem menuItem);
 }
