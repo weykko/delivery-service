@@ -78,7 +78,7 @@ public class AuthServiceTest {
         when(userRepository.existsByEmail(email)).thenReturn(false);
         when(userRepository.existsByPhone(phone)).thenReturn(false);
         when(passwordEncoder.encode(password)).thenReturn(password);
-        when(userMapper.toUser(request, password)).thenReturn(user);
+        when(userMapper.toEntity(request)).thenReturn(user);
         when(userRepository.save(user)).thenReturn(user);
         when(userMapper.toRegisterResponse(user)).thenReturn(response);
 

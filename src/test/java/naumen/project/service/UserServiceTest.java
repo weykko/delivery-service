@@ -32,15 +32,15 @@ public class UserServiceTest {
                 "test@notexists@ru",
                 "Alexey",
                 "73454562345",
-                Role.ROLE_USER.name()
+                Role.ROLE_USER
         );
 
-        when(userMapper.toInfoDto(user)).thenReturn(dto);
+        when(userMapper.toResponse(user)).thenReturn(dto);
 
         UserResponseDto result = userService.getInfoForUser(user);
 
         assertEquals(dto, result);
-        verify(userMapper).toInfoDto(user);
+        verify(userMapper).toResponse(user);
     }
 
     /**
@@ -57,19 +57,19 @@ public class UserServiceTest {
                 "test@notexists@ru",
                 "NameNew",
                 "PhoneNew",
-                Role.ROLE_USER.name()
+                Role.ROLE_USER
         );
 
-        when(userMapper.updateUser(user, request)).thenReturn(updatedUser);
+        when(userMapper.updateUserEntityFromRequest(request, user)).thenReturn(updatedUser);
         when(userRepository.save(updatedUser)).thenReturn(updatedUser);
-        when(userMapper.toInfoDto(updatedUser)).thenReturn(dto);
+        when(userMapper.toResponse(updatedUser)).thenReturn(dto);
 
         UserResponseDto result = userService.updateInfo(user, request);
 
         assertEquals(dto, result);
-        verify(userMapper).updateUser(user, request);
+        verify(userMapper).updateUserEntityFromRequest(request, user);
         verify(userRepository).save(updatedUser);
-        verify(userMapper).toInfoDto(updatedUser);
+        verify(userMapper).toResponse(updatedUser);
     }
 
     /**
