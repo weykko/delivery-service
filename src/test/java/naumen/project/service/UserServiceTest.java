@@ -49,6 +49,8 @@ public class UserServiceTest {
     @Test
     void testUpdateInfo() {
         User user = new User();
+        user.setPhone("phone");
+        user.setEmail("email");
         UpdateUserRequestDto request = new UpdateUserRequestDto("NameNew", "PhoneNew");
 
         User updatedUser = new User();
