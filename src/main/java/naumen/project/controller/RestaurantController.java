@@ -31,33 +31,31 @@ public class RestaurantController {
     /**
      * Создает новое блюдо в меню ресторана текущего пользователя.
      *
-     * @param menuItemRequestDto DTO с данными для создания блюда
-     *        должен содержать валидные название, описание и цену
+     * @param request данные для создания блюда
      * @param user аутентифицированный пользователь с ролью RESTAURANT
      * @return созданное блюдо с присвоенным идентификатором
      */
     @PostMapping("/menu")
     @ResponseStatus(HttpStatus.CREATED)
-    public MenuItemResponseDto createMenuItem(@RequestBody @Valid MenuItemRequestDto menuItemRequestDto,
+    public MenuItemResponseDto createMenuItem(@RequestBody @Valid MenuItemRequestDto request,
                                               @AuthenticationPrincipal User user) {
-        return menuService.createMenuItem(menuItemRequestDto, user);
+        return menuService.createMenuItem(request, user);
     }
 
     /**
      * Обновляет существующее блюдо в меню ресторана.
      *
      * @param id идентификатор обновляемого блюда
-     * @param menuItemRequestDto DTO с обновленными данными блюда
-     *        должен содержать валидные название, описание и цену
+     * @param request данные для обновления блюда
      * @param user аутентифицированный пользователь с ролью RESTAURANT
      * @return обновленное блюдо
      */
     @PutMapping("/menu/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public MenuItemResponseDto updateMenuItem(@RequestBody @Valid MenuItemRequestDto menuItemRequestDto,
+    public MenuItemResponseDto updateMenuItem(@RequestBody @Valid MenuItemRequestDto request,
                                               @PathVariable Long id,
                                               @AuthenticationPrincipal User user) {
-        return menuService.updateMenuItem(id, menuItemRequestDto, user);
+        return menuService.updateMenuItem(id, request, user);
     }
 
     /**
