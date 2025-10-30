@@ -2,24 +2,31 @@ package naumen.project.exception.handler;
 
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import naumen.project.dto.error.ErrorResponseDto;
 import naumen.project.dto.error.ViolationConstraintDto;
-import naumen.project.exception.MenuItemNotFoundException;
 import naumen.project.exception.WebException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.Instant;
+import java.util.Objects;
 
 /**
- * Глобальный обработчик ошибок
+ * Глобальный обработчик исключений для REST API.
+ * Перехватывает и обрабатывает исключения на уровне всего приложения, возвращая структурированные ответы.
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -27,7 +34,7 @@ public class GlobalExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     /**
-     * Общий обработчик ошибок
+     * Обрабатывает все непредвиденные исключения.
      */
     @Hidden
     @ExceptionHandler
@@ -44,7 +51,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Обработка {@link WebException}
+     * Обрабатывает кастомные исключения приложения {@link WebException}
      */
     @ExceptionHandler
     public ResponseEntity<ErrorResponseDto> handleWebException(WebException ex, HttpServletRequest request) {
@@ -59,7 +66,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Обработка ошибок валидации
+     * Обрабатывает ошибки валидации данных запроса.
      */
     @Hidden
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -76,6 +83,48 @@ public class GlobalExceptionHandler {
         );
     }
 
+    /**
+     * Обрабатывает нарушения ограничений валидации.
+     */
+    @Hidden
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler
+    public ErrorResponseDto handleConstraintViolationException(ConstraintViolationException ex, HttpServletRequest request) {
+        return new ErrorResponseDto(
+                Instant.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Входные данные не соответствуют заданным ограничениям",
+                request.getServletPath(),
+                ex.getConstraintViolations().stream()
+                        .map(e -> new ViolationConstraintDto(e.getPropertyPath().toString(), e.getMessage()))
+                        .toList()
+        );
+    }
+
+    /**
+     * Обрабатывает ошибки валидации параметров методов.
+     */
+    @Hidden
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler
+    public ErrorResponseDto handleConstraintViolationException(HandlerMethodValidationException ex, HttpServletRequest request) {
+        return new ErrorResponseDto(
+                Instant.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Входные данные не соответствуют заданным ограничениям",
+                request.getServletPath(),
+                ex.getParameterValidationResults().stream()
+                        .map(e -> new ViolationConstraintDto(
+                                e.getMethodParameter().getParameterName(),
+                                e.getResolvableErrors().getFirst().getDefaultMessage())
+                        )
+                        .toList()
+        );
+    }
+
+    /**
+     * Обрабатывает ошибки аутентификации.
+     */
     @Hidden
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler
@@ -89,16 +138,66 @@ public class GlobalExceptionHandler {
         );
     }
 
+    /**
+     * Обрабатывает неподдерживаемые HTTP методы.
+     */
+    @Hidden
+    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ErrorResponseDto handleMethodNotSupported(HttpRequestMethodNotSupportedException ex, HttpServletRequest request) {
+        return new ErrorResponseDto(
+                Instant.now(),
+                HttpStatus.METHOD_NOT_ALLOWED.value(),
+                "HTTP метод '%s' не поддерживается на этом эндпоинте".formatted(ex.getMethod()),
+                request.getServletPath(),
+                null
+        );
+    }
 
-    @ExceptionHandler({
-            MenuItemNotFoundException.class
-    })
+    /**
+     * Обрабатывает ошибки чтения JSON запроса.
+     */
+    @Hidden
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler
+    public ErrorResponseDto handleHttpMessageNotReadableException(HttpMessageNotReadableException ex, HttpServletRequest request) {
+        return new ErrorResponseDto(
+                Instant.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Неверный запрос JSON",
+                request.getServletPath(),
+                null
+        );
+    }
+
+    /**
+     * Обрабатывает несоответствие типов аргументов для параметров.
+     */
+    @Hidden
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler
+    public ErrorResponseDto handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
+        return new ErrorResponseDto(
+                Instant.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Неверный тип для параметра '%s': ожидается тип '%s'"
+                        .formatted(ex.getName(), Objects.requireNonNull(ex.getRequiredType()).getSimpleName()),
+                request.getServletPath(),
+                null
+        );
+    }
+
+    /**
+     * Обрабатывает запросы к несуществующим ресурсам.
+     */
+    @Hidden
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponseDto handleNotFoundException(RuntimeException ex, HttpServletRequest request) {
+    @ExceptionHandler
+    public ErrorResponseDto handleNoResourceFoundException(NoResourceFoundException ex, HttpServletRequest request) {
         return new ErrorResponseDto(
                 Instant.now(),
                 HttpStatus.NOT_FOUND.value(),
-                ex.getMessage(),
+                "Запрашиваемый ресурс не найден",
                 request.getServletPath(),
                 null
         );

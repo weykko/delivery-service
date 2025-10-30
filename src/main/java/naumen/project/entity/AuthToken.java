@@ -6,7 +6,11 @@ import naumen.project.entity.enums.TokenType;
 import java.time.Instant;
 
 /**
- * Сущность токен в бд
+ * Сущность JWT токена в базе данных.
+ * Хранит информацию о выданных токенах для управления сессиями.
+ *
+ * @see TokenType
+ * @see User
  */
 @Entity
 @Table(name = "auth_token")

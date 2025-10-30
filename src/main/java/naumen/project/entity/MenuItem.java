@@ -1,9 +1,14 @@
 package naumen.project.entity;
 
 import jakarta.persistence.*;
-
 import java.math.BigDecimal;
 
+/**
+ * Сущность позиции меню ресторана.
+ * Содержит информацию о блюде и ссылку на ресторан-владельца.
+ *
+ * @see User
+ */
 @Entity
 @Table(name = "menu_item")
 public class MenuItem {
@@ -21,8 +26,7 @@ public class MenuItem {
     private BigDecimal price;
 
     @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "restaurant_id", nullable = false)
-    @JoinColumn(name = "restaurant_id")
+    @JoinColumn(name = "restaurant_id", nullable = false)
     private User restaurant;
 
     public void setId(Long id) {

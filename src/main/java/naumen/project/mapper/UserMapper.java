@@ -5,52 +5,48 @@ import naumen.project.dto.auth.RegisterResponseDto;
 import naumen.project.dto.user.UpdateUserRequestDto;
 import naumen.project.dto.user.UserResponseDto;
 import naumen.project.entity.User;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 /**
- * Маппер для пользователей
+ * Маппер для преобразования между сущностью User и DTO.
+ * Обеспечивает маппинг данных пользователя для регистрации, обновления и отображения.
  */
-@Component
-public class UserMapper {
+@Mapper(componentModel = "spring")
+public interface UserMapper {
 
     /**
-     * Замапить в dto с информацией пользователя
+     * Преобразует сущность User в DTO ответа.
+     *
+     * @param user сущность пользователя
+     * @return DTO с данными пользователя
      */
-    public UserResponseDto toInfoDto(User user) {
-        return new UserResponseDto(
-                user.getId(),
-                user.getEmail(),
-                user.getName(),
-                user.getPhone(),
-                user.getRole().name()
-        );
-    }
+    UserResponseDto toResponse(User user);
 
     /**
-     * Обновить поля пользователя
+     * Обновляет сущность User данными из DTO запроса.
+     *
+     * @param request DTO с обновленными данными пользователя
+     * @param user сущность для обновления
+     * @return обновленная сущность пользователя
      */
-    public User updateUser(User user, UpdateUserRequestDto dto) {
-        user.setName(dto.name());
-        user.setPhone(dto.phone());
-        return user;
-    }
+    User updateUserEntityFromRequest(UpdateUserRequestDto request, @MappingTarget User user);
 
-    public User toUser(RegisterRequestDto dto, String password) {
-        User user = new User();
-        user.setEmail(dto.email());
-        user.setName(dto.name());
-        user.setPhone(dto.phone());
-        user.setRole(dto.role());
-        user.setPassword(password);
-        return user;
-    }
+    /**
+     * Преобразует DTO регистрации в сущность User.
+     *
+     * @param request DTO с данными для регистрации
+     * @return сущность пользователя
+     */
+    @Mapping(target = "password", ignore = true)
+    User toEntity(RegisterRequestDto request);
 
-    public RegisterResponseDto toRegisterResponse(User user) {
-        return new RegisterResponseDto(
-                user.getId(),
-                user.getEmail(),
-                user.getName(),
-                user.getRole()
-        );
-    }
+    /**
+     * Преобразует сущность User в DTO ответа регистрации.
+     *
+     * @param user сущность пользователя
+     * @return DTO с данными зарегистрированного пользователя
+     */
+    RegisterResponseDto toRegisterResponse(User user);
 }

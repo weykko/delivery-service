@@ -11,7 +11,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Логика по работе с пользователями
+ * Сервис для операций с пользователями.
+ * Предоставляет методы для получения, обновления и удаления пользователей.
+ *
+ * @see UserRepository
+ * @see UserMapper
  */
 @Service
 public class UserService {
@@ -31,24 +35,33 @@ public class UserService {
     }
 
     /**
-     * Возвращает информацию о переданном пользователе
+     * Получает информацию о переданном пользователе.
+     *
+     * @param user пользователь
+     * @return данные пользователя
      */
     public UserResponseDto getInfoForUser(User user) {
-        return userMapper.toInfoDto(user);
+        return userMapper.toResponse(user);
     }
 
     /**
-     * Обновление информации пользователя
+     * Обновляет информацию о пользователе.
+     *
+     * @param user пользователь
+     * @param request новые данные пользователя
+     * @return обновленные данные пользователя
      */
     @Transactional
     public UserResponseDto updateInfo(User user, UpdateUserRequestDto request) {
-        User updatedUser = userMapper.updateUser(user, request);
+        User updatedUser = userMapper.updateUserEntityFromRequest(request, user);
         save(updatedUser);
-        return userMapper.toInfoDto(updatedUser);
+        return userMapper.toResponse(updatedUser);
     }
 
     /**
-     * Удалить пользователя
+     * Удаляет переданного пользователя.
+     *
+     * @param user пользователь
      */
     @Transactional
     public void deleteUser(User user) {
