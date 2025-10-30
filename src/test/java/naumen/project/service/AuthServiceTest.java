@@ -11,39 +11,44 @@ import naumen.project.exception.WebException;
 import naumen.project.mapper.UserMapper;
 import naumen.project.repository.UserRepository;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Тесты, связанные с регистрацией и аутентификацией пользователя
+ * Модульные тесты для {@link AuthService}
  */
+@ExtendWith(MockitoExtension.class)
 public class AuthServiceTest {
 
-    private final UserRepository userRepository = mock(UserRepository.class);
-    private final UserMapper userMapper = mock(UserMapper.class);
-    private final PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
-    private final AuthenticationManager authenticationManager = mock(AuthenticationManager.class);
-    private final AuthTokenService authTokenService = mock(AuthTokenService.class);
+    @Mock
+    private UserRepository userRepository;
 
-    private final AuthService authService = new AuthService(
-            userRepository,
-            userMapper,
-            passwordEncoder,
-            authenticationManager,
-            authTokenService
-    );
+    @Mock
+    private UserMapper userMapper;
 
-    /**
-     * Тестируем, что регистрация работает корректно
-     */
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private AuthenticationManager authenticationManager;
+
+    @Mock
+    private AuthTokenService authTokenService;
+
+    @InjectMocks
+    private AuthService authService;
+
     @Test
-    public void testCorrectRegister() {
+    public void register_WithValidData_ShouldReturnSuccessResponse() {
         String email = "test@notexists@ru";
         String password = "strongPassword";
         Role role = Role.ROLE_USER;
@@ -89,11 +94,8 @@ public class AuthServiceTest {
         assertEquals(request.name(), result.name());
     }
 
-    /**
-     * Проверяем, что выбрасывается нужное исключение при дублировании email
-     */
     @Test
-    public void testEmailAlreadyExistsRegister() {
+    public void register_WithExistingEmail_ShouldThrowWebException() {
         String email = "test@notexists@ru";
         String phone = "73454562345";
 
@@ -106,16 +108,12 @@ public class AuthServiceTest {
         );
 
         when(userRepository.existsByEmail(email)).thenReturn(true);
-        when(userRepository.existsByPhone(phone)).thenReturn(false);
 
         assertThrows(WebException.class, () -> authService.register(request));
     }
 
-    /**
-     * Проверяем, что выбрасывается нужное исключение при дублировании phone
-     */
     @Test
-    public void testPhoneAlreadyExistsRegister() {
+    public void register_WithExistingPhone_ShouldThrowWebException() {
         String email = "test@notexists@ru";
         String phone = "73454562345";
 
@@ -133,11 +131,8 @@ public class AuthServiceTest {
         assertThrows(WebException.class, () -> authService.register(request));
     }
 
-    /**
-     * Тестируем корректный вход
-     */
     @Test
-    public void testLoginCorrect() {
+    public void login_WithValidCredentials_ShouldReturnTokens() {
         String email = "test@notexists@ru";
         String password = "strongPassword";
 
@@ -171,12 +166,8 @@ public class AuthServiceTest {
         );
     }
 
-
-    /**
-     * Тестируем неверные данные для логина
-     */
     @Test
-    public void testLoginWrong() {
+    public void login_WithInvalidCredentials_ShouldThrowBadCredentialsException() {
         String email = "test@notexists@ru";
         String password = "strongPassword";
 
@@ -188,5 +179,4 @@ public class AuthServiceTest {
 
         assertThrows(BadCredentialsException.class, () -> authService.login(request));
     }
-
 }
