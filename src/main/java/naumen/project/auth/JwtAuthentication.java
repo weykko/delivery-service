@@ -7,9 +7,6 @@ import org.springframework.security.core.GrantedAuthority;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * Объект для аутентификации, далее вызывается на проверке ролей, например. Лежит в security context
- */
 public class JwtAuthentication implements Authentication {
 
     private User user;
