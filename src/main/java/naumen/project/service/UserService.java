@@ -41,7 +41,7 @@ public class UserService {
      * @return данные пользователя
      */
     public UserResponseDto getInfoForUser(User user) {
-        return userMapper.toInfoDto(user);
+        return userMapper.toResponse(user);
     }
 
     /**
@@ -53,7 +53,7 @@ public class UserService {
      */
     @Transactional
     public UserResponseDto updateInfo(User user, UpdateUserRequestDto request) {
-        User updatedUser = userMapper.updateUser(user, request);
+        User updatedUser = userMapper.updateUserEntityFromRequest(request, user);
         save(updatedUser);
         return userMapper.toResponse(updatedUser);
     }
