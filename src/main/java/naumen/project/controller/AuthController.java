@@ -11,7 +11,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * Контроллер с операции аутентификации, работы с токенами
+ * Контроллер для операций аутентификации и управления токенами.
+ * Обеспечивает регистрацию, вход, обновление токенов и выход из системы.
+ *
+ * @see AuthService
+ * @see AuthTokenService
  */
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -32,7 +36,10 @@ public class AuthController {
     }
 
     /**
-     * Регистрация пользователя
+     * Регистрирует нового пользователя в системе.
+     *
+     * @param request данные для регистрации пользователя
+     * @return информация о зарегистрированном пользователе
      */
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
@@ -41,7 +48,10 @@ public class AuthController {
     }
 
     /**
-     * Аутентификация пользователя
+     * Выполняет аутентификацию пользователя.
+     *
+     * @param request учетные данные пользователя
+     * @return пара access и refresh токенов
      */
     @PostMapping("/login")
     public TokenResponseDto login(@RequestBody @Valid LoginRequestDto request) {
@@ -49,7 +59,10 @@ public class AuthController {
     }
 
     /**
-     * Обновление jwt токенов
+     * Обновляет JWT токены по валидному refresh токену.
+     *
+     * @param request запрос с refresh токеном
+     * @return новая пара access и refresh токенов
      */
     @PostMapping("/refresh")
     public TokenResponseDto refresh(@RequestBody @Valid RefreshRequestDto request) {
@@ -57,7 +70,9 @@ public class AuthController {
     }
 
     /**
-     * Отзыв всех токенов
+     * Выполняет выход пользователя из системы и отзывает все токены.
+     *
+     * @param user аутентифицированный пользователь
      */
     @SecurityRequirement(name = "JWT")
     @PostMapping("/logout")

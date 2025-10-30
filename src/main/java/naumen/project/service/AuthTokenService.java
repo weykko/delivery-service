@@ -16,7 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 
 /**
- * Сервис с операциями с токенами в бд
+ * Сервис для управления JWT токенами в базе данных.
+ * Отвечает за генерацию, валидацию и отзыв токенов.
+ *
+ * @see AuthTokenRepository
+ * @see JwtUtil
  */
 @Service
 public class AuthTokenService {
@@ -35,11 +39,24 @@ public class AuthTokenService {
         this.authProps = authProps;
     }
 
+    /**
+     * Проверяет, разрешен ли токен к использованию.
+     *
+     * @param token проверяемый токен
+     * @param type тип токена
+     * @return true если токен активен и разрешен
+     */
     @Transactional(readOnly = true)
     public boolean isTokenAllowed(String token, TokenType type) {
         return authTokenRepository.existsByTokenAndType(token, type);
     }
 
+    /**
+     * Генерирует и сохраняет новую пару токенов для пользователя.
+     *
+     * @param user пользователь для которого генерируются токены
+     * @return сгенерированные токены
+     */
     @Transactional
     public TokenResponseDto generateAndSave(User user) {
         AuthToken accessToken = generateAccessToken(user);
@@ -50,6 +67,12 @@ public class AuthTokenService {
         );
     }
 
+    /**
+     * Обновляет пару токенов по валидному refresh токену.
+     *
+     * @param request запрос с refresh токеном
+     * @return новая пара токенов
+     */
     @Transactional
     public TokenResponseDto refresh(RefreshRequestDto request) {
         if (!jwtUtil.validateRefreshToken(request.refreshToken()) ||
@@ -61,11 +84,22 @@ public class AuthTokenService {
         return generateAndSave(currentRefreshToken.getUser());
     }
 
+    /**
+     * Выполняет выход пользователя, удаляя все его токены.
+     *
+     * @param user пользователь выполняющий выход
+     */
     @Transactional
     public void logout(User user) {
         authTokenRepository.removeAllByUser(user);
     }
 
+    /**
+     * Генерирует access токен.
+     *
+     * @param user пользователь
+     * @return access токен
+     */
     private AuthToken generateAccessToken(User user) {
         String accessToken = jwtUtil.generateAccessToken(user);
         AuthToken accessAuthToken = new AuthToken();
@@ -79,6 +113,12 @@ public class AuthTokenService {
         return accessAuthToken;
     }
 
+    /**
+     * Генерирует refresh токен.
+     *
+     * @param user пользователь
+     * @return refresh токен
+     */
     private AuthToken generateRefreshToken(User user) {
         String refreshToken = jwtUtil.generateRefreshToken(user);
         AuthToken refreshAuthToken = new AuthToken();
@@ -92,6 +132,13 @@ public class AuthTokenService {
         return refreshAuthToken;
     }
 
+    /**
+     * Получает токен определенного типа из базы данных.
+     *
+     * @param token токен
+     * @param type тип токена
+     * @return токен из базы данных
+     */
     private AuthToken getToken(String token, TokenType type) {
         return authTokenRepository.findByTokenAndType(token, type)
                 .orElseThrow(() -> new WebException(HttpStatus.NOT_FOUND, "Токен не найден"));

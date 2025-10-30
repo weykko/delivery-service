@@ -13,7 +13,11 @@ import java.util.Date;
 import java.util.Map;
 
 /**
- * Утильные методы по работе с токенами
+ * Утилитарный класс для работы с JWT токенами.
+ * Обеспечивает генерацию, валидацию и извлечение данных из access и refresh токенов.
+ *
+ * @see AuthProps
+ * @see User
  */
 @Component
 public class JwtUtil {
@@ -24,6 +28,12 @@ public class JwtUtil {
         this.authProps = authProps;
     }
 
+    /**
+     * Генерирует access токен для пользователя.
+     *
+     * @param user пользователь для которого генерируется токен
+     * @return сгенерированный access токен
+     */
     public String generateAccessToken(User user) {
         return createToken(
                 null,
@@ -33,6 +43,12 @@ public class JwtUtil {
         );
     }
 
+    /**
+     * Генерирует refresh токен для пользователя.
+     *
+     * @param user пользователь для которого генерируется токен
+     * @return сгенерированный refresh токен
+     */
     public String generateRefreshToken(User user) {
         return createToken(
                 null,
@@ -42,22 +58,52 @@ public class JwtUtil {
         );
     }
 
+    /**
+     * Проверяет валидность access токена.
+     *
+     * @param token проверяемый токен
+     * @return true если токен валиден
+     */
     public boolean validateAccessToken(String token) {
         return validateToken(token, getSignKey(authProps.getAccess().getToken()));
     }
 
+    /**
+     * Проверяет валидность refresh токена.
+     *
+     * @param token проверяемый токен
+     * @return true если токен валиден
+     */
     public boolean validateRefreshToken(String token) {
         return validateToken(token, getSignKey(authProps.getRefresh().getToken()));
     }
 
+    /**
+     * Извлекает claims из access токена.
+     *
+     * @param token access токен
+     * @return claims токена
+     */
     public Claims getAccessClaims(String token) {
         return getClaims(token, getSignKey(authProps.getAccess().getToken()));
     }
 
+    /**
+     * Извлекает claims из refresh токена.
+     *
+     * @param token refresh токен
+     * @return claims токена
+     */
     public Claims getRefreshClaims(String token) {
         return getClaims(token, getSignKey(authProps.getRefresh().getToken()));
     }
 
+    /**
+     * Извлекает идентификатор пользователя из access токена.
+     *
+     * @param token access токен
+     * @return идентификатор пользователя
+     */
     public Long extractAccessUserId(String token) {
         return Long.parseLong(getAccessClaims(token).getSubject());
     }

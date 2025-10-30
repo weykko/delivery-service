@@ -1,12 +1,23 @@
 package naumen.project.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import naumen.project.dto.menu.MenuItemRequestDto;
 import naumen.project.dto.menu.MenuItemResponseDto;
+import naumen.project.entity.User;
 import naumen.project.service.MenuService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Контроллер для управления меню ресторана.
+ * Предоставляет endpoints для создания, обновления и удаления блюд в меню.
+ * Требует аутентификации с JWT токеном и права доступа RESTAURANT.
+ *
+ * @see MenuService
+ */
+@SecurityRequirement(name = "JWT")
 @RestController
 @RequestMapping("/api/v1/restaurant")
 public class RestaurantController {
@@ -17,23 +28,46 @@ public class RestaurantController {
         this.menuService = menuService;
     }
 
-    //TODO: Блюдо должно создаваться для авторизованого ресторана, переделать после добавления авторизации
+    /**
+     * Создает новое блюдо в меню ресторана текущего пользователя.
+     *
+     * @param request данные для создания блюда
+     * @param user аутентифицированный пользователь с ролью RESTAURANT
+     * @return созданное блюдо с присвоенным идентификатором
+     */
     @PostMapping("/menu")
     @ResponseStatus(HttpStatus.CREATED)
-    public MenuItemResponseDto createMenuItem(@RequestBody @Valid MenuItemRequestDto menuItemRequestDto) {
-        return menuService.createMenuItem(menuItemRequestDto);
+    public MenuItemResponseDto createMenuItem(@RequestBody @Valid MenuItemRequestDto request,
+                                              @AuthenticationPrincipal User user) {
+        return menuService.createMenuItem(request, user);
     }
 
+    /**
+     * Обновляет существующее блюдо в меню ресторана.
+     *
+     * @param id идентификатор обновляемого блюда
+     * @param request данные для обновления блюда
+     * @param user аутентифицированный пользователь с ролью RESTAURANT
+     * @return обновленное блюдо
+     */
     @PutMapping("/menu/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public MenuItemResponseDto updateMenuItem(@RequestBody @Valid MenuItemRequestDto menuItemRequestDto,
-                                              @PathVariable Long id) {
-        return menuService.updateMenuItem(id,  menuItemRequestDto);
+    public MenuItemResponseDto updateMenuItem(@RequestBody @Valid MenuItemRequestDto request,
+                                              @PathVariable Long id,
+                                              @AuthenticationPrincipal User user) {
+        return menuService.updateMenuItem(id, request, user);
     }
 
+    /**
+     * Удаляет блюдо из меню ресторана.
+     *
+     * @param id идентификатор удаляемого блюда
+     * @param user аутентифицированный пользователь с ролью RESTAURANT
+     */
     @DeleteMapping("/menu/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteMenuItem(@PathVariable Long id) {
-        menuService.deleteMenuItem(id);
+    public void deleteMenuItem(@PathVariable Long id,
+                               @AuthenticationPrincipal User user) {
+        menuService.deleteMenuItem(id, user);
     }
 }

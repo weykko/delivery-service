@@ -11,7 +11,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * Операции с пользователями
+ * Контроллер для операций с пользователями.
+ * Предоставляет endpoints для получения, обновления и удаления данных текущего пользователя.
+ * Требует аутентификации с JWT токеном.
+ *
+ * @see UserService
  */
 @SecurityRequirement(name = "JWT")
 @RestController
@@ -28,7 +32,10 @@ public class UserController {
     }
 
     /**
-     * Получение информации о текущем авторизованном пользователе
+     * Получает информацию о текущем аутентифицированном пользователе.
+     *
+     * @param user аутентифицированный пользователь
+     * @return данные пользователя
      */
     @GetMapping("/me")
     public UserResponseDto getMyUser(@AuthenticationPrincipal User user) {
@@ -36,7 +43,11 @@ public class UserController {
     }
 
     /**
-     * Обновление текущего авторизованного пользователя
+     * Обновляет информацию текущего пользователя.
+     *
+     * @param user аутентифицированный пользователь
+     * @param request новые данные пользователя
+     * @return обновленные данные пользователя
      */
     @PutMapping("/me")
     public UserResponseDto updateUser(
@@ -47,7 +58,9 @@ public class UserController {
     }
 
     /**
-     * Удаление текущего авторизованного пользователя
+     * Удаляет текущего пользователя из системы.
+     *
+     * @param user аутентифицированный пользователь
      */
     @DeleteMapping("/me")
     @ResponseStatus(HttpStatus.NO_CONTENT)

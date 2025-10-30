@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
  * Ошибка для прокидывания наружу для клиента
  */
 public class WebException extends RuntimeException {
-    private HttpStatus status;
+    private final HttpStatus status;
 
     /**
      * Инициализация с текстом ошибки
