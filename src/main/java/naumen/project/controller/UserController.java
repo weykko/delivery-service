@@ -4,8 +4,10 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import naumen.project.dto.user.UpdateUserRequestDto;
 import naumen.project.dto.user.UserResponseDto;
+import naumen.project.entity.User;
 import naumen.project.service.UserService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -35,9 +37,9 @@ public class UserController {
      * @param user аутентифицированный пользователь
      * @return данные пользователя
      */
-    @GetMapping("/{id}")
-    public UserResponseDto getUser(@PathVariable Long id) {
-        return userService.getInfoById(id);
+    @GetMapping("/me")
+    public UserResponseDto getMyUser(@AuthenticationPrincipal User user) {
+        return userService.getInfoForUser(user);
     }
 
     /**
@@ -47,10 +49,12 @@ public class UserController {
      * @param request новые данные пользователя
      * @return обновленные данные пользователя
      */
-    @PutMapping("/{id}")
-    public UserResponseDto updateUser(@PathVariable Long id,
-                                      @RequestBody @Valid UpdateUserRequestDto request) {
-        return userService.updateInfoById(id, request);
+    @PutMapping("/me")
+    public UserResponseDto updateUser(
+            @AuthenticationPrincipal User user,
+            @RequestBody @Valid UpdateUserRequestDto request
+    ) {
+        return userService.updateInfo(user, request);
     }
 
     /**
@@ -58,9 +62,9 @@ public class UserController {
      *
      * @param user аутентифицированный пользователь
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/me")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteUser(@PathVariable Long id) {
-        userService.deleteById(id);
+    public void deleteUser(@AuthenticationPrincipal User user) {
+        userService.deleteUser(user);
     }
 }

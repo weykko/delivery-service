@@ -40,9 +40,7 @@ public class UserService {
      * @param user пользователь
      * @return данные пользователя
      */
-    @Transactional(readOnly = true)
-    public UserResponseDto getInfoById(Long id) {
-        User user = getById(id);
+    public UserResponseDto getInfoForUser(User user) {
         return userMapper.toResponse(user);
     }
 
@@ -54,8 +52,7 @@ public class UserService {
      * @return обновленные данные пользователя
      */
     @Transactional
-    public UserResponseDto updateInfoById(Long id, UpdateUserRequestDto request) {
-        User user = getById(id);
+    public UserResponseDto updateInfo(User user, UpdateUserRequestDto request) {
         User updatedUser = userMapper.updateUserEntityFromRequest(request, user);
         save(updatedUser);
         return userMapper.toResponse(updatedUser);
@@ -67,8 +64,7 @@ public class UserService {
      * @param user пользователь
      */
     @Transactional
-    public void deleteById(Long id) {
-        User user = getById(id);
+    public void deleteUser(User user) {
         userRepository.delete(user);
     }
 
