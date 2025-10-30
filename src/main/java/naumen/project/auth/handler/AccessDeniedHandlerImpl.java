@@ -9,15 +9,8 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 
 import java.io.IOException;
 
-
-/**
- * Обработчик ошибок типа 403 Forbidden
- */
 public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
 
-    /**
-     * Проставляем статус и отправляем текстовое описание статус кода
-     */
     @Override
     public void handle(
             HttpServletRequest request,

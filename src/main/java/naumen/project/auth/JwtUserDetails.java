@@ -6,9 +6,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
-/**
- * Информация о пользователе. Используется при аутентификации
- */
 public class JwtUserDetails implements UserDetails {
 
     private User user;
