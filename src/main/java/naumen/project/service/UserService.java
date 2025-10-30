@@ -69,22 +69,7 @@ public class UserService {
     }
 
     /**
-     * Находит пользователя в базе данных по идентификатору.
-     *
-     * @param id идентификатор пользователя
-     * @return найденный пользователь
-     */
-    private User getById(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() ->
-                        new WebException(HttpStatus.NOT_FOUND, "Пользователь с id '%d' не найден", id)
-                );
-    }
-
-    /**
-     * Сохраняет пользователя в базе данных.
-     *
-     * @param user сохраняемый пользователь
+     * Сохранить пользователя
      */
     private void save(User user) {
         userRepository.save(user);
