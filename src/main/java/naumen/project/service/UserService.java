@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 /**
  * Сервис для операций с пользователями.
  * Предоставляет методы для получения, обновления и удаления пользователей.
@@ -28,8 +29,7 @@ public class UserService {
      */
     public UserService(
             UserRepository userRepository,
-            UserMapper userMapper
-    ) {
+            UserMapper userMapper) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
     }
@@ -53,6 +53,10 @@ public class UserService {
      */
     @Transactional
     public UserResponseDto updateInfo(User user, UpdateUserRequestDto request) {
+        if (!user.getPhone().equals(request.phone()) && userRepository.existsByPhone(request.phone())) {
+            throw new WebException(HttpStatus.BAD_REQUEST, "Телефон уже занят");
+        }
+
         User updatedUser = userMapper.updateUserEntityFromRequest(request, user);
         save(updatedUser);
         return userMapper.toResponse(updatedUser);

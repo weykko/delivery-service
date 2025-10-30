@@ -2,8 +2,9 @@ package naumen.project.controller;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
-import naumen.project.dto.menu.MenuItemRequestDto;
+import naumen.project.dto.menu.CreateMenuItemRequestDto;
 import naumen.project.dto.menu.MenuItemResponseDto;
+import naumen.project.dto.menu.UpdateMenuItemRequestDto;
 import naumen.project.entity.User;
 import naumen.project.service.MenuService;
 import org.springframework.http.HttpStatus;
@@ -37,7 +38,7 @@ public class RestaurantController {
      */
     @PostMapping("/menu")
     @ResponseStatus(HttpStatus.CREATED)
-    public MenuItemResponseDto createMenuItem(@RequestBody @Valid MenuItemRequestDto request,
+    public MenuItemResponseDto createMenuItem(@RequestBody @Valid CreateMenuItemRequestDto request,
                                               @AuthenticationPrincipal User user) {
         return menuService.createMenuItem(request, user);
     }
@@ -52,8 +53,8 @@ public class RestaurantController {
      */
     @PutMapping("/menu/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public MenuItemResponseDto updateMenuItem(@RequestBody @Valid MenuItemRequestDto request,
-                                              @PathVariable Long id,
+    public MenuItemResponseDto updateMenuItem(@PathVariable Long id,
+                                              @RequestBody @Valid UpdateMenuItemRequestDto request,
                                               @AuthenticationPrincipal User user) {
         return menuService.updateMenuItem(id, request, user);
     }

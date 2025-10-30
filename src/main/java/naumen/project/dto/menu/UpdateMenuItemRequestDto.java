@@ -5,19 +5,18 @@ import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 
 /**
- * Запрос позиции меню
+ * Создание позиции меню
  */
-public record MenuItemRequestDto(
-        @NotBlank
+public record UpdateMenuItemRequestDto(
         @Size(min = 3, max = 30)
         String title,
 
-        @Size(max = 120)
+        @Size(max = 255)
         String description,
 
-        @NotNull
         @Positive
         @Max(100000)
         BigDecimal price
 ) {
 }
+
