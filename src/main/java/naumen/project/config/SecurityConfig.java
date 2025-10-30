@@ -17,7 +17,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
- * Настройки касательно security
+ * Конфигурация Spring Security
  */
 @Configuration
 public class SecurityConfig {
