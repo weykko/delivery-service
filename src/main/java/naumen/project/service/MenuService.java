@@ -29,12 +29,10 @@ public class MenuService {
 
     private final MenuRepository menuRepository;
     private final MenuMapper menuMapper;
-    private final PageMapper pageMapper;
 
     public MenuService(MenuRepository menuRepository, MenuMapper menuMapper, PageMapper pageMapper) {
         this.menuRepository = menuRepository;
         this.menuMapper = menuMapper;
-        this.pageMapper = pageMapper;
     }
 
     /**
@@ -45,30 +43,23 @@ public class MenuService {
      * @param pageable параметры пагинации
      * @return страница позиций меню
      */
-    @Transactional(readOnly = true)
-    public PagedResponseDto<MenuItemResponseDto> getMenuItems(Long restaurantId, String title, Pageable pageable) {
-        Page<MenuItemResponseDto> menuPages = menuRepository
-                .findByRestaurantIdAndTitle(restaurantId, title, pageable)
-                .map(menuMapper::toResponse);
-
-        return pageMapper.toResponse(menuPages);
+    public Page<MenuItem> getMenuItems(Long restaurantId, String title, Pageable pageable) {
+        return menuRepository
+                .findByRestaurantIdAndTitle(restaurantId, title, pageable);
     }
 
     /**
      * Создает новую позицию в меню для указанного пользователя-ресторана.
      *
-     * @param request данные для создания позиции меню
+     * @param menuItem сущность позиции меню
      * @param user пользователь-ресторан, для которого создается позиция
      * @return созданная позиция меню
      */
-    @Transactional
-    public MenuItemResponseDto createMenuItem(CreateMenuItemRequestDto request, User user) {
-        MenuItem menuItem = menuMapper.toEntity(request);
+    public MenuItem createMenuItem(MenuItem menuItem, User user) {
         menuItem.setRestaurant(user);
-
         menuRepository.save(menuItem);
 
-        return menuMapper.toResponse(menuItem);
+        return menuItem;
     }
 
     /**
@@ -79,8 +70,7 @@ public class MenuService {
      * @param user пользователь, выполняющий обновление
      * @return обновленная позиция меню
      */
-    @Transactional
-    public MenuItemResponseDto updateMenuItem(Long id, UpdateMenuItemRequestDto request, User user) {
+    public MenuItem updateMenuItem(Long id, UpdateMenuItemRequestDto request, User user) {
         MenuItem menuItem = getMenuItemById(id);
 
         assertBelongsToRestaurant(menuItem, user);
@@ -88,7 +78,7 @@ public class MenuService {
         menuMapper.updateEntityFromRequest(request, menuItem);
         menuRepository.save(menuItem);
 
-        return menuMapper.toResponse(menuItem);
+        return menuItem;
     }
 
     /**
@@ -97,7 +87,6 @@ public class MenuService {
      * @param id идентификатор удаляемой позиции
      * @param user пользователь, выполняющий удаление
      */
-    @Transactional
     public void deleteMenuItem(Long id, User user) {
         MenuItem menuItem = getMenuItemById(id);
 

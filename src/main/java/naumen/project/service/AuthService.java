@@ -28,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthService {
 
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final AuthTokenService authTokenService;
@@ -41,7 +40,6 @@ public class AuthService {
             AuthenticationManager authenticationManager,
             AuthTokenService authTokenService) {
         this.userRepository = userRepository;
-        this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.authTokenService = authTokenService;
@@ -50,31 +48,29 @@ public class AuthService {
     /**
      * Регистрирует нового пользователя в системе.
      *
-     * @param request данные для регистрации
-     * @return информация о зарегистрированном пользователе
+     * @param user регистрируемый пользователь
+     * @param password пароль пользователя
+     * @return зарегистрированный пользователь
      */
-    @Transactional
-    public RegisterResponseDto register(RegisterRequestDto request) {
-        checkUniqueFields(request);
-        String password = passwordEncoder.encode(request.password());
-        User user = userMapper.toEntity(request);
-        user.setPassword(password);
+    public User register(User user, String password) {
+        String encodePassword = passwordEncoder.encode(password);
+        user.setPassword(encodePassword);
 
         userRepository.save(user);
 
-        return userMapper.toRegisterResponse(user);
+        return user;
     }
 
     /**
      * Выполняет аутентификацию пользователя и генерирует токены.
      *
-     * @param request учетные данные пользователя
+     * @param email почта пользователя
+     * @param password пароль пользователя
      * @return сгенерированные access и refresh токены
      */
-    @Transactional
-    public TokenResponseDto login(LoginRequestDto request) {
+    public TokenResponseDto login(String email, String password) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.email(), request.password())
+                new UsernamePasswordAuthenticationToken(email, password)
         );
         JwtUserDetails userDetails = (JwtUserDetails) authentication.getPrincipal();
 
@@ -86,7 +82,7 @@ public class AuthService {
      *
      * @param request запрос
      */
-    private void checkUniqueFields(RegisterRequestDto request) {
+    public void checkUniqueFieldsRegistration(RegisterRequestDto request) {
         if (userRepository.existsByEmail(request.email())) {
             throw new WebException(HttpStatus.BAD_REQUEST, "Email уже занят");
         }

@@ -4,9 +4,15 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.constraints.Size;
 import naumen.project.dto.menu.MenuItemResponseDto;
 import naumen.project.dto.paged.PagedResponseDto;
+import naumen.project.entity.MenuItem;
+import naumen.project.mapper.MenuMapper;
+import naumen.project.mapper.PageMapper;
+import naumen.project.repository.MenuRepository;
 import naumen.project.service.MenuService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,9 +29,13 @@ import org.springframework.web.bind.annotation.*;
 public class MenuController {
 
     private final MenuService menuService;
+    private final MenuMapper menuMapper;
+    private final PageMapper pageMapper;
 
-    public MenuController(MenuService menuService) {
+    public MenuController(MenuService menuService, MenuMapper menuMapper, PageMapper pageMapper) {
         this.menuService = menuService;
+        this.menuMapper = menuMapper;
+        this.pageMapper = pageMapper;
     }
 
     /**
@@ -40,12 +50,16 @@ public class MenuController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @Validated
+    @Transactional(readOnly = true)
     public PagedResponseDto<MenuItemResponseDto> getMenuItems(
             @RequestParam(required = false) Long restaurantId,
             @Size(max = 30)
             @RequestParam(required = false) String title,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return menuService.getMenuItems(restaurantId, title, PageRequest.of(page, size));
+        Page<MenuItemResponseDto> menuPages = menuService
+                .getMenuItems(restaurantId, title, PageRequest.of(page, size))
+                .map(menuMapper::toResponse);
+        return pageMapper.toResponse(menuPages);
     }
 }

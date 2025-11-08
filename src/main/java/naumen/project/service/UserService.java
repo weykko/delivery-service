@@ -1,5 +1,6 @@
 package naumen.project.service;
 
+import naumen.project.dto.auth.RegisterRequestDto;
 import naumen.project.dto.user.UpdateUserRequestDto;
 import naumen.project.dto.user.UserResponseDto;
 import naumen.project.entity.User;

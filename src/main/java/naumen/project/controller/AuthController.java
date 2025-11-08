@@ -4,10 +4,13 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import naumen.project.dto.auth.*;
 import naumen.project.entity.User;
+import naumen.project.mapper.UserMapper;
 import naumen.project.service.AuthService;
 import naumen.project.service.AuthTokenService;
+import naumen.project.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -23,16 +26,18 @@ public class AuthController {
 
     private final AuthService authService;
     private final AuthTokenService authTokenService;
+    private final UserMapper userMapper;
 
     /**
      * Инициализация контролера
      */
     public AuthController(
             AuthService authService,
-            AuthTokenService authTokenService
+            AuthTokenService authTokenService, UserService userService, UserMapper userMapper
     ) {
         this.authService = authService;
         this.authTokenService = authTokenService;
+        this.userMapper = userMapper;
     }
 
     /**
@@ -43,8 +48,12 @@ public class AuthController {
      */
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
+    @Transactional
     public RegisterResponseDto register(@RequestBody @Valid RegisterRequestDto request) {
-        return authService.register(request);
+        authService.checkUniqueFieldsRegistration(request);
+        User user = userMapper.toEntity(request);
+
+        return userMapper.toRegisterResponse(authService.register(user, request.password()));
     }
 
     /**
@@ -54,8 +63,11 @@ public class AuthController {
      * @return пара access и refresh токенов
      */
     @PostMapping("/login")
+    @Transactional
     public TokenResponseDto login(@RequestBody @Valid LoginRequestDto request) {
-        return authService.login(request);
+        String email = request.email();
+        String password = request.password();
+        return authService.login(email, password);
     }
 
     /**
