@@ -35,7 +35,6 @@ public class UserService {
      * @param updatedUser пользователь с обновленными данными
      * @return обновленные данные пользователя
      */
-    @Transactional
     public User updateInfo(User updatedUser) {
         if (userRepository.countByPhone(updatedUser.getPhone()) > 1) {
             throw new WebException(HttpStatus.BAD_REQUEST, "Телефон уже занят");
@@ -50,7 +49,6 @@ public class UserService {
      *
      * @param user пользователь
      */
-    @Transactional
     public void deleteUser(User user) {
         userRepository.delete(user);
     }

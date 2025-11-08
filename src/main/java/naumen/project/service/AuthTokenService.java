@@ -56,7 +56,6 @@ public class AuthTokenService {
      * @param user пользователь для которого генерируются токены
      * @return сгенерированные токены
      */
-    @Transactional
     public TokenResponseDto generateAndSave(User user) {
         AuthToken accessToken = generateAccessToken(user);
         AuthToken refreshToken = generateRefreshToken(user);
@@ -72,7 +71,6 @@ public class AuthTokenService {
      * @param refreshToken refresh токен
      * @return новая пара токенов
      */
-    @Transactional
     public TokenResponseDto refresh(String refreshToken) {
         if (!jwtUtil.validateRefreshToken(refreshToken) ||
             !isTokenAllowed(refreshToken, TokenType.REFRESH)) {
@@ -88,7 +86,6 @@ public class AuthTokenService {
      *
      * @param user пользователь выполняющий выход
      */
-    @Transactional
     public void logout(User user) {
         authTokenRepository.removeAllByUser(user);
     }

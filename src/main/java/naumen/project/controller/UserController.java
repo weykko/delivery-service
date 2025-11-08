@@ -9,6 +9,7 @@ import naumen.project.mapper.UserMapper;
 import naumen.project.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -41,6 +42,7 @@ public class UserController {
      * @return данные пользователя
      */
     @GetMapping("/me")
+    @Transactional(readOnly = true)
     public UserResponseDto getMyUser(@AuthenticationPrincipal User user) {
         return userMapper.toResponse(user);
     }
@@ -53,6 +55,7 @@ public class UserController {
      * @return обновленные данные пользователя
      */
     @PutMapping("/me")
+    @Transactional
     public UserResponseDto updateUser(
             @AuthenticationPrincipal User user,
             @RequestBody @Valid UpdateUserRequestDto request
@@ -68,6 +71,7 @@ public class UserController {
      */
     @DeleteMapping("/me")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Transactional
     public void deleteUser(@AuthenticationPrincipal User user) {
         userService.deleteUser(user);
     }

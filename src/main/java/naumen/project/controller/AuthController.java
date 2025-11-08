@@ -75,6 +75,7 @@ public class AuthController {
      * @return новая пара access и refresh токенов
      */
     @PostMapping("/refresh")
+    @Transactional
     public TokenResponseDto refresh(@RequestBody @Valid RefreshRequestDto request) {
         return authTokenService.refresh(request.refreshToken());
     }
@@ -87,6 +88,7 @@ public class AuthController {
     @SecurityRequirement(name = "JWT")
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Transactional
     public void logout(@AuthenticationPrincipal User user) {
         authTokenService.logout(user);
     }
