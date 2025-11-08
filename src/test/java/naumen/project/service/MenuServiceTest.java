@@ -209,7 +209,7 @@ class MenuServiceTest {
         user.setId(1L);
         user.setEmail("restaurant@example.com");
         user.setName("Test Restaurant");
-        user.setRole(Role.ROLE_RESTAURANT);
+        user.setRole(Role.RESTAURANT);
         return user;
     }
 
@@ -218,7 +218,7 @@ class MenuServiceTest {
         user.setId(2L);
         user.setEmail("other@example.com");
         user.setName("Other Restaurant");
-        user.setRole(Role.ROLE_RESTAURANT);
+        user.setRole(Role.RESTAURANT);
         return user;
     }
 

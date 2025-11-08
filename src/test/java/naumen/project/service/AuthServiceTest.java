@@ -51,14 +51,14 @@ public class AuthServiceTest {
     public void register_WithValidData_ShouldReturnSuccessResponse() {
         String email = "test@notexists@ru";
         String password = "strongPassword";
-        Role role = Role.ROLE_USER;
+        Role role = Role.USER;
         String name = "Alexey";
         String phone = "73454562345";
 
         RegisterRequestDto request = new RegisterRequestDto(
                 email,
                 password,
-                Role.ROLE_USER,
+                Role.USER,
                 name,
                 phone
         );
@@ -102,7 +102,7 @@ public class AuthServiceTest {
         RegisterRequestDto request = new RegisterRequestDto(
                 email,
                 "strongPassword",
-                Role.ROLE_USER,
+                Role.USER,
                 "Alexey",
                 phone
         );
@@ -120,7 +120,7 @@ public class AuthServiceTest {
         RegisterRequestDto request = new RegisterRequestDto(
                 email,
                 "strongPassword",
-                Role.ROLE_USER,
+                Role.USER,
                 "Alexey",
                 phone
         );
@@ -141,7 +141,7 @@ public class AuthServiceTest {
         User user = new User();
         user.setEmail(email);
         user.setPassword(password);
-        user.setRole(Role.ROLE_USER);
+        user.setRole(Role.USER);
         user.setName("Name");
         user.setPhone("73454562345");
         user.setId(1L);

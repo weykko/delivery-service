@@ -130,7 +130,7 @@ public class UserServiceTest {
         user.setEmail("test@example.com");
         user.setName("Test User");
         user.setPhone("+79991234567");
-        user.setRole(Role.ROLE_USER);
+        user.setRole(Role.USER);
         return user;
     }
 
@@ -144,7 +144,7 @@ public class UserServiceTest {
                 "test@example.com",
                 "Test User",
                 "+79991234567",
-                Role.ROLE_USER
+                Role.USER
         );
     }
 
@@ -154,7 +154,7 @@ public class UserServiceTest {
         user.setEmail("test@example.com");
         user.setName("Updated Name");
         user.setPhone("+79991234567");
-        user.setRole(Role.ROLE_USER);
+        user.setRole(Role.USER);
         return user;
     }
 }

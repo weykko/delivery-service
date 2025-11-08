@@ -7,7 +7,7 @@ import naumen.project.entity.User;
 import naumen.project.entity.enums.TokenType;
 import naumen.project.entity.enums.Role;
 import naumen.project.exception.WebException;
-import naumen.project.props.AuthProps;
+import naumen.project.auth.AuthProps;
 import naumen.project.repository.AuthTokenRepository;
 import naumen.project.util.JwtUtil;
 import org.junit.jupiter.api.Test;
@@ -267,7 +267,7 @@ class AuthTokenServiceTest {
         user.setId(1L);
         user.setEmail("test@example.com");
         user.setName("Test User");
-        user.setRole(Role.ROLE_USER);
+        user.setRole(Role.USER);
         return user;
     }
 

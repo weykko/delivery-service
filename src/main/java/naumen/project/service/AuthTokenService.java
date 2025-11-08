@@ -6,7 +6,7 @@ import naumen.project.entity.AuthToken;
 import naumen.project.entity.User;
 import naumen.project.entity.enums.TokenType;
 import naumen.project.exception.WebException;
-import naumen.project.props.AuthProps;
+import naumen.project.auth.AuthProps;
 import naumen.project.repository.AuthTokenRepository;
 import naumen.project.util.JwtUtil;
 import org.springframework.http.HttpStatus;
