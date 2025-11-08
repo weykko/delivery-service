@@ -43,7 +43,7 @@ public class AuthTokenService {
      * Проверяет, разрешен ли токен к использованию.
      *
      * @param token проверяемый токен
-     * @param type тип токена
+     * @param type  тип токена
      * @return true если токен активен и разрешен
      */
     @Transactional(readOnly = true)
@@ -76,7 +76,7 @@ public class AuthTokenService {
     @Transactional
     public TokenResponseDto refresh(RefreshRequestDto request) {
         if (!jwtUtil.validateRefreshToken(request.refreshToken()) ||
-            !isTokenAllowed(request.refreshToken(), TokenType.REFRESH)) {
+                !isTokenAllowed(request.refreshToken(), TokenType.REFRESH)) {
             throw new WebException(HttpStatus.BAD_REQUEST, "Токен невалиден");
         }
 
@@ -136,7 +136,7 @@ public class AuthTokenService {
      * Получает токен определенного типа из базы данных.
      *
      * @param token токен
-     * @param type тип токена
+     * @param type  тип токена
      * @return токен из базы данных
      */
     private AuthToken getToken(String token, TokenType type) {

@@ -1,6 +1,5 @@
 package naumen.project.service;
 
-import naumen.project.dto.auth.RegisterRequestDto;
 import naumen.project.dto.user.UpdateUserRequestDto;
 import naumen.project.dto.user.UserResponseDto;
 import naumen.project.entity.User;
@@ -48,7 +47,7 @@ public class UserService {
     /**
      * Обновляет информацию о пользователе.
      *
-     * @param user пользователь
+     * @param user    пользователь
      * @param request новые данные пользователя
      * @return обновленные данные пользователя
      */

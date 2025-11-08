@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.*;
  * Требует аутентификации с JWT токеном.
  *
  * @see MenuService
+ * @see MenuMapper
+ * @see PageMapper
  */
 @SecurityRequirement(name = "JWT")
 @RestController

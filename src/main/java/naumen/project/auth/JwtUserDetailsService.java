@@ -13,6 +13,11 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Сервис для загрузки данных пользователя в контексте Spring Security
+ *
+ * @see UserRepository
+ */
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
 
@@ -31,11 +36,23 @@ public class JwtUserDetailsService implements UserDetailsService {
         );
     }
 
+    /**
+     * Получает пользователя по email
+     *
+     * @param email email пользователя
+     * @return найденный пользователь
+     */
     private User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
     }
 
+    /**
+     * Конвертирует роль пользователя в коллекцию прав доступа
+     *
+     * @param role роль пользователя
+     * @return коллекция прав доступа на основе роли
+     */
     private Collection<? extends GrantedAuthority> convertToAuthorities(Role role) {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }

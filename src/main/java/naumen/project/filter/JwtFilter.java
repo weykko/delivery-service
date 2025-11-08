@@ -43,13 +43,6 @@ public class JwtFilter extends OncePerRequestFilter {
         this.jwtAuthenticationService = jwtAuthenticationService;
     }
 
-    /**
-     * Обрабатывает каждый HTTP запрос для JWT аутентификации.
-     *
-     * @param request HTTP запрос
-     * @param response HTTP ответ
-     * @param filterChain цепочка фильтров
-     */
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,

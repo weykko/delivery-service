@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
  *
  * @see AuthService
  * @see AuthTokenService
+ * @see UserMapper
  */
 @RestController
 @RequestMapping("/api/v1/auth")

@@ -16,20 +16,35 @@ import java.time.Instant;
 @Table(name = "auth_token")
 public class AuthToken {
 
+    /**
+     * Уникальный идентификатор токена
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * JWT токен
+     */
     @Column(name = "token", nullable = false, unique = true)
     private String token;
 
+    /**
+     * Тип токена (access, refresh и т.д.)
+     */
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
     private TokenType type;
 
+    /**
+     * Время истечения срока действия токена
+     */
     @Column(name = "expire_at", nullable = false)
     private Instant expireAt;
 
+    /**
+     * Пользователь, которому принадлежит токен
+     */
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

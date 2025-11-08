@@ -12,19 +12,34 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "menu_item")
 public class MenuItem {
+    /**
+     * Уникальный идентификатор позиции меню
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * Название блюда
+     */
     @Column(name = "title", nullable = false)
     private String title;
 
+    /**
+     * Описание блюда
+     */
     @Column(name = "description")
     private String description;
 
+    /**
+     * Цена блюда
+     */
     @Column(name = "price", nullable = false)
     private BigDecimal price;
 
+    /**
+     * Ресторан, которому принадлежит позиция меню
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id", nullable = false)
     private User restaurant;

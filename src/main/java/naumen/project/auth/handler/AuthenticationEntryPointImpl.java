@@ -9,6 +9,9 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 
 import java.io.IOException;
 
+/**
+ * Обработчик Security ошибок типа 401 Unauthorized
+ */
 public class AuthenticationEntryPointImpl implements AuthenticationEntryPoint {
 
     @Override

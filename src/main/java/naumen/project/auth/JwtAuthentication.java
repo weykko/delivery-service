@@ -7,6 +7,9 @@ import org.springframework.security.core.GrantedAuthority;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Реализация аутентификации на основе JWT токена
+ */
 public class JwtAuthentication implements Authentication {
 
     private User user;

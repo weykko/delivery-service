@@ -1,9 +1,6 @@
 package naumen.project.service;
 
-import naumen.project.dto.menu.CreateMenuItemRequestDto;
 import naumen.project.dto.menu.UpdateMenuItemRequestDto;
-import naumen.project.dto.menu.MenuItemResponseDto;
-import naumen.project.dto.paged.PagedResponseDto;
 import naumen.project.entity.MenuItem;
 import naumen.project.entity.User;
 import naumen.project.exception.WebException;
@@ -14,7 +11,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Сервис для управления меню ресторанов.
@@ -39,8 +35,8 @@ public class MenuService {
      * Получает позиции меню с пагинацией и с возможностью фильтрации по ресторану и названию.
      *
      * @param restaurantId идентификатор ресторана для фильтрации
-     * @param title текст для поиска в названиях позиций меню
-     * @param pageable параметры пагинации
+     * @param title        текст для поиска в названиях позиций меню
+     * @param pageable     параметры пагинации
      * @return страница позиций меню
      */
     public Page<MenuItem> getMenuItems(Long restaurantId, String title, Pageable pageable) {
@@ -52,7 +48,7 @@ public class MenuService {
      * Создает новую позицию в меню для указанного пользователя-ресторана.
      *
      * @param menuItem сущность позиции меню
-     * @param user пользователь-ресторан, для которого создается позиция
+     * @param user     пользователь-ресторан, для которого создается позиция
      * @return созданная позиция меню
      */
     public MenuItem createMenuItem(MenuItem menuItem, User user) {
@@ -65,9 +61,9 @@ public class MenuService {
     /**
      * Обновляет существующую позицию меню.
      *
-     * @param id идентификатор обновляемой позиции
+     * @param id      идентификатор обновляемой позиции
      * @param request новые данные для позиции меню
-     * @param user пользователь, выполняющий обновление
+     * @param user    пользователь, выполняющий обновление
      * @return обновленная позиция меню
      */
     public MenuItem updateMenuItem(Long id, UpdateMenuItemRequestDto request, User user) {
@@ -84,7 +80,7 @@ public class MenuService {
     /**
      * Удаляет позицию меню.
      *
-     * @param id идентификатор удаляемой позиции
+     * @param id   идентификатор удаляемой позиции
      * @param user пользователь, выполняющий удаление
      */
     public void deleteMenuItem(Long id, User user) {
@@ -114,7 +110,7 @@ public class MenuService {
      * Проверяет, принадлежит ли позиция меню указанному пользователю-ресторану.
      *
      * @param menuItem проверяемая позиция меню
-     * @param user пользователь для проверки принадлежности
+     * @param user     пользователь для проверки принадлежности
      */
     private void assertBelongsToRestaurant(MenuItem menuItem, User user) {
         if (!menuItem.getRestaurant().getId().equals(user.getId())) {

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
  * Требует аутентификации с JWT токеном и права доступа RESTAURANT.
  *
  * @see MenuService
+ * @see MenuMapper
  */
 @SecurityRequirement(name = "JWT")
 @RestController

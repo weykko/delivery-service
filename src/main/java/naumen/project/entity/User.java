@@ -14,29 +14,53 @@ import java.util.List;
 @Entity
 @Table(name = "\"user\"")
 public class User {
+    /**
+     * Уникальный идентификатор пользователя
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * Email пользователя (используется для входа)
+     */
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
+    /**
+     * Имя пользователя
+     */
     @Column(name = "name", nullable = false)
     private String name;
 
+    /**
+     * Телефон пользователя
+     */
     @Column(name = "phone", nullable = false, unique = true)
     private String phone;
 
+    /**
+     * Роль пользователя в системе
+     */
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    /**
+     * Хэшированный пароль пользователя
+     */
     @Column(name = "password", nullable = false)
     private String password;
 
+    /**
+     * Список токенов пользователя
+     */
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<AuthToken> authTokens;
 
+    /**
+     * Список позиций меню (только для ресторанов)
+     */
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<MenuItem> menuItems;
 

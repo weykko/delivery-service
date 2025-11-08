@@ -1,7 +1,7 @@
 package naumen.project.entity.enums;
 
 /**
- * Типы jwt токенов
+ * Енам для типов jwt токенов
  */
 public enum TokenType {
     ACCESS,

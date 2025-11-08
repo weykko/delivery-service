@@ -6,6 +6,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
+/**
+ * Реализация UserDetails для работы с JWT аутентификацией
+ */
 public class JwtUserDetails implements UserDetails {
 
     private User user;
@@ -34,6 +37,9 @@ public class JwtUserDetails implements UserDetails {
         return user.getEmail();
     }
 
+    /**
+     * @return объект пользователя
+     */
     public User getUser() {
         return user;
     }

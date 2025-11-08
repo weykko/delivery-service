@@ -1,13 +1,10 @@
 package naumen.project.service;
 
 import naumen.project.auth.JwtUserDetails;
-import naumen.project.dto.auth.LoginRequestDto;
 import naumen.project.dto.auth.RegisterRequestDto;
-import naumen.project.dto.auth.RegisterResponseDto;
 import naumen.project.dto.auth.TokenResponseDto;
 import naumen.project.entity.User;
 import naumen.project.exception.WebException;
-import naumen.project.mapper.UserMapper;
 import naumen.project.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,7 +12,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Сервис для обработки операций аутентификации и регистрации пользователей.
@@ -27,28 +23,26 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AuthService {
 
-    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final AuthTokenService authTokenService;
-
+    private final UserRepository userRepository;
 
     public AuthService(
-            UserRepository userRepository,
-            UserMapper userMapper,
             PasswordEncoder passwordEncoder,
             AuthenticationManager authenticationManager,
-            AuthTokenService authTokenService) {
-        this.userRepository = userRepository;
+            AuthTokenService authTokenService,
+            UserRepository userRepository) {
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.authTokenService = authTokenService;
+        this.userRepository = userRepository;
     }
 
     /**
      * Регистрирует нового пользователя в системе.
      *
-     * @param user регистрируемый пользователь
+     * @param user     регистрируемый пользователь
      * @param password пароль пользователя
      * @return зарегистрированный пользователь
      */
@@ -64,7 +58,7 @@ public class AuthService {
     /**
      * Выполняет аутентификацию пользователя и генерирует токены.
      *
-     * @param email почта пользователя
+     * @param email    почта пользователя
      * @param password пароль пользователя
      * @return сгенерированные access и refresh токены
      */
