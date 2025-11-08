@@ -3,5 +3,15 @@ package naumen.project.dto.error;
 /**
  * Список ошибок валидации
  */
-public record ViolationConstraintDto(String fieldName, String message) {
+public record ViolationConstraintDto(
+        /**
+         * Имя поля с ошибкой валидации
+         */
+        String fieldName,
+        
+        /**
+         * Сообщение об ошибке валидации
+         */
+        String message
+) {
 }
