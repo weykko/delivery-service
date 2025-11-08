@@ -1,6 +1,5 @@
 package naumen.project.service;
 
-import naumen.project.dto.user.UpdateUserRequestDto;
 import naumen.project.dto.user.UserResponseDto;
 import naumen.project.entity.User;
 import naumen.project.exception.WebException;
@@ -22,44 +21,27 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
 
     /**
      * Инициализация, внедрение зависимостей
      */
-    public UserService(
-            UserRepository userRepository,
-            UserMapper userMapper) {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.userMapper = userMapper;
-    }
-
-    /**
-     * Получает информацию о переданном пользователе.
-     *
-     * @param user пользователь
-     * @return данные пользователя
-     */
-    public UserResponseDto getInfoForUser(User user) {
-        return userMapper.toResponse(user);
     }
 
     /**
      * Обновляет информацию о пользователе.
      *
-     * @param user    пользователь
-     * @param request новые данные пользователя
+     * @param updatedUser пользователь с обновленными данными
      * @return обновленные данные пользователя
      */
-    @Transactional
-    public UserResponseDto updateInfo(User user, UpdateUserRequestDto request) {
-        if (!user.getPhone().equals(request.phone()) && userRepository.existsByPhone(request.phone())) {
+    public User updateInfo(User updatedUser) {
+        if (userRepository.countByPhone(updatedUser.getPhone()) > 1) {
             throw new WebException(HttpStatus.BAD_REQUEST, "Телефон уже занят");
         }
 
-        User updatedUser = userMapper.updateUserEntityFromRequest(request, user);
         save(updatedUser);
-        return userMapper.toResponse(updatedUser);
+        return updatedUser;
     }
 
     /**
@@ -67,7 +49,6 @@ public class UserService {
      *
      * @param user пользователь
      */
-    @Transactional
     public void deleteUser(User user) {
         userRepository.delete(user);
     }

@@ -31,7 +31,7 @@ import java.util.Objects;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     /**
      * Обрабатывает все непредвиденные исключения.

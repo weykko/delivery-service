@@ -1,4 +1,4 @@
-package naumen.project.props;
+package naumen.project.auth;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -8,7 +8,14 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "security.jwt")
 public class AuthProps {
 
+    /**
+     * Конфигурация для access токена
+     */
     private final TokenProps access = new TokenProps();
+
+    /**
+     * Конфигурация для refresh токена
+     */
     private final TokenProps refresh = new TokenProps();
 
     public TokenProps getAccess() {
@@ -19,6 +26,9 @@ public class AuthProps {
         return refresh;
     }
 
+    /**
+     * Конфигурация для токена. Токен может быть как access, так и refresh
+     */
     public class TokenProps {
         private String token;
         private long lifetime;

@@ -1,7 +1,6 @@
 package naumen.project.service;
 
 import naumen.project.auth.JwtUserDetails;
-import naumen.project.dto.auth.RegisterRequestDto;
 import naumen.project.dto.auth.TokenResponseDto;
 import naumen.project.entity.User;
 import naumen.project.exception.WebException;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service;
  * Сервис для обработки операций аутентификации и регистрации пользователей.
  * Отвечает за регистрацию новых пользователей и их вход в систему.
  *
- * @see UserRepository
  * @see AuthTokenService
  */
 @Service
@@ -47,6 +45,7 @@ public class AuthService {
      * @return зарегистрированный пользователь
      */
     public User register(User user, String password) {
+        checkUniqueFieldsRegistration(user);
         String encodePassword = passwordEncoder.encode(password);
         user.setPassword(encodePassword);
 
@@ -74,14 +73,14 @@ public class AuthService {
     /**
      * Выполняет проверку на уникальность полей запроса.
      *
-     * @param request запрос
+     * @param user пользователь
      */
-    public void checkUniqueFieldsRegistration(RegisterRequestDto request) {
-        if (userRepository.existsByEmail(request.email())) {
+    public void checkUniqueFieldsRegistration(User user) {
+        if (userRepository.existsByEmail(user.getEmail())) {
             throw new WebException(HttpStatus.BAD_REQUEST, "Email уже занят");
         }
 
-        if (userRepository.existsByPhone(request.phone())) {
+        if (userRepository.existsByPhone(user.getPhone())) {
             throw new WebException(HttpStatus.BAD_REQUEST, "Телефон уже занят");
         }
     }

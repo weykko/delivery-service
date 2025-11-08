@@ -34,7 +34,8 @@ public class AuthController {
      */
     public AuthController(
             AuthService authService,
-            AuthTokenService authTokenService, UserService userService, UserMapper userMapper
+            AuthTokenService authTokenService,
+            UserMapper userMapper
     ) {
         this.authService = authService;
         this.authTokenService = authTokenService;
@@ -51,9 +52,7 @@ public class AuthController {
     @ResponseStatus(HttpStatus.CREATED)
     @Transactional
     public RegisterResponseDto register(@RequestBody @Valid RegisterRequestDto request) {
-        authService.checkUniqueFieldsRegistration(request);
         User user = userMapper.toEntity(request);
-
         return userMapper.toRegisterResponse(authService.register(user, request.password()));
     }
 
@@ -66,9 +65,7 @@ public class AuthController {
     @PostMapping("/login")
     @Transactional
     public TokenResponseDto login(@RequestBody @Valid LoginRequestDto request) {
-        String email = request.email();
-        String password = request.password();
-        return authService.login(email, password);
+        return authService.login(request.email(), request.password());
     }
 
     /**
@@ -78,8 +75,9 @@ public class AuthController {
      * @return новая пара access и refresh токенов
      */
     @PostMapping("/refresh")
+    @Transactional
     public TokenResponseDto refresh(@RequestBody @Valid RefreshRequestDto request) {
-        return authTokenService.refresh(request);
+        return authTokenService.refresh(request.refreshToken());
     }
 
     /**
@@ -90,6 +88,7 @@ public class AuthController {
     @SecurityRequirement(name = "JWT")
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Transactional
     public void logout(@AuthenticationPrincipal User user) {
         authTokenService.logout(user);
     }
