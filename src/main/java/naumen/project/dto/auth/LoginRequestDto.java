@@ -6,8 +6,12 @@ import jakarta.validation.constraints.NotNull;
 
 /**
  * Запрос для аутентификации
+ *
+ * @param email    электронная почта пользователя
+ * @param password пароль пользователя
  */
 public record LoginRequestDto(
+
         @Email
         @NotNull
         String email,

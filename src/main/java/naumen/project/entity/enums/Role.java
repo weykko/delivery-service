@@ -1,7 +1,7 @@
 package naumen.project.entity.enums;
 
 /**
- * Роли пользователей
+ * Енам с типами ролей для авторизованных пользователей
  */
 public enum Role {
     ROLE_USER,

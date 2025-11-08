@@ -5,8 +5,12 @@ import jakarta.validation.constraints.Size;
 
 /**
  * Обновление информации о пользователе
+ *
+ * @param name  Имя пользователя (от 2 до 20 символов)
+ * @param phone Номер телефона в формате +7XXXXXXXXXX или 8XXXXXXXXXX
  */
 public record UpdateUserRequestDto(
+
         @Size(min = 2, max = 20)
         String name,
 
