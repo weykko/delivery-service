@@ -5,31 +5,23 @@ import java.util.List;
 
 /**
  * Ответ при ошибке
+ *
+ * @param timestamp  Время возникновения ошибки
+ * @param status     HTTP статус код ошибки
+ * @param error      Описание ошибки
+ * @param path       URL путь запроса, вызвавшего ошибку
+ * @param violations Список ошибок валидации (может быть пустым)
  */
 public record ErrorResponseDto(
-        /**
-         * Время возникновения ошибки
-         */
+
         Instant timestamp,
-        
-        /**
-         * HTTP статус код ошибки
-         */
+
         Integer status,
-        
-        /**
-         * Описание ошибки
-         */
+
         String error,
-        
-        /**
-         * URL путь запроса, вызвавшего ошибку
-         */
+
         String path,
-        
-        /**
-         * Список ошибок валидации (может быть пустым)
-         */
+
         List<ViolationConstraintDto> violations
 ) {
 }

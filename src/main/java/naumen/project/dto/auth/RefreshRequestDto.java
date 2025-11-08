@@ -4,11 +4,11 @@ import jakarta.validation.constraints.NotBlank;
 
 /**
  * Запрос по обновлению токенов
+ *
+ * @param refreshToken Refresh токен для обновления пары токенов
  */
 public record RefreshRequestDto(
-        /**
-         * Refresh токен для обновления пары токенов
-         */
+
         @NotBlank
         String refreshToken
 ) {

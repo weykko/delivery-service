@@ -4,26 +4,20 @@ import naumen.project.entity.enums.Role;
 
 /**
  * Ответ при регистрации
+ *
+ * @param id    уникальный идентификатор пользователя
+ * @param email электронная почта пользователя
+ * @param name  имя пользователя
+ * @param role  роль пользователя в системе
  */
 public record RegisterResponseDto(
-        /**
-         * Уникальный идентификатор пользователя
-         */
+
         Long id,
-        
-        /**
-         * Электронная почта пользователя
-         */
+
         String email,
-        
-        /**
-         * Имя пользователя
-         */
+
         String name,
-        
-        /**
-         * Роль пользователя в системе
-         */
+
         Role role
 ) {
 }

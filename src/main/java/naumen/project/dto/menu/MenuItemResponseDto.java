@@ -4,31 +4,23 @@ import java.math.BigDecimal;
 
 /**
  * Ответ с информацией о позиции меню
+ *
+ * @param id           Уникальный идентификатор позиции меню
+ * @param title        Название позиции меню
+ * @param description  Описание позиции меню
+ * @param price        Цена позиции меню
+ * @param restaurantId Идентификатор ресторана
  */
 public record MenuItemResponseDto(
-        /**
-         * Уникальный идентификатор позиции меню
-         */
+
         Long id,
-        
-        /**
-         * Название позиции меню
-         */
+
         String title,
-        
-        /**
-         * Описание позиции меню
-         */
+
         String description,
-        
-        /**
-         * Цена позиции меню
-         */
+
         BigDecimal price,
-        
-        /**
-         * Идентификатор ресторана
-         */
+
         Long restaurantId
 ) {
 }
