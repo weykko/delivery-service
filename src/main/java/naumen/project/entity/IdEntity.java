@@ -5,6 +5,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 
+/**
+ * Абстрактный класс для сущностей c id - автоинкрементное число
+ */
 @MappedSuperclass
 public abstract class IdEntity {
     /**
