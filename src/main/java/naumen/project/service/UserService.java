@@ -1,13 +1,13 @@
 package naumen.project.service;
 
-import naumen.project.dto.user.UserResponseDto;
 import naumen.project.entity.User;
 import naumen.project.exception.WebException;
 import naumen.project.mapper.UserMapper;
 import naumen.project.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 
 /**
@@ -35,14 +35,15 @@ public class UserService {
      * @param updatedUser пользователь с обновленными данными
      * @return обновленные данные пользователя
      */
-    public User updateInfo(User updatedUser) {
-        if (userRepository.countByPhone(updatedUser.getPhone()) > 1) {
-            throw new WebException(HttpStatus.BAD_REQUEST, "Телефон уже занят");
-        }
-
-        save(updatedUser);
-        return updatedUser;
+public User updateInfo(User updatedUser) {
+    Optional<User> userWithPhone = userRepository.findByPhone(updatedUser.getPhone());
+    if (userWithPhone.isPresent() && !userWithPhone.get().getId().equals(updatedUser.getId())) {
+        throw new WebException(HttpStatus.BAD_REQUEST, "Телефон уже занят");
     }
+
+    save(updatedUser);
+    return updatedUser;
+}
 
     /**
      * Удаляет переданного пользователя.
