@@ -13,14 +13,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "\"user\"")
-public class User {
-    /**
-     * Уникальный идентификатор пользователя
-     */
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+public class User extends IdEntity{
     /**
      * Email пользователя (используется для входа)
      */
@@ -64,14 +57,6 @@ public class User {
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<MenuItem> menuItems;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getEmail() {
         return email;
     }
@@ -110,17 +95,5 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    @Override
-    public final boolean equals(Object o) {
-        if (!(o instanceof User user)) return false;
-
-        return id.equals(user.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return id.hashCode();
     }
 }

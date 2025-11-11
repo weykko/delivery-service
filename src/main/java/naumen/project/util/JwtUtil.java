@@ -1,11 +1,17 @@
 package naumen.project.util;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.io.DecodingException;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
+import naumen.project.auth.AuthProps;
 import naumen.project.entity.User;
-import naumen.project.props.AuthProps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -21,6 +27,7 @@ import java.util.Map;
  */
 @Component
 public class JwtUtil {
+    private final Logger log = LoggerFactory.getLogger(JwtUtil.class);
 
     private final AuthProps authProps;
 
@@ -108,10 +115,25 @@ public class JwtUtil {
         return Long.parseLong(getAccessClaims(token).getSubject());
     }
 
+    /**
+     * Получить ключ для подписи токена
+     *
+     * @param key ключ в виде строки
+     * @return экзмеляр {@link SecretKey}
+     */
     private SecretKey getSignKey(String key) {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(key));
     }
 
+    /**
+     * Сгенерировать токен
+     *
+     * @param claims   claims для токена
+     * @param subject  кому выдается токен (у нас это id пользователя)
+     * @param signKey  ключ для подписи
+     * @param lifetime время жизни токена в секундах
+     * @return строка - токен
+     */
     private String createToken(Map<String, Object> claims, String subject, SecretKey signKey, Long lifetime) {
         return Jwts.builder()
                 .claims(claims)
@@ -122,15 +144,39 @@ public class JwtUtil {
                 .compact();
     }
 
+    /**
+     * Валидация токена
+     *
+     * @param token     сам токен в виде строки
+     * @param verifyKey ключ для подписи
+     * @return true - токен валиден, false - токен невалиден
+     */
     private boolean validateToken(String token, SecretKey verifyKey) {
         try {
             getClaims(token, verifyKey);
             return true;
+        } catch (ExpiredJwtException e) {
+            log.warn("JWT токен просрочен: {}", e.getMessage());
+        } catch (SignatureException e) {
+            log.warn("Подпись JWT токена недействительна: {}", e.getMessage());
+        } catch (MalformedJwtException e) {
+            log.warn("JWT токен поврежден или имеет неверный формат: {}", e.getMessage());
+        } catch (DecodingException e) {
+            log.warn("Ошибка декодирования JWT токена: {}", e.getMessage());
         } catch (Exception e) {
-            return false;
+            log.warn("Не удалось валидировать JWT токен: {}", e.getMessage());
         }
+
+        return false;
     }
 
+    /**
+     * Извлечь все claims из токена
+     *
+     * @param token     токен
+     * @param verifyKey ключ для подписи
+     * @return экземпляр {@link Claims}
+     */
     private Claims getClaims(String token, SecretKey verifyKey) {
         return Jwts.parser()
                 .verifyWith(verifyKey)

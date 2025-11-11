@@ -5,9 +5,11 @@ import jakarta.validation.Valid;
 import naumen.project.dto.user.UpdateUserRequestDto;
 import naumen.project.dto.user.UserResponseDto;
 import naumen.project.entity.User;
+import naumen.project.mapper.UserMapper;
 import naumen.project.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -23,12 +25,14 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final UserMapper userMapper;
 
     /**
      * Инициализация контроллера - внедрение зависимостей
      */
-    public UserController(UserService userService) {
+    public UserController(UserService userService, UserMapper userMapper) {
         this.userService = userService;
+        this.userMapper = userMapper;
     }
 
     /**
@@ -38,8 +42,9 @@ public class UserController {
      * @return данные пользователя
      */
     @GetMapping("/me")
+    @Transactional(readOnly = true)
     public UserResponseDto getMyUser(@AuthenticationPrincipal User user) {
-        return userService.getInfoForUser(user);
+        return userMapper.toResponse(user);
     }
 
     /**
@@ -50,11 +55,13 @@ public class UserController {
      * @return обновленные данные пользователя
      */
     @PutMapping("/me")
+    @Transactional
     public UserResponseDto updateUser(
             @AuthenticationPrincipal User user,
             @RequestBody @Valid UpdateUserRequestDto request
     ) {
-        return userService.updateInfo(user, request);
+        User updatedUser = userMapper.updateUserEntityFromRequest(request, user);
+        return userMapper.toResponse(userService.updateInfo(updatedUser));
     }
 
     /**
@@ -64,6 +71,7 @@ public class UserController {
      */
     @DeleteMapping("/me")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Transactional
     public void deleteUser(@AuthenticationPrincipal User user) {
         userService.deleteUser(user);
     }

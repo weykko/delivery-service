@@ -11,14 +11,7 @@ import java.math.BigDecimal;
  */
 @Entity
 @Table(name = "menu_item")
-public class MenuItem {
-    /**
-     * Уникальный идентификатор позиции меню
-     */
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+public class MenuItem extends IdEntity {
     /**
      * Название блюда
      */
@@ -43,14 +36,6 @@ public class MenuItem {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id", nullable = false)
     private User restaurant;
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return id;
-    }
 
     public String getTitle() {
         return title;
@@ -82,17 +67,5 @@ public class MenuItem {
 
     public void setRestaurant(User restaurant) {
         this.restaurant = restaurant;
-    }
-
-    @Override
-    public final boolean equals(Object o) {
-        if (!(o instanceof MenuItem menuItem)) return false;
-
-        return id.equals(menuItem.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return id.hashCode();
     }
 }

@@ -1,12 +1,11 @@
 package naumen.project.service;
 
-import naumen.project.dto.auth.RefreshRequestDto;
+import naumen.project.auth.AuthProps;
 import naumen.project.dto.auth.TokenResponseDto;
 import naumen.project.entity.AuthToken;
 import naumen.project.entity.User;
 import naumen.project.entity.enums.TokenType;
 import naumen.project.exception.WebException;
-import naumen.project.props.AuthProps;
 import naumen.project.repository.AuthTokenRepository;
 import naumen.project.util.JwtUtil;
 import org.springframework.http.HttpStatus;
@@ -57,7 +56,6 @@ public class AuthTokenService {
      * @param user пользователь для которого генерируются токены
      * @return сгенерированные токены
      */
-    @Transactional
     public TokenResponseDto generateAndSave(User user) {
         AuthToken accessToken = generateAccessToken(user);
         AuthToken refreshToken = generateRefreshToken(user);
@@ -70,17 +68,16 @@ public class AuthTokenService {
     /**
      * Обновляет пару токенов по валидному refresh токену.
      *
-     * @param request запрос с refresh токеном
+     * @param refreshToken refresh токен
      * @return новая пара токенов
      */
-    @Transactional
-    public TokenResponseDto refresh(RefreshRequestDto request) {
-        if (!jwtUtil.validateRefreshToken(request.refreshToken()) ||
-                !isTokenAllowed(request.refreshToken(), TokenType.REFRESH)) {
+    public TokenResponseDto refresh(String refreshToken) {
+        if (!jwtUtil.validateRefreshToken(refreshToken) ||
+            !isTokenAllowed(refreshToken, TokenType.REFRESH)) {
             throw new WebException(HttpStatus.BAD_REQUEST, "Токен невалиден");
         }
 
-        AuthToken currentRefreshToken = getToken(request.refreshToken(), TokenType.REFRESH);
+        AuthToken currentRefreshToken = getToken(refreshToken, TokenType.REFRESH);
         return generateAndSave(currentRefreshToken.getUser());
     }
 
@@ -89,7 +86,6 @@ public class AuthTokenService {
      *
      * @param user пользователь выполняющий выход
      */
-    @Transactional
     public void logout(User user) {
         authTokenRepository.removeAllByUser(user);
     }

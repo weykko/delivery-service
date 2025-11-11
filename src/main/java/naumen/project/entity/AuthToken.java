@@ -14,15 +14,7 @@ import java.time.Instant;
  */
 @Entity
 @Table(name = "auth_token")
-public class AuthToken {
-
-    /**
-     * Уникальный идентификатор токена
-     */
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+public class AuthToken extends IdEntity {
     /**
      * JWT токен
      */
@@ -48,14 +40,6 @@ public class AuthToken {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getToken() {
         return token;
@@ -87,19 +71,5 @@ public class AuthToken {
 
     public void setUser(User user) {
         this.user = user;
-    }
-
-    @Override
-    public final boolean equals(Object o) {
-        if (!(o instanceof AuthToken authToken)) return false;
-
-        return token.equals(authToken.token) && type == authToken.type;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = token.hashCode();
-        result = 31 * result + type.hashCode();
-        return result;
     }
 }

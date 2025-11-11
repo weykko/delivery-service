@@ -1,6 +1,6 @@
 package naumen.project.config;
 
-import naumen.project.props.AuthProps;
+import naumen.project.auth.AuthProps;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
