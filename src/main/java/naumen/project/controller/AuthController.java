@@ -7,7 +7,6 @@ import naumen.project.entity.User;
 import naumen.project.mapper.UserMapper;
 import naumen.project.service.AuthService;
 import naumen.project.service.AuthTokenService;
-import naumen.project.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +33,7 @@ public class AuthController {
      */
     public AuthController(
             AuthService authService,
-            AuthTokenService authTokenService, UserService userService, UserMapper userMapper
+            AuthTokenService authTokenService, UserMapper userMapper
     ) {
         this.authService = authService;
         this.authTokenService = authTokenService;

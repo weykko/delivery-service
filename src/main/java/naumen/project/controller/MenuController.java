@@ -64,4 +64,18 @@ public class MenuController {
                 .map(menuMapper::toResponse);
         return pageMapper.toResponse(menuPages);
     }
+
+    /**
+     * Получает информацию о конкретной позиции меню по её идентификатору.
+     *
+     * @param menuId идентификатор позиции меню
+     * @return информация о позиции меню
+     */
+    @GetMapping("/{menuId}")
+    @ResponseStatus(HttpStatus.OK)
+    @Transactional(readOnly = true)
+    public MenuItemResponseDto getMenuItem(@PathVariable Long menuId) {
+        MenuItem menuItem = menuService.getMenuItemById(menuId);
+        return menuMapper.toResponse(menuItem);
+    }
 }
