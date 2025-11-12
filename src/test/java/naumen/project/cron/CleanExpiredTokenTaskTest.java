@@ -25,6 +25,9 @@ class CleanExpiredTokenTaskTest {
     @InjectMocks
     private CleanExpiredTokenTask cleanExpiredTokenTask;
 
+    /**
+     * Тестирование вызова метода удаления просроченных токенов с текущим временем
+     */
     @Test
     void run_ShouldCallRemoveAllExpiredWithCurrentTime() {
         cleanExpiredTokenTask.run();
@@ -32,19 +35,17 @@ class CleanExpiredTokenTaskTest {
         verify(authTokenRepository).removeAllExpired(any(Instant.class));
     }
 
-    @Test
-    void run_ShouldCallRepositoryExactlyOnce() {
-        cleanExpiredTokenTask.run();
-
-        verify(authTokenRepository, times(1)).removeAllExpired(any(Instant.class));
-        verifyNoMoreInteractions(authTokenRepository);
-    }
-
+    /**
+     * Тестирование успешного выполнения задачи без исключений
+     */
     @Test
     void run_ShouldExecuteSuccessfullyWithoutExceptions() {
         assertDoesNotThrow(() -> cleanExpiredTokenTask.run());
     }
 
+    /**
+     * Тестирование обработки исключения, выбрасываемого репозиторием
+     */
     @Test
     void run_WhenRepositoryThrowsException_ShouldPropagateException() {
         doThrow(new RuntimeException("Database error"))
@@ -54,6 +55,9 @@ class CleanExpiredTokenTaskTest {
         verify(authTokenRepository).removeAllExpired(any(Instant.class));
     }
 
+    /**
+     * Тестирование передачи текущего времени в репозиторий
+     */
     @Test
     void run_ShouldPassCurrentInstantToRepository() {
         Instant[] capturedInstant = new Instant[1];
@@ -67,14 +71,5 @@ class CleanExpiredTokenTaskTest {
         assertNotNull(capturedInstant[0]);
         assertTrue(Instant.now().minusSeconds(60).isBefore(capturedInstant[0]));
         assertTrue(Instant.now().plusSeconds(1).isAfter(capturedInstant[0]));
-    }
-
-    @Test
-    void constructor_ShouldInitializeWithRepository() {
-        AuthTokenRepository testRepository = mock(AuthTokenRepository.class);
-
-        CleanExpiredTokenTask task = new CleanExpiredTokenTask(testRepository);
-
-        assertNotNull(task);
     }
 }

@@ -35,15 +35,15 @@ public class UserService {
      * @param updatedUser пользователь с обновленными данными
      * @return обновленные данные пользователя
      */
-public User updateInfo(User updatedUser) {
-    Optional<User> userWithPhone = userRepository.findByPhone(updatedUser.getPhone());
-    if (userWithPhone.isPresent() && !userWithPhone.get().getId().equals(updatedUser.getId())) {
-        throw new WebException(HttpStatus.BAD_REQUEST, "Телефон уже занят");
-    }
+    public User updateInfo(User updatedUser) {
+        Optional<User> userWithPhone = userRepository.findByPhone(updatedUser.getPhone());
+        if (userWithPhone.isPresent() && !userWithPhone.get().getId().equals(updatedUser.getId())) {
+            throw new WebException(HttpStatus.BAD_REQUEST, "Телефон уже занят");
+        }
 
-    save(updatedUser);
-    return updatedUser;
-}
+        save(updatedUser);
+        return updatedUser;
+    }
 
     /**
      * Удаляет переданного пользователя.

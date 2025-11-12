@@ -28,8 +28,6 @@ public interface UserRepository extends CrudRepository<User, Long> {
      */
     boolean existsByEmail(String email);
 
-
-
     /**
      * Проверяет существование пользователя с указанным телефоном.
      *
