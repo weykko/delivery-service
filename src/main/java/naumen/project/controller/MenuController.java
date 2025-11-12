@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.constraints.Size;
 import naumen.project.dto.menu.MenuItemResponseDto;
 import naumen.project.dto.paged.PagedResponseDto;
+import naumen.project.entity.MenuItem;
 import naumen.project.mapper.MenuMapper;
 import naumen.project.mapper.PageMapper;
 import naumen.project.service.MenuService;

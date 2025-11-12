@@ -66,7 +66,7 @@ class MenuControllerTest {
 
         Mockito.when(menuService.getMenuItems(restaurantId, title, pageable)).thenReturn(menuItemPage);
         Mockito.when(menuMapper.toResponse(menuItem)).thenReturn(menuItemResponse);
-        Mockito.when(pageMapper.toResponse(Mockito.<Page<MenuItemResponseDto>>any())).thenReturn(expectedPagedResponse);
+        Mockito.when(pageMapper.toMenuResponse(Mockito.<Page<MenuItemResponseDto>>any())).thenReturn(expectedPagedResponse);
 
         PagedResponseDto<MenuItemResponseDto> result = menuController.getMenuItems(restaurantId, title, page, size);
 
@@ -74,7 +74,7 @@ class MenuControllerTest {
         Assertions.assertEquals(1, result.totalElements());
         Assertions.assertEquals(1, result.content().size());
         Mockito.verify(menuService).getMenuItems(restaurantId, title, pageable);
-        Mockito.verify(pageMapper).toResponse(Mockito.<Page<MenuItemResponseDto>>any());
+        Mockito.verify(pageMapper).toMenuResponse(Mockito.<Page<MenuItemResponseDto>>any());
     }
 
     /**
@@ -97,7 +97,7 @@ class MenuControllerTest {
 
         Mockito.when(menuService.getMenuItems(null, null, pageable)).thenReturn(menuItemPage);
         Mockito.when(menuMapper.toResponse(menuItem)).thenReturn(menuItemResponse);
-        Mockito.when(pageMapper.toResponse(Mockito.<Page<MenuItemResponseDto>>any())).thenReturn(expectedPagedResponse);
+        Mockito.when(pageMapper.toMenuResponse(Mockito.<Page<MenuItemResponseDto>>any())).thenReturn(expectedPagedResponse);
 
         PagedResponseDto<MenuItemResponseDto> result = menuController.getMenuItems(null, null, page, size);
 
