@@ -5,7 +5,6 @@ import naumen.project.dto.auth.TokenResponseDto;
 import naumen.project.entity.User;
 import naumen.project.entity.enums.Role;
 import naumen.project.exception.WebException;
-import naumen.project.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,9 +25,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class AuthServiceTest {
 
     @Mock
-    private UserRepository userRepository;
-
-    @Mock
     private PasswordEncoder passwordEncoder;
 
     @Mock
@@ -36,6 +32,9 @@ public class AuthServiceTest {
 
     @Mock
     private AuthTokenService authTokenService;
+
+    @Mock
+    private UserService userService;
 
     @InjectMocks
     private AuthService authService;
@@ -50,10 +49,9 @@ public class AuthServiceTest {
         String password = "strongPassword";
         String encodedPassword = "encodedPassword";
 
-        Mockito.when(userRepository.existsByEmail(testUser.getEmail())).thenReturn(false);
-        Mockito.when(userRepository.existsByPhone(testUser.getPhone())).thenReturn(false);
+        Mockito.doNothing().when(userService).checkUniqueFieldsRegistration(testUser);
         Mockito.when(passwordEncoder.encode(password)).thenReturn(encodedPassword);
-        Mockito.when(userRepository.save(testUser)).thenReturn(testUser);
+        Mockito.doNothing().when(userService).saveUser(testUser);
 
         User result = authService.register(testUser, password);
 
@@ -61,10 +59,9 @@ public class AuthServiceTest {
         Assertions.assertEquals(testUser.getRole(), result.getRole());
         Assertions.assertEquals(testUser.getName(), result.getName());
         Assertions.assertEquals(encodedPassword, result.getPassword());
-        Mockito.verify(userRepository).existsByEmail(testUser.getEmail());
-        Mockito.verify(userRepository).existsByPhone(testUser.getPhone());
+        Mockito.verify(userService).checkUniqueFieldsRegistration(testUser);
         Mockito.verify(passwordEncoder).encode(password);
-        Mockito.verify(userRepository).save(testUser);
+        Mockito.verify(userService).saveUser(testUser);
     }
 
     /**
@@ -74,7 +71,8 @@ public class AuthServiceTest {
     public void register_WithExistingEmail_ShouldThrowWebException() {
         String password = "strongPassword";
 
-        Mockito.when(userRepository.existsByEmail(testUser.getEmail())).thenReturn(true);
+        Mockito.doThrow(new WebException(HttpStatus.BAD_REQUEST, "Email уже занят"))
+                .when(userService).checkUniqueFieldsRegistration(testUser);
 
         WebException exception = Assertions.assertThrows(WebException.class,
                 () -> authService.register(testUser, password));
@@ -89,14 +87,14 @@ public class AuthServiceTest {
     public void register_WithExistingPhone_ShouldThrowWebException() {
         String password = "strongPassword";
 
-        Mockito.when(userRepository.existsByEmail(testUser.getEmail())).thenReturn(false);
-        Mockito.when(userRepository.existsByPhone(testUser.getPhone())).thenReturn(true);
+        Mockito.doThrow(new WebException(HttpStatus.BAD_REQUEST, "Телефон уже занят"))
+                .when(userService).checkUniqueFieldsRegistration(testUser);
 
         WebException exception = Assertions.assertThrows(WebException.class,
                 () -> authService.register(testUser, password));
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
         Assertions.assertEquals("Телефон уже занят", exception.getMessage());
-        Mockito.verify(userRepository).existsByEmail(testUser.getEmail());
+        Mockito.verify(userService).checkUniqueFieldsRegistration(testUser);
     }
 
     /**
