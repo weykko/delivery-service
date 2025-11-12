@@ -7,7 +7,6 @@ import naumen.project.dto.paged.PagedResponseDto;
 import naumen.project.entity.MenuItem;
 import naumen.project.mapper.MenuMapper;
 import naumen.project.mapper.PageMapper;
-import naumen.project.repository.MenuRepository;
 import naumen.project.service.MenuService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
