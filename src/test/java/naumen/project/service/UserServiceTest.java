@@ -1,22 +1,19 @@
 package naumen.project.service;
 
-import naumen.project.dto.user.UpdateUserRequestDto;
-import naumen.project.dto.user.UserResponseDto;
 import naumen.project.entity.User;
 import naumen.project.entity.enums.Role;
 import naumen.project.exception.WebException;
-import naumen.project.mapper.UserMapper;
 import naumen.project.repository.UserRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import java.util.Optional;
 
 /**
  * Модульные тесты для {@link UserService}
@@ -27,103 +24,121 @@ public class UserServiceTest {
     @Mock
     private UserRepository userRepository;
 
-    @Mock
-    private UserMapper userMapper;
-
     @InjectMocks
     private UserService userService;
 
     private final User testUser = createTestUser();
-    private UpdateUserRequestDto updateRequest = createUpdateUserRequest();
-    private final UserResponseDto userResponse = createUserResponse();
-    private final User updatedUser = createUpdatedUser();
 
-    @Test
-    void getInfoForUser_WithValidUser_ShouldReturnUserInfo() {
-        when(userMapper.toResponse(testUser)).thenReturn(userResponse);
-
-        UserResponseDto result = userService.getInfoForUser(testUser);
-
-        assertNotNull(result);
-        assertEquals(userResponse, result);
-        verify(userMapper).toResponse(testUser);
-    }
-
+    /**
+     * Тестирование успешного обновления информации пользователя с тем же номером телефона
+     */
     @Test
     void updateInfo_WithSamePhone_ShouldUpdateUser() {
-        updateRequest = new UpdateUserRequestDto("Updated Name", testUser.getPhone());
-        when(userMapper.updateUserEntityFromRequest(updateRequest, testUser)).thenReturn(updatedUser);
-        when(userRepository.save(updatedUser)).thenReturn(updatedUser);
-        when(userMapper.toResponse(updatedUser)).thenReturn(userResponse);
+        User userToUpdate = new User();
+        userToUpdate.setId(testUser.getId());
+        userToUpdate.setEmail(testUser.getEmail());
+        userToUpdate.setName("Updated Name");
+        userToUpdate.setPhone(testUser.getPhone());
+        userToUpdate.setRole(testUser.getRole());
 
-        UserResponseDto result = userService.updateInfo(testUser, updateRequest);
+        Mockito.when(userRepository.findByPhone(testUser.getPhone())).thenReturn(Optional.of(testUser));
+        Mockito.when(userRepository.save(userToUpdate)).thenReturn(userToUpdate);
 
-        assertNotNull(result);
-        assertEquals(userResponse, result);
-        verify(userRepository, never()).existsByPhone(any());
-        verify(userMapper).updateUserEntityFromRequest(updateRequest, testUser);
-        verify(userRepository).save(updatedUser);
-        verify(userMapper).toResponse(updatedUser);
+        User result = userService.updateInfo(userToUpdate);
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(userToUpdate.getName(), result.getName());
+        Mockito.verify(userRepository).findByPhone(testUser.getPhone());
+        Mockito.verify(userRepository).save(userToUpdate);
     }
 
+    /**
+     * Тестирование успешного обновления информации пользователя с новым уникальным номером телефона
+     */
     @Test
     void updateInfo_WithNewUniquePhone_ShouldUpdateUser() {
         String newPhone = "+79997654321";
-        updateRequest = new UpdateUserRequestDto("Updated Name", newPhone);
+        User userToUpdate = new User();
+        userToUpdate.setId(testUser.getId());
+        userToUpdate.setEmail(testUser.getEmail());
+        userToUpdate.setName("Updated Name");
+        userToUpdate.setPhone(newPhone);
+        userToUpdate.setRole(testUser.getRole());
 
-        when(userRepository.existsByPhone(newPhone)).thenReturn(false);
-        when(userMapper.updateUserEntityFromRequest(updateRequest, testUser)).thenReturn(updatedUser);
-        when(userRepository.save(updatedUser)).thenReturn(updatedUser);
-        when(userMapper.toResponse(updatedUser)).thenReturn(userResponse);
+        Mockito.when(userRepository.findByPhone(newPhone)).thenReturn(Optional.empty());
+        Mockito.when(userRepository.save(userToUpdate)).thenReturn(userToUpdate);
 
-        UserResponseDto result = userService.updateInfo(testUser, updateRequest);
+        User result = userService.updateInfo(userToUpdate);
 
-        assertNotNull(result);
-        assertEquals(userResponse, result);
-        verify(userRepository).existsByPhone(newPhone);
-        verify(userMapper).updateUserEntityFromRequest(updateRequest, testUser);
-        verify(userRepository).save(updatedUser);
-        verify(userMapper).toResponse(updatedUser);
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(newPhone, result.getPhone());
+        Mockito.verify(userRepository).findByPhone(newPhone);
+        Mockito.verify(userRepository).save(userToUpdate);
     }
 
+    /**
+     * Тестирование обновления информации пользователя с уже существующим номером телефона
+     */
     @Test
     void updateInfo_WithExistingPhone_ShouldThrowException() {
         String existingPhone = "+79998887766";
-        updateRequest = new UpdateUserRequestDto("Updated Name", existingPhone);
+        User userToUpdate = new User();
+        userToUpdate.setId(2L); // другой ID
+        userToUpdate.setEmail("another@example.com");
+        userToUpdate.setName("Updated Name");
+        userToUpdate.setPhone(existingPhone);
+        userToUpdate.setRole(Role.USER);
 
-        when(userRepository.existsByPhone(existingPhone)).thenReturn(true);
+        User existingUser = new User();
+        existingUser.setId(3L); // другой пользователь с таким телефоном
+        existingUser.setPhone(existingPhone);
 
-        WebException exception = assertThrows(WebException.class,
-                () -> userService.updateInfo(testUser, updateRequest));
+        Mockito.when(userRepository.findByPhone(existingPhone)).thenReturn(Optional.of(existingUser));
 
-        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
-        assertEquals("Телефон уже занят", exception.getMessage());
-        verify(userRepository).existsByPhone(existingPhone);
-        verify(userMapper, never()).updateUserEntityFromRequest(any(), any());
-        verify(userRepository, never()).save(any());
+        WebException exception = Assertions.assertThrows(WebException.class,
+                () -> userService.updateInfo(userToUpdate));
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
+        Assertions.assertEquals("Телефон уже занят", exception.getMessage());
+        Mockito.verify(userRepository).findByPhone(existingPhone);
+        Mockito.verify(userRepository, Mockito.never()).save(Mockito.any());
     }
 
+    /**
+     * Тестирование успешного удаления пользователя
+     */
     @Test
     void deleteUser_WithValidUser_ShouldDeleteUser() {
         userService.deleteUser(testUser);
 
-        verify(userRepository).delete(testUser);
+        Mockito.verify(userRepository).delete(testUser);
     }
 
+    /**
+     * Тестирование вызова метода сохранения пользователя
+     */
     @Test
-    void save_ShouldCallRepositorySave() {
-        updateRequest = new UpdateUserRequestDto("Updated Name", testUser.getPhone());
-        when(userMapper.updateUserEntityFromRequest(updateRequest, testUser)).thenReturn(updatedUser);
-        when(userRepository.save(updatedUser)).thenReturn(updatedUser);
-        when(userMapper.toResponse(updatedUser)).thenReturn(userResponse);
+    void saveUser_ShouldCallRepositorySave() {
+        User userToUpdate = new User();
+        userToUpdate.setId(testUser.getId());
+        userToUpdate.setEmail(testUser.getEmail());
+        userToUpdate.setName("Updated Name");
+        userToUpdate.setPhone(testUser.getPhone());
+        userToUpdate.setRole(testUser.getRole());
 
-        userService.updateInfo(testUser, updateRequest);
+        Mockito.when(userRepository.findByPhone(testUser.getPhone())).thenReturn(Optional.of(testUser));
+        Mockito.when(userRepository.save(userToUpdate)).thenReturn(userToUpdate);
 
-        verify(userRepository).save(updatedUser);
+        userService.updateInfo(userToUpdate);
+
+        Mockito.verify(userRepository).save(userToUpdate);
     }
 
     // Вспомогательные методы для создания тестовых данных
 
+    /**
+     * Создает тестового пользователя
+     */
     private User createTestUser() {
         User user = new User();
         user.setId(1L);
@@ -133,28 +148,10 @@ public class UserServiceTest {
         user.setRole(Role.USER);
         return user;
     }
-
-    private UpdateUserRequestDto createUpdateUserRequest() {
-        return new UpdateUserRequestDto("Updated Name", "+79991234567");
-    }
-
-    private UserResponseDto createUserResponse() {
-        return new UserResponseDto(
-                1L,
-                "test@example.com",
-                "Test User",
-                "+79991234567",
-                Role.USER
-        );
-    }
-
-    private User createUpdatedUser() {
-        User user = new User();
-        user.setId(1L);
-        user.setEmail("test@example.com");
-        user.setName("Updated Name");
-        user.setPhone("+79991234567");
-        user.setRole(Role.USER);
-        return user;
-    }
 }
+
+
+
+
+
+

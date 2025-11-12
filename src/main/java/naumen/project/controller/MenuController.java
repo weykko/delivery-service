@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.constraints.Size;
 import naumen.project.dto.menu.MenuItemResponseDto;
 import naumen.project.dto.paged.PagedResponseDto;
+import naumen.project.entity.MenuItem;
 import naumen.project.mapper.MenuMapper;
 import naumen.project.mapper.PageMapper;
 import naumen.project.service.MenuService;
@@ -61,5 +62,19 @@ public class MenuController {
                 .getMenuItems(restaurantId, title, PageRequest.of(page, size))
                 .map(menuMapper::toResponse);
         return pageMapper.toMenuResponse(menuPages);
+    }
+
+    /**
+     * Получает информацию о конкретной позиции меню по её идентификатору.
+     *
+     * @param menuId идентификатор позиции меню
+     * @return информация о позиции меню
+     */
+    @GetMapping("/{menuId}")
+    @ResponseStatus(HttpStatus.OK)
+    @Transactional(readOnly = true)
+    public MenuItemResponseDto getMenuItem(@PathVariable Long menuId) {
+        MenuItem menuItem = menuService.getMenuItemById(menuId);
+        return menuMapper.toResponse(menuItem);
     }
 }

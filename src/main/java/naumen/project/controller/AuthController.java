@@ -7,7 +7,6 @@ import naumen.project.entity.User;
 import naumen.project.mapper.UserMapper;
 import naumen.project.service.AuthService;
 import naumen.project.service.AuthTokenService;
-import naumen.project.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,7 +64,10 @@ public class AuthController {
     @PostMapping("/login")
     @Transactional
     public TokenResponseDto login(@RequestBody @Valid LoginRequestDto request) {
-        return authService.login(request.email(), request.password());
+        String email = request.email();
+        String password = request.password();
+
+        return authService.login(email, password);
     }
 
     /**

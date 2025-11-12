@@ -1,39 +1,28 @@
 package naumen.project.service;
 
 import naumen.project.auth.JwtUserDetails;
-import naumen.project.dto.auth.LoginRequestDto;
-import naumen.project.dto.auth.RegisterRequestDto;
-import naumen.project.dto.auth.RegisterResponseDto;
 import naumen.project.dto.auth.TokenResponseDto;
 import naumen.project.entity.User;
 import naumen.project.entity.enums.Role;
 import naumen.project.exception.WebException;
-import naumen.project.mapper.UserMapper;
-import naumen.project.repository.UserRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 
 /**
  * Модульные тесты для {@link AuthService}
  */
 @ExtendWith(MockitoExtension.class)
 public class AuthServiceTest {
-
-    @Mock
-    private UserRepository userRepository;
-
-    @Mock
-    private UserMapper userMapper;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -44,139 +33,123 @@ public class AuthServiceTest {
     @Mock
     private AuthTokenService authTokenService;
 
+    @Mock
+    private UserService userService;
+
     @InjectMocks
     private AuthService authService;
 
+    private final User testUser = createTestUser();
+
+    /**
+     * Тестирование успешной регистрации пользователя с валидными данными
+     */
     @Test
     public void register_WithValidData_ShouldReturnSuccessResponse() {
-        String email = "test@notexists@ru";
         String password = "strongPassword";
-        Role role = Role.USER;
-        String name = "Alexey";
-        String phone = "73454562345";
+        String encodedPassword = "encodedPassword";
 
-        RegisterRequestDto request = new RegisterRequestDto(
-                email,
-                password,
-                Role.USER,
-                name,
-                phone
-        );
+        Mockito.doNothing().when(userService).checkUniqueFieldsRegistration(testUser);
+        Mockito.when(passwordEncoder.encode(password)).thenReturn(encodedPassword);
+        Mockito.doNothing().when(userService).saveUser(testUser);
 
-        User user = new User();
-        user.setEmail(email);
-        user.setPassword(password);
-        user.setRole(role);
-        user.setName(name);
-        user.setPhone(phone);
+        User result = authService.register(testUser, password);
 
-        long userId = 1;
-        user.setId(userId);
-
-        RegisterResponseDto response = new RegisterResponseDto(
-                userId,
-                email,
-                name,
-                role
-        );
-
-        when(userRepository.existsByEmail(email)).thenReturn(false);
-        when(userRepository.existsByPhone(phone)).thenReturn(false);
-        when(passwordEncoder.encode(password)).thenReturn(password);
-        when(userMapper.toEntity(request)).thenReturn(user);
-        when(userRepository.save(user)).thenReturn(user);
-        when(userMapper.toRegisterResponse(user)).thenReturn(response);
-
-        RegisterResponseDto result = authService.register(request);
-        assertEquals(request.email(), result.email());
-        assertEquals(request.role(), result.role());
-        assertEquals(userId, result.id());
-        assertEquals(request.name(), result.name());
+        Assertions.assertEquals(testUser.getEmail(), result.getEmail());
+        Assertions.assertEquals(testUser.getRole(), result.getRole());
+        Assertions.assertEquals(testUser.getName(), result.getName());
+        Assertions.assertEquals(encodedPassword, result.getPassword());
+        Mockito.verify(userService).checkUniqueFieldsRegistration(testUser);
+        Mockito.verify(passwordEncoder).encode(password);
+        Mockito.verify(userService).saveUser(testUser);
     }
 
+    /**
+     * Тестирование регистрации пользователя с уже существующим email
+     */
     @Test
     public void register_WithExistingEmail_ShouldThrowWebException() {
-        String email = "test@notexists@ru";
-        String phone = "73454562345";
-
-        RegisterRequestDto request = new RegisterRequestDto(
-                email,
-                "strongPassword",
-                Role.USER,
-                "Alexey",
-                phone
-        );
-
-        when(userRepository.existsByEmail(email)).thenReturn(true);
-
-        assertThrows(WebException.class, () -> authService.register(request));
-    }
-
-    @Test
-    public void register_WithExistingPhone_ShouldThrowWebException() {
-        String email = "test@notexists@ru";
-        String phone = "73454562345";
-
-        RegisterRequestDto request = new RegisterRequestDto(
-                email,
-                "strongPassword",
-                Role.USER,
-                "Alexey",
-                phone
-        );
-
-        when(userRepository.existsByEmail(email)).thenReturn(false);
-        when(userRepository.existsByPhone(phone)).thenReturn(true);
-
-        assertThrows(WebException.class, () -> authService.register(request));
-    }
-
-    @Test
-    public void login_WithValidCredentials_ShouldReturnTokens() {
-        String email = "test@notexists@ru";
         String password = "strongPassword";
 
-        LoginRequestDto request = new LoginRequestDto(email, password);
+        Mockito.doThrow(new WebException(HttpStatus.BAD_REQUEST, "Email уже занят"))
+                .when(userService).checkUniqueFieldsRegistration(testUser);
 
-        User user = new User();
-        user.setEmail(email);
-        user.setPassword(password);
-        user.setRole(Role.USER);
-        user.setName("Name");
-        user.setPhone("73454562345");
-        user.setId(1L);
+        WebException exception = Assertions.assertThrows(WebException.class,
+                () -> authService.register(testUser, password));
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
+        Assertions.assertEquals("Email уже занят", exception.getMessage());
+    }
 
+    /**
+     * Тестирование регистрации пользователя с уже существующим номером телефона
+     */
+    @Test
+    public void register_WithExistingPhone_ShouldThrowWebException() {
+        String password = "strongPassword";
+
+        Mockito.doThrow(new WebException(HttpStatus.BAD_REQUEST, "Телефон уже занят"))
+                .when(userService).checkUniqueFieldsRegistration(testUser);
+
+        WebException exception = Assertions.assertThrows(WebException.class,
+                () -> authService.register(testUser, password));
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
+        Assertions.assertEquals("Телефон уже занят", exception.getMessage());
+        Mockito.verify(userService).checkUniqueFieldsRegistration(testUser);
+    }
+
+    /**
+     * Тестирование успешного входа пользователя с валидными учетными данными
+     */
+    @Test
+    public void login_WithValidCredentials_ShouldReturnTokens() {
+        String password = "strongPassword";
         String aToken = "a";
         String rToken = "r";
 
-        when(authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.email(), request.password()))
+        Mockito.when(authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(testUser.getEmail(), password))
         ).thenReturn(
                 new UsernamePasswordAuthenticationToken(
-                        new JwtUserDetails(user, null),
+                        new JwtUserDetails(testUser, null),
                         null
                 )
         );
-        when(authTokenService.generateAndSave(user)).thenReturn(new TokenResponseDto(aToken, rToken));
+        Mockito.when(authTokenService.generateAndSave(testUser)).thenReturn(new TokenResponseDto(aToken, rToken));
 
-        TokenResponseDto result = authService.login(request);
-        assertAll(
-                () -> assertEquals(aToken, result.accessToken()),
-                () -> assertEquals(rToken, result.refreshToken())
+        TokenResponseDto result = authService.login(testUser.getEmail(), password);
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(aToken, result.accessToken()),
+                () -> Assertions.assertEquals(rToken, result.refreshToken())
         );
     }
 
+    /**
+     * Тестирование входа пользователя с невалидными учетными данными
+     */
     @Test
     public void login_WithInvalidCredentials_ShouldThrowBadCredentialsException() {
-        String email = "test@notexists@ru";
         String password = "strongPassword";
 
-        LoginRequestDto request = new LoginRequestDto(email, password);
-
-        when(authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(request.email(), request.password()))
+        Mockito.when(authenticationManager
+                .authenticate(new UsernamePasswordAuthenticationToken(testUser.getEmail(), password))
         ).thenThrow(BadCredentialsException.class);
 
-        assertThrows(BadCredentialsException.class, () -> authService.login(request));
+        Assertions.assertThrows(BadCredentialsException.class, () -> authService.login(testUser.getEmail(), password));
+    }
+
+    // Вспомогательные методы для создания тестовых данных
+
+    /**
+     * Создает тестового пользователя
+     */
+    private User createTestUser() {
+        User user = new User();
+        user.setId(1L);
+        user.setEmail("test@notexists.ru");
+        user.setName("Alexey");
+        user.setPhone("73454562345");
+        user.setRole(Role.USER);
+        return user;
     }
 }
+
