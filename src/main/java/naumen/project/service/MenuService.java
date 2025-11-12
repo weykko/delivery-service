@@ -97,7 +97,7 @@ public class MenuService {
      * @param id идентификатор позиции меню
      * @return найденная позиция меню
      */
-    private MenuItem getMenuItemById(Long id) {
+    public MenuItem getMenuItemById(Long id) {
         return menuRepository
                 .findById(id)
                 .orElseThrow(() -> new WebException(

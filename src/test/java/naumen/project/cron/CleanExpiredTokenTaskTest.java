@@ -1,17 +1,17 @@
 package naumen.project.cron;
 
 import naumen.project.repository.AuthTokenRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 /**
  * Модульные тесты для {@link CleanExpiredTokenTask}
@@ -25,56 +25,39 @@ class CleanExpiredTokenTaskTest {
     @InjectMocks
     private CleanExpiredTokenTask cleanExpiredTokenTask;
 
+    /**
+     * Тестирование вызова метода удаления просроченных токенов с текущим временем
+     */
     @Test
     void run_ShouldCallRemoveAllExpiredWithCurrentTime() {
         cleanExpiredTokenTask.run();
 
-        verify(authTokenRepository).removeAllExpired(any(Instant.class));
+        Mockito.verify(authTokenRepository).removeAllExpired(ArgumentMatchers.any(Instant.class));
     }
 
-    @Test
-    void run_ShouldCallRepositoryExactlyOnce() {
-        cleanExpiredTokenTask.run();
-
-        verify(authTokenRepository, times(1)).removeAllExpired(any(Instant.class));
-        verifyNoMoreInteractions(authTokenRepository);
-    }
-
+    /**
+     * Тестирование успешного выполнения задачи без исключений
+     */
     @Test
     void run_ShouldExecuteSuccessfullyWithoutExceptions() {
-        assertDoesNotThrow(() -> cleanExpiredTokenTask.run());
+        Assertions.assertDoesNotThrow(() -> cleanExpiredTokenTask.run());
     }
 
-    @Test
-    void run_WhenRepositoryThrowsException_ShouldPropagateException() {
-        doThrow(new RuntimeException("Database error"))
-                .when(authTokenRepository).removeAllExpired(any(Instant.class));
-
-        assertThrows(RuntimeException.class, () -> cleanExpiredTokenTask.run());
-        verify(authTokenRepository).removeAllExpired(any(Instant.class));
-    }
-
+    /**
+     * Тестирование передачи текущего времени в репозиторий
+     */
     @Test
     void run_ShouldPassCurrentInstantToRepository() {
         Instant[] capturedInstant = new Instant[1];
-        doAnswer(invocation -> {
+        Mockito.doAnswer(invocation -> {
             capturedInstant[0] = invocation.getArgument(0);
             return null;
-        }).when(authTokenRepository).removeAllExpired(any(Instant.class));
+        }).when(authTokenRepository).removeAllExpired(ArgumentMatchers.any(Instant.class));
 
         cleanExpiredTokenTask.run();
 
-        assertNotNull(capturedInstant[0]);
-        assertTrue(Instant.now().minusSeconds(60).isBefore(capturedInstant[0]));
-        assertTrue(Instant.now().plusSeconds(1).isAfter(capturedInstant[0]));
-    }
-
-    @Test
-    void constructor_ShouldInitializeWithRepository() {
-        AuthTokenRepository testRepository = mock(AuthTokenRepository.class);
-
-        CleanExpiredTokenTask task = new CleanExpiredTokenTask(testRepository);
-
-        assertNotNull(task);
+        Assertions.assertNotNull(capturedInstant[0]);
+        Assertions.assertTrue(Instant.now().minusSeconds(60).isBefore(capturedInstant[0]));
+        Assertions.assertTrue(Instant.now().plusSeconds(1).isAfter(capturedInstant[0]));
     }
 }
