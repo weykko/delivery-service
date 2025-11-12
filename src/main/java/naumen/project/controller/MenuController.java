@@ -4,10 +4,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.constraints.Size;
 import naumen.project.dto.menu.MenuItemResponseDto;
 import naumen.project.dto.paged.PagedResponseDto;
-import naumen.project.entity.MenuItem;
 import naumen.project.mapper.MenuMapper;
 import naumen.project.mapper.PageMapper;
-import naumen.project.repository.MenuRepository;
 import naumen.project.service.MenuService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -62,6 +60,6 @@ public class MenuController {
         Page<MenuItemResponseDto> menuPages = menuService
                 .getMenuItems(restaurantId, title, PageRequest.of(page, size))
                 .map(menuMapper::toResponse);
-        return pageMapper.toResponse(menuPages);
+        return pageMapper.toMenuResponse(menuPages);
     }
 }

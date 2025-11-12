@@ -22,5 +22,5 @@ public enum Role {
     /**
      * Курьер, который доставляет заказы
      */
-    DELIVERY,
+    COURIER,
 }
