@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import naumen.project.entity.enums.OrderStatus;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
@@ -32,6 +33,12 @@ public class Order extends IdEntity {
      */
     @OneToMany(mappedBy = "order", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private List<OrderItem> items;
+
+    /**
+     * Общая стоимость заказа
+     */
+    @Column(name = "total_price", nullable = false)
+    private BigDecimal totalPrice;
 
     /**
      * Ресторан, у которого заказ

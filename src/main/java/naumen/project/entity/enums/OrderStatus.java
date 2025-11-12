@@ -10,4 +10,23 @@ public enum OrderStatus {
      */
     CREATED,
 
+    /**
+     * Заказ принят рестораном
+     */
+    ACCEPTED,
+
+    /**
+     * Заказ приготовлен
+     */
+    PREPARED,
+
+    /**
+     * Заказ забран курьером
+     */
+    DELIVERING,
+
+    /**
+     * Заказ доставлен
+     */
+    COMPLETED,
 }

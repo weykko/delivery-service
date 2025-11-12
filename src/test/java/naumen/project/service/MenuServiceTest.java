@@ -64,7 +64,7 @@ class MenuServiceTest {
         when(menuRepository.findByRestaurantIdAndTitle(restaurantId, title, pageable))
                 .thenReturn(menuPage);
         when(menuMapper.toResponse(menuItem)).thenReturn(menuItemResponseDto);
-        when(pageMapper.toResponse(responsePage)).thenReturn(expectedResponse);
+        when(pageMapper.toMenuResponse(responsePage)).thenReturn(expectedResponse);
 
         PagedResponseDto<MenuItemResponseDto> result = menuService.getMenuItems(restaurantId, title, pageable);
 
@@ -72,7 +72,7 @@ class MenuServiceTest {
         assertEquals(expectedResponse, result);
         verify(menuRepository).findByRestaurantIdAndTitle(restaurantId, title, pageable);
         verify(menuMapper).toResponse(menuItem);
-        verify(pageMapper).toResponse(responsePage);
+        verify(pageMapper).toMenuResponse(responsePage);
     }
 
     @Test
@@ -85,7 +85,7 @@ class MenuServiceTest {
         when(menuRepository.findByRestaurantIdAndTitle(null, null, pageable))
                 .thenReturn(menuPage);
         when(menuMapper.toResponse(menuItem)).thenReturn(menuItemResponseDto);
-        when(pageMapper.toResponse(responsePage)).thenReturn(expectedResponse);
+        when(pageMapper.toMenuResponse(responsePage)).thenReturn(expectedResponse);
 
         PagedResponseDto<MenuItemResponseDto> result = menuService.getMenuItems(null, null, pageable);
 
