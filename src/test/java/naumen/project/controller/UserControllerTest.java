@@ -62,7 +62,10 @@ class UserControllerTest {
      */
     @Test
     void updateUser_WithValidRequest_ShouldReturnUpdatedUser() {
-        UpdateUserRequestDto updateRequest = new UpdateUserRequestDto("Updated Name", "+79997654321");
+        UpdateUserRequestDto updateRequest = new UpdateUserRequestDto(
+                "Updated Name",
+                "+79997654321",
+                "Ул Пушкина");
         User updatedUser = new User();
         updatedUser.setId(testUser.getId());
         updatedUser.setEmail(testUser.getEmail());

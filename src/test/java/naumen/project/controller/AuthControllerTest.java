@@ -139,7 +139,8 @@ class AuthControllerTest {
                 "password123",
                 Role.USER,
                 "Test User",
-                "+79991234567"
+                "+79991234567",
+                "Ул Пушкина"
         );
     }
 
