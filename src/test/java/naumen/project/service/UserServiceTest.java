@@ -118,7 +118,7 @@ public class UserServiceTest {
      * Тестирование вызова метода сохранения пользователя
      */
     @Test
-    void save_ShouldCallRepositorySave() {
+    void saveUser_ShouldCallRepositorySave() {
         User userToUpdate = new User();
         userToUpdate.setId(testUser.getId());
         userToUpdate.setEmail(testUser.getEmail());

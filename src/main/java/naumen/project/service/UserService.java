@@ -41,7 +41,7 @@ public class UserService {
             throw new WebException(HttpStatus.BAD_REQUEST, "Телефон уже занят");
         }
 
-        save(updatedUser);
+        saveUser(updatedUser);
         return updatedUser;
     }
 
@@ -55,9 +55,26 @@ public class UserService {
     }
 
     /**
-     * Сохранить пользователя
+     * Сохранить пользователя в БД
+     *
+     * @param user пользователь
      */
-    private void save(User user) {
+    public void saveUser(User user) {
         userRepository.save(user);
+    }
+
+    /**
+     * Выполняет проверку на уникальность полей запроса.
+     *
+     * @param user пользователь
+     */
+    public void checkUniqueFieldsRegistration(User user) {
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new WebException(HttpStatus.BAD_REQUEST, "Email уже занят");
+        }
+
+        if (userRepository.existsByPhone(user.getPhone())) {
+            throw new WebException(HttpStatus.BAD_REQUEST, "Телефон уже занят");
+        }
     }
 }
