@@ -28,8 +28,6 @@ public interface UserRepository extends CrudRepository<User, Long> {
      */
     boolean existsByEmail(String email);
 
-
-
     /**
      * Проверяет существование пользователя с указанным телефоном.
      *
@@ -39,9 +37,10 @@ public interface UserRepository extends CrudRepository<User, Long> {
     boolean existsByPhone(String phone);
 
     /**
-     * Количество пользователей с номером телефона
-     * @param phone проверяемый телефон
-     * @return число пользователей
+     * Находит пользователя по номеру телефона.
+     *
+     * @param phone номер телефона пользователя
+     * @return Optional с найденным пользователем
      */
-    int countByPhone(String phone);
+    Optional<User> findByPhone(String phone);
 }
