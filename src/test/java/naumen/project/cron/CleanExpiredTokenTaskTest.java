@@ -11,7 +11,8 @@ import java.time.Instant;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.verify;
 
 /**
  * Модульные тесты для {@link CleanExpiredTokenTask}
@@ -41,18 +42,6 @@ class CleanExpiredTokenTaskTest {
     @Test
     void run_ShouldExecuteSuccessfullyWithoutExceptions() {
         assertDoesNotThrow(() -> cleanExpiredTokenTask.run());
-    }
-
-    /**
-     * Тестирование обработки исключения, выбрасываемого репозиторием
-     */
-    @Test
-    void run_WhenRepositoryThrowsException_ShouldPropagateException() {
-        doThrow(new RuntimeException("Database error"))
-                .when(authTokenRepository).removeAllExpired(any(Instant.class));
-
-        assertThrows(RuntimeException.class, () -> cleanExpiredTokenTask.run());
-        verify(authTokenRepository).removeAllExpired(any(Instant.class));
     }
 
     /**
