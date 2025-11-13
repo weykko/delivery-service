@@ -91,6 +91,14 @@ public class Order extends IdEntity {
         this.items = items;
     }
 
+    public BigDecimal getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
     public User getRestaurant() {
         return restaurant;
     }

@@ -10,6 +10,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * DAO слой для {@link Order}
+ */
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
@@ -34,4 +37,16 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "WHERE o.courier = :courier " +
             "AND o.status != 'COMPLETED'")
     List<Order> findActiveOrdersByCourier(User courier);
+
+    /**
+     * Поиск активных заказов ресторана
+     *
+     * @param restaurant ресторан
+     * @return список активных заказов ресторана
+     */
+    @Query("SELECT o FROM Order o " +
+            "WHERE o.restaurant = :restaurant " +
+            "AND o.status IN ('CREATED', 'ACCEPTED', 'PREPARED')")
+    Page<Order> findActiveOrdersByRestaurant(User restaurant, Pageable pageable);
+
 }

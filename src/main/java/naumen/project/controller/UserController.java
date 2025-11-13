@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
  * Требует аутентификации с JWT токеном.
  *
  * @see UserService
+ * @see UserMapper
  */
 @SecurityRequirement(name = "JWT")
 @RestController
@@ -50,7 +51,7 @@ public class UserController {
     /**
      * Обновляет информацию текущего пользователя.
      *
-     * @param user аутентифицированный пользователь
+     * @param user    аутентифицированный пользователь
      * @param request новые данные пользователя
      * @return обновленные данные пользователя
      */

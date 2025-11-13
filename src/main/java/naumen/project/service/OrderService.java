@@ -89,7 +89,6 @@ public class OrderService {
             );
         }
 
-        order.setStatus(OrderStatus.DELIVERING);
         orderRepository.save(order);
     }
 
@@ -117,7 +116,94 @@ public class OrderService {
             );
         }
 
-        order.setStatus(OrderStatus.COMPLETED);
+        orderRepository.save(order);
+    }
+
+    /**
+     * Получение активных заказов ресторана
+     *
+     * @param restaurant ресторан
+     * @param pageable   параметры пагинации
+     * @return страница с активными заказами ресторана
+     */
+    public Page<Order> getActiveOrdersByRestaurant(User restaurant, Pageable pageable) {
+        return orderRepository.findActiveOrdersByRestaurant(restaurant, pageable);
+    }
+
+    /**
+     * Получение заказа ресторана по идентификатору
+     *
+     * @param orderId    идентификатор заказа
+     * @param restaurant ресторан
+     * @return заказ
+     */
+    public Order getOrderByRestaurant(Long orderId, User restaurant) {
+        Order order = getOrderById(orderId);
+
+        assertBelongsToRestaurant(order, restaurant);
+
+        return order;
+    }
+
+    /**
+     * Пометка заказа как в приготовлении рестораном
+     *
+     * @param orderId    идентификатор заказа
+     * @param restaurant ресторан
+     */
+    public void prepareOrderByRestaurant(Long orderId, User restaurant) {
+        Order order = getOrderById(orderId);
+
+        assertBelongsToRestaurant(order, restaurant);
+
+        switch (order.getStatus()) {
+            case CREATED -> order.setStatus(OrderStatus.ACCEPTED);
+            case ACCEPTED -> throw new WebException(
+                    HttpStatus.BAD_REQUEST,
+                    "Заказ с id '%d' уже готовиться",
+                    orderId);
+            case PREPARED -> throw new WebException(
+                    HttpStatus.BAD_REQUEST,
+                    "Заказ с id '%d' уже приготовлен",
+                    orderId);
+            default -> throw new WebException(
+                    HttpStatus.BAD_REQUEST,
+                    "Заказ с id '%d' уже был отдан курьеру",
+                    orderId
+            );
+        }
+
+        orderRepository.save(order);
+    }
+
+    /**
+     * Пометка заказа как готового рестораном
+     *
+     * @param orderId    идентификатор заказа
+     * @param restaurant ресторан
+     */
+    public void readyOrderByRestaurant(Long orderId, User restaurant) {
+        Order order = getOrderById(orderId);
+
+        assertBelongsToRestaurant(order, restaurant);
+
+        switch (order.getStatus()) {
+            case ACCEPTED -> order.setStatus(OrderStatus.PREPARED);
+            case CREATED -> throw new WebException(
+                    HttpStatus.BAD_REQUEST,
+                    "Заказ с id '%d' еще не начал готовиться",
+                    orderId);
+            case PREPARED -> throw new WebException(
+                    HttpStatus.BAD_REQUEST,
+                    "Заказ с id '%d' уже приготовлен",
+                    orderId);
+            default -> throw new WebException(
+                    HttpStatus.BAD_REQUEST,
+                    "Заказ с id '%d' уже был отдан курьеру",
+                    orderId
+            );
+        }
+
         orderRepository.save(order);
     }
 
@@ -148,6 +234,22 @@ public class OrderService {
             throw new WebException(
                     HttpStatus.FORBIDDEN,
                     "Заказ с id '%d' не принадлежит вам",
+                    order.getId());
+        }
+    }
+
+    /**
+     * Проверяет, принадлежит ли заказ указанному ресторану
+     *
+     * @param order      заказ
+     * @param restaurant ресторан
+     */
+    private void assertBelongsToRestaurant(Order order, User restaurant) {
+        if (order.getRestaurant() == null ||
+                !order.getRestaurant().getId().equals(restaurant.getId())) {
+            throw new WebException(
+                    HttpStatus.FORBIDDEN,
+                    "Заказ с id '%d' не принадлежит вашему ресторану",
                     order.getId());
         }
     }

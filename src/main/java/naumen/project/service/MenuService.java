@@ -5,7 +5,6 @@ import naumen.project.entity.MenuItem;
 import naumen.project.entity.User;
 import naumen.project.exception.WebException;
 import naumen.project.mapper.MenuMapper;
-import naumen.project.mapper.PageMapper;
 import naumen.project.repository.MenuRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service;
  *
  * @see MenuRepository
  * @see MenuMapper
- * @see PageMapper
  */
 @Service
 public class MenuService {
@@ -26,7 +24,7 @@ public class MenuService {
     private final MenuRepository menuRepository;
     private final MenuMapper menuMapper;
 
-    public MenuService(MenuRepository menuRepository, MenuMapper menuMapper, PageMapper pageMapper) {
+    public MenuService(MenuRepository menuRepository, MenuMapper menuMapper) {
         this.menuRepository = menuRepository;
         this.menuMapper = menuMapper;
     }
