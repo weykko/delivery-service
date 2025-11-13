@@ -27,14 +27,14 @@ import java.util.List;
  */
 @SecurityRequirement(name = "JWT")
 @RestController
-@RequestMapping("/api/v1/courier")
-public class CourierController {
+@RequestMapping("/api/v1/courier/orders")
+public class CourierOrderController {
 
     private final OrderService orderService;
     private final OrderMapper orderMapper;
     private final PageMapper pageMapper;
 
-    public CourierController(OrderService orderService, OrderMapper orderMapper, PageMapper pageMapper) {
+    public CourierOrderController(OrderService orderService, OrderMapper orderMapper, PageMapper pageMapper) {
         this.orderService = orderService;
         this.orderMapper = orderMapper;
         this.pageMapper = pageMapper;
@@ -47,7 +47,7 @@ public class CourierController {
      * @param size количество элементов на странице
      * @return страница с доступными заказами
      */
-    @GetMapping("/orders")
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @Transactional(readOnly = true)
     public PagedResponseDto<OrderCourierResponseDto> getAvailableOrders(
@@ -66,7 +66,7 @@ public class CourierController {
      * @param courier аутентифицированный курьер
      * @return страница с активными заказами курьера
      */
-    @GetMapping("/orders/active")
+    @GetMapping("/active")
     @ResponseStatus(HttpStatus.OK)
     @Transactional(readOnly = true)
     public List<OrderCourierResponseDto> getActiveOrders(@AuthenticationPrincipal User courier) {
@@ -81,7 +81,7 @@ public class CourierController {
      * @param orderId идентификатор заказа
      * @param courier аутентифицированный курьер
      */
-    @PatchMapping("/orders/{orderId}/accept")
+    @PatchMapping("/{orderId}/accept")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Transactional
     public void acceptOrder(@PathVariable Long orderId,
@@ -95,7 +95,7 @@ public class CourierController {
      * @param orderId идентификатор заказа
      * @param courier аутентифицированный курьер
      */
-    @PatchMapping("/orders/{orderId}/pick-up")
+    @PatchMapping("/{orderId}/pick-up")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Transactional
     public void pickUpOrder(@PathVariable Long orderId,
@@ -109,7 +109,7 @@ public class CourierController {
      * @param orderId идентификатор заказа
      * @param courier аутентифицированный курьер
      */
-    @PatchMapping("/orders/{orderId}/deliver")
+    @PatchMapping("/{orderId}/deliver")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Transactional
     public void deliverOrder(@PathVariable Long orderId,

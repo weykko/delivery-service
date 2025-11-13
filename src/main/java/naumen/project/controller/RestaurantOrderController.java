@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @SecurityRequirement(name = "JWT")
 @RestController
-@RequestMapping("/api/v1/restaurant")
+@RequestMapping("/api/v1/restaurant/orders")
 public class RestaurantOrderController {
 
     private final OrderService orderService;
@@ -48,7 +48,7 @@ public class RestaurantOrderController {
      * @param restaurant аутентифицированный ресторан
      * @return страница с активными заказами ресторана
      */
-    @GetMapping("/orders")
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @Transactional(readOnly = true)
     public PagedResponseDto<OrderRestaurantResponseDto> getActiveOrders(
@@ -69,7 +69,7 @@ public class RestaurantOrderController {
      * @param restaurant аутентифицированный ресторан
      * @return информация о заказе ресторана
      */
-    @GetMapping("/orders/{orderId}")
+    @GetMapping("/{orderId}")
     @ResponseStatus(HttpStatus.OK)
     @Transactional(readOnly = true)
     public OrderResponseDto getOrder(
@@ -86,7 +86,7 @@ public class RestaurantOrderController {
      * @param orderId    идентификатор заказа
      * @param restaurant аутентифицированный ресторан
      */
-    @PatchMapping("/orders/{orderId}/prepare")
+    @PatchMapping("/{orderId}/prepare")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Transactional
     public void prepareOrder(@PathVariable Long orderId,
@@ -100,7 +100,7 @@ public class RestaurantOrderController {
      * @param orderId    идентификатор заказа
      * @param restaurant аутентифицированный ресторан
      */
-    @PatchMapping("/orders/{orderId}/ready")
+    @PatchMapping("/{orderId}/ready")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Transactional
     public void readyOrder(@PathVariable Long orderId,

@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @SecurityRequirement(name = "JWT")
 @RestController
-@RequestMapping("/api/v1/restaurant")
+@RequestMapping("/api/v1/restaurant/menu")
 public class RestaurantMenuController {
 
     private final MenuService menuService;
@@ -42,7 +42,7 @@ public class RestaurantMenuController {
      * @param user    аутентифицированный ресторан
      * @return созданное блюдо с присвоенным идентификатором
      */
-    @PostMapping("/menu")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Transactional
     public MenuItemResponseDto createMenuItem(@RequestBody @Valid CreateMenuItemRequestDto request,
@@ -59,7 +59,7 @@ public class RestaurantMenuController {
      * @param user    аутентифицированный ресторан
      * @return обновленное блюдо
      */
-    @PutMapping("/menu/{id}")
+    @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @Transactional
     public MenuItemResponseDto updateMenuItem(@PathVariable Long id,
@@ -75,7 +75,7 @@ public class RestaurantMenuController {
      * @param id   идентификатор удаляемой позиции меню
      * @param user аутентифицированный ресторан
      */
-    @DeleteMapping("/menu/{id}")
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Transactional
     public void deleteMenuItem(@PathVariable Long id,
