@@ -20,6 +20,10 @@ import java.util.List;
  * Контроллер для управления курьерами ресторана.
  * Предоставляет endpoints для операций с курьерами.
  * Требует аутентификации с JWT токеном и права доступа DELIVERY.
+ *
+ * @see OrderService
+ * @see OrderMapper
+ * @see PageMapper
  */
 @SecurityRequirement(name = "JWT")
 @RestController
@@ -30,7 +34,7 @@ public class CourierController {
     private final OrderMapper orderMapper;
     private final PageMapper pageMapper;
 
-    public  CourierController(OrderService orderService, OrderMapper orderMapper, PageMapper pageMapper) {
+    public CourierController(OrderService orderService, OrderMapper orderMapper, PageMapper pageMapper) {
         this.orderService = orderService;
         this.orderMapper = orderMapper;
         this.pageMapper = pageMapper;
@@ -39,32 +43,35 @@ public class CourierController {
     /**
      * Получает заказы, доступные курьеру.
      *
+     * @param page номер страницы
+     * @param size количество элементов на странице
      * @return страница с доступными заказами
      */
     @GetMapping("/orders")
     @ResponseStatus(HttpStatus.OK)
-    @Transactional
+    @Transactional(readOnly = true)
     public PagedResponseDto<OrderCourierResponseDto> getAvailableOrders(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Page<OrderCourierResponseDto> orderPages = orderService
                 .getAvailableOrders(PageRequest.of(page, size))
-                .map(orderMapper::toResponse);
+                .map(orderMapper::toCourierResponse);
 
-        return pageMapper.toOrderResponse(orderPages);
+        return pageMapper.toOrderCourierResponse(orderPages);
     }
 
     /**
      * Получает активные заказы курьера.
      *
+     * @param courier аутентифицированный курьер
      * @return страница с активными заказами курьера
      */
     @GetMapping("/orders/active")
     @ResponseStatus(HttpStatus.OK)
-    @Transactional
+    @Transactional(readOnly = true)
     public List<OrderCourierResponseDto> getActiveOrders(@AuthenticationPrincipal User courier) {
         return orderService.getActiveOrdersByCourier(courier).stream()
-                .map(orderMapper::toResponse)
+                .map(orderMapper::toCourierResponse)
                 .toList();
     }
 
@@ -72,6 +79,7 @@ public class CourierController {
      * Принимает заказ курьером.
      *
      * @param orderId идентификатор заказа
+     * @param courier аутентифицированный курьер
      */
     @PatchMapping("/orders/{orderId}/accept")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -85,6 +93,7 @@ public class CourierController {
      * Помечает заказ как забранный курьером.
      *
      * @param orderId идентификатор заказа
+     * @param courier аутентифицированный курьер
      */
     @PatchMapping("/orders/{orderId}/pick-up")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -98,6 +107,7 @@ public class CourierController {
      * Помечает заказ как доставленный курьером.
      *
      * @param orderId идентификатор заказа
+     * @param courier аутентифицированный курьер
      */
     @PatchMapping("/orders/{orderId}/deliver")
     @ResponseStatus(HttpStatus.NO_CONTENT)

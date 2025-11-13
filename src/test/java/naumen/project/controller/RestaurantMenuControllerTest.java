@@ -19,10 +19,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 
 /**
- * Модульные тесты для {@link RestaurantController}
+ * Модульные тесты для {@link RestaurantMenuController}
  */
 @ExtendWith(MockitoExtension.class)
-class RestaurantControllerTest {
+class RestaurantMenuControllerTest {
 
     @Mock
     private MenuService menuService;
@@ -31,7 +31,7 @@ class RestaurantControllerTest {
     private MenuMapper menuMapper;
 
     @InjectMocks
-    private RestaurantController restaurantController;
+    private RestaurantMenuController restaurantMenuController;
 
     private final User restaurantUser = createRestaurantUser();
 
@@ -70,7 +70,7 @@ class RestaurantControllerTest {
         Mockito.when(menuService.createMenuItem(newMenuItem, restaurantUser)).thenReturn(savedMenuItem);
         Mockito.when(menuMapper.toResponse(savedMenuItem)).thenReturn(expectedResponse);
 
-        MenuItemResponseDto result = restaurantController.createMenuItem(createRequest, restaurantUser);
+        MenuItemResponseDto result = restaurantMenuController.createMenuItem(createRequest, restaurantUser);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(expectedResponse.id(), result.id());
@@ -113,7 +113,7 @@ class RestaurantControllerTest {
                 .thenReturn(updatedMenuItem);
         Mockito.when(menuMapper.toResponse(updatedMenuItem)).thenReturn(expectedResponse);
 
-        MenuItemResponseDto result = restaurantController.updateMenuItem(menuItemId, updateRequest, restaurantUser);
+        MenuItemResponseDto result = restaurantMenuController.updateMenuItem(menuItemId, updateRequest, restaurantUser);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(expectedResponse.id(), result.id());
@@ -131,7 +131,7 @@ class RestaurantControllerTest {
     void deleteMenuItem_WithValidOwner_ShouldCallDeleteService() {
         Long menuItemId = 1L;
 
-        restaurantController.deleteMenuItem(menuItemId, restaurantUser);
+        restaurantMenuController.deleteMenuItem(menuItemId, restaurantUser);
 
         Mockito.verify(menuService).deleteMenuItem(menuItemId, restaurantUser);
     }
