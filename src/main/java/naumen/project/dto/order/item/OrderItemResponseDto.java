@@ -1,4 +1,4 @@
-package naumen.project.dto.order;
+package naumen.project.dto.order.item;
 
 import java.math.BigDecimal;
 

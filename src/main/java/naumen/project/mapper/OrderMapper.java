@@ -1,7 +1,7 @@
 package naumen.project.mapper;
 
 import naumen.project.dto.order.OrderCourierResponseDto;
-import naumen.project.dto.order.OrderItemResponseDto;
+import naumen.project.dto.order.item.OrderItemResponseDto;
 import naumen.project.dto.order.OrderResponseDto;
 import naumen.project.dto.order.OrderRestaurantResponseDto;
 import naumen.project.dto.order.client.OrderClientCreateResponseDto;

@@ -1,6 +1,6 @@
 package naumen.project.dto.order.client;
 
-import naumen.project.dto.order.OrderItemResponseDto;
+import naumen.project.dto.order.item.OrderItemResponseDto;
 import naumen.project.entity.enums.OrderStatus;
 
 import java.math.BigDecimal;
