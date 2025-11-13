@@ -4,6 +4,8 @@ import naumen.project.dto.order.OrderCourierResponseDto;
 import naumen.project.dto.order.OrderItemResponseDto;
 import naumen.project.dto.order.OrderResponseDto;
 import naumen.project.dto.order.OrderRestaurantResponseDto;
+import naumen.project.dto.order.client.OrderClientCreateResponseDto;
+import naumen.project.dto.order.client.OrderClientInfoResponseDto;
 import naumen.project.entity.Order;
 import naumen.project.entity.OrderItem;
 import org.mapstruct.Mapper;
@@ -41,6 +43,26 @@ public interface OrderMapper {
      */
     @Mapping(target = "courierId", source = "courier.id")
     OrderResponseDto toResponse(Order order);
+
+    /**
+     * Преобразует сущность Order в ответ для клиента. Подробный вариант
+     *
+     * @param order сущность заказа
+     * @return DTO ответа клиенту
+     */
+    @Mapping(target = "courierId", source = "courier.id")
+    @Mapping(target = "restaurantId", source = "restaurant.id")
+    @Mapping(target = "items", source = "items")
+    OrderClientInfoResponseDto toClientInfoResponse(Order order);
+
+    /**
+     * Преобразует сущность Order в ответ для клиента при оформлении заказа.
+     *
+     * @param order сущность заказа
+     * @return DTO ответа клиенту
+     */
+    @Mapping(target = "items", source = "items")
+    OrderClientCreateResponseDto toClientCreateResponse(Order order);
 
     /**
      * Преобразует сущность OrderItem в DTO ответа.
