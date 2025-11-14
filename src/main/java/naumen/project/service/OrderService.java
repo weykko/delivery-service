@@ -1,6 +1,7 @@
 package naumen.project.service;
 
 import naumen.project.entity.Order;
+import naumen.project.entity.OrderItem;
 import naumen.project.entity.User;
 import naumen.project.entity.enums.OrderStatus;
 import naumen.project.exception.WebException;
@@ -10,15 +11,21 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final UserService userService;
 
-    public OrderService(OrderRepository orderRepository) {
+    public OrderService(
+            OrderRepository orderRepository,
+            UserService userService
+    ) {
         this.orderRepository = orderRepository;
+        this.userService = userService;
     }
 
     /**
@@ -208,6 +215,60 @@ public class OrderService {
     }
 
     /**
+     * Оформление заказа
+     * @param restaurantId id ресторана
+     * @param orderItems заказанное меню
+     * @param deliveryAddress адрес доставки
+     * @param client заказчик - клиент
+     * @return заказ
+     */
+    public Order createOrderByClient(Long restaurantId, List<OrderItem> orderItems,
+                                     String deliveryAddress, User client) {
+        User restaurant = userService.getById(restaurantId);
+
+        Order order = new Order();
+        order.setDeliveryAddress(deliveryAddress);
+        order.setStatus(OrderStatus.CREATED);
+        order.setItems(orderItems);
+        order.setTotalPrice(
+                orderItems.stream()
+                        .map(OrderItem::getItemPrice)
+                        .reduce(BigDecimal::add)
+                        .orElse(BigDecimal.ZERO)
+        );
+        order.setRestaurant(restaurant);
+        order.setClient(client);
+
+        orderItems.forEach(item -> item.setOrder(order));
+
+        return orderRepository.save(order);
+    }
+
+    /**
+     * Получить информацию по заказу. Для клиента. Проверяется, что заказ принадлежит клиенту
+     * @param orderId id заказа
+     * @param client текущий клиент
+     * @return заказ
+     */
+    public Order getOrderByClient(Long orderId, User client) {
+        Order order = getOrderById(orderId);
+        assertBelongsToClient(order, client);
+        return order;
+    }
+
+    /**
+     * Удалить заказ. Т.е. перевести в статус DELETED
+     * @param orderId id заказа
+     * @param client текущий клиент
+     */
+    public void deleteOrderByClient(Long orderId, User client) {
+        Order order = getOrderById(orderId);
+        assertBelongsToClient(order, client);
+        order.setStatus(OrderStatus.DELETED);
+        orderRepository.save(order);
+    }
+
+    /**
      * Получение заказа по идентификатору
      *
      * @param id идентификатор заказа
@@ -230,7 +291,7 @@ public class OrderService {
      */
     private void assertBelongsToCourier(Order order, User courier) {
         if (order.getCourier() == null ||
-                !order.getCourier().getId().equals(courier.getId())) {
+            !order.getCourier().getId().equals(courier.getId())) {
             throw new WebException(
                     HttpStatus.FORBIDDEN,
                     "Заказ с id '%d' не принадлежит вам",
@@ -246,11 +307,20 @@ public class OrderService {
      */
     private void assertBelongsToRestaurant(Order order, User restaurant) {
         if (order.getRestaurant() == null ||
-                !order.getRestaurant().getId().equals(restaurant.getId())) {
+            !order.getRestaurant().getId().equals(restaurant.getId())) {
             throw new WebException(
                     HttpStatus.FORBIDDEN,
                     "Заказ с id '%d' не принадлежит вашему ресторану",
                     order.getId());
+        }
+    }
+
+    private void assertBelongsToClient(Order order, User client) {
+        if (!order.getClient().getId().equals(client.getId())) {
+            throw new WebException(
+                    HttpStatus.FORBIDDEN,
+                    "Заказ c '%d' вам не принадлежит"
+            );
         }
     }
 }
