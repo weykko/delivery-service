@@ -10,7 +10,7 @@ import naumen.project.entity.OrderItem;
 import naumen.project.entity.User;
 import naumen.project.mapper.OrderMapper;
 import naumen.project.service.OrderItemService;
-import naumen.project.service.OrderService;
+import naumen.project.service.order.OrderClientService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +23,7 @@ import java.util.List;
  * Предоставляет endpoints для создания, получения информации и удаления заказов
  * Требует аутентификации с JWT токеном и права доступа CLIENT
  *
- * @see OrderService
+ * @see OrderClientService
  * @see OrderItemService
  * @see OrderMapper
  */
@@ -32,15 +32,15 @@ import java.util.List;
 @RequestMapping("/api/v1/client/orders")
 public class ClientOrderController {
 
-    private final OrderService orderService;
+    private final OrderClientService orderClientService;
     private final OrderItemService orderItemService;
     private final OrderMapper orderMapper;
 
     public ClientOrderController(
-            OrderService orderService,
+            OrderClientService orderClientService,
             OrderItemService orderItemService,
             OrderMapper orderMapper) {
-        this.orderService = orderService;
+        this.orderClientService = orderClientService;
         this.orderItemService = orderItemService;
         this.orderMapper = orderMapper;
     }
@@ -62,7 +62,7 @@ public class ClientOrderController {
         List<OrderItem> orderItemList = request.items().stream()
                 .map(orderItem -> orderItemService.buildOrderItem(orderItem.menuItemId(), orderItem.quantity()))
                 .toList();
-        Order order = orderService.createOrderByClient(
+        Order order = orderClientService.createOrder(
                 request.restaurantId(),
                 orderItemList,
                 request.deliveryAddress(),
@@ -83,7 +83,7 @@ public class ClientOrderController {
     public List<OrderClientShortResponseDto> getOrders(
             @AuthenticationPrincipal User client
     ) {
-        return orderService.getOrdersByClient(client).stream()
+        return orderClientService.getOrders(client).stream()
                 .map(orderMapper::toClientShortResponse)
                 .toList();
     }
@@ -102,7 +102,7 @@ public class ClientOrderController {
             @PathVariable Long orderId,
             @AuthenticationPrincipal User client
     ) {
-        Order order = orderService.getOrderByClient(orderId, client);
+        Order order = orderClientService.getOrder(orderId, client);
         return orderMapper.toClientInfoResponse(order);
     }
 
@@ -117,6 +117,6 @@ public class ClientOrderController {
     @Transactional
     public void deleteOrderByClient(@PathVariable Long orderId,
                                     @AuthenticationPrincipal User client) {
-        orderService.deleteOrderByClient(orderId, client);
+        orderClientService.deleteOrder(orderId, client);
     }
 }
