@@ -10,9 +10,10 @@ import java.util.List;
 
 /**
  * Запрос на оформление заказа
- * @param restaurantId id ресторана
+ *
+ * @param restaurantId    id ресторана
  * @param deliveryAddress адрес доставки
- * @param items состав заказа
+ * @param items           состав заказа
  */
 public record OrderClientCreateRequestDto(
 

@@ -7,8 +7,8 @@ import naumen.project.entity.enums.Role;
  *
  * @param id    уникальный идентификатор пользователя
  * @param email электронная почта пользователя
- * @param name  имя пользователя
  * @param role  роль пользователя в системе
+ * @param name  имя пользователя
  */
 public record RegisterResponseDto(
 
@@ -16,8 +16,8 @@ public record RegisterResponseDto(
 
         String email,
 
-        String name,
+        Role role,
 
-        Role role
+        String name
 ) {
 }

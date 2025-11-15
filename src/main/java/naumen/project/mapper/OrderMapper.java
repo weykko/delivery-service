@@ -1,11 +1,11 @@
 package naumen.project.mapper;
 
-import naumen.project.dto.order.OrderCourierResponseDto;
-import naumen.project.dto.order.item.OrderItemResponseDto;
-import naumen.project.dto.order.OrderResponseDto;
-import naumen.project.dto.order.OrderRestaurantResponseDto;
-import naumen.project.dto.order.client.OrderClientCreateResponseDto;
 import naumen.project.dto.order.client.OrderClientInfoResponseDto;
+import naumen.project.dto.order.client.OrderClientShortResponseDto;
+import naumen.project.dto.order.courier.OrderCourierResponseDto;
+import naumen.project.dto.order.item.OrderItemResponseDto;
+import naumen.project.dto.order.restaurant.OrderRestaurantResponseDto;
+import naumen.project.dto.order.restaurant.OrderRestaurantShortResponseDto;
 import naumen.project.entity.Order;
 import naumen.project.entity.OrderItem;
 import org.mapstruct.Mapper;
@@ -28,21 +28,21 @@ public interface OrderMapper {
     OrderCourierResponseDto toCourierResponse(Order order);
 
     /**
-     * Преобразует сущность Order в DTO ответа для ресторана.
+     * Преобразует сущность Order в короткий DTO ответа для ресторана.
      *
      * @param order сущность заказа
      * @return DTO с данными заказа для ресторана
      */
-    OrderRestaurantResponseDto toRestaurantResponse(Order order);
+    OrderRestaurantShortResponseDto toRestaurantShortResponse(Order order);
 
     /**
-     * Преобразует сущность Order в общий DTO ответа.
+     * Преобразует сущность Order в DTO ответа для ресторана.
      *
      * @param order сущность заказа
      * @return общий DTO с данными заказа
      */
     @Mapping(target = "courierId", source = "courier.id")
-    OrderResponseDto toResponse(Order order);
+    OrderRestaurantResponseDto toRestaurantResponse(Order order);
 
     /**
      * Преобразует сущность Order в ответ для клиента. Подробный вариант
@@ -56,13 +56,12 @@ public interface OrderMapper {
     OrderClientInfoResponseDto toClientInfoResponse(Order order);
 
     /**
-     * Преобразует сущность Order в ответ для клиента при оформлении заказа.
+     * Преобразует сущность Order в ответ для клиента. Короткий вариант
      *
      * @param order сущность заказа
      * @return DTO ответа клиенту
      */
-    @Mapping(target = "items", source = "items")
-    OrderClientCreateResponseDto toClientCreateResponse(Order order);
+    OrderClientShortResponseDto toClientShortResponse(Order order);
 
     /**
      * Преобразует сущность OrderItem в DTO ответа.

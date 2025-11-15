@@ -14,6 +14,12 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
 
+/**
+ * Сервис для работы с заказами.
+ *
+ * @see OrderRepository
+ * @see UserService
+ */
 @Service
 public class OrderService {
 
@@ -34,8 +40,8 @@ public class OrderService {
      * @param pageable параметры пагинации
      * @return страница с доступными заказами
      */
-    public Page<Order> getAvailableOrders(Pageable pageable) {
-        return orderRepository.findAvailableOrders(pageable);
+    public Page<Order> getAvailableOrdersForCourier(Pageable pageable) {
+        return orderRepository.findAvailableOrdersForCourier(pageable);
     }
 
     /**
@@ -215,15 +221,27 @@ public class OrderService {
     }
 
     /**
-     * Оформление заказа
-     * @param restaurantId id ресторана
-     * @param orderItems заказанное меню
+     * Оформление заказа клиентом.
+     * Все позиции заказа должны принадлежать указанному ресторану
+     *
+     * @param restaurantId    id ресторана
+     * @param orderItems      заказанное меню
      * @param deliveryAddress адрес доставки
-     * @param client заказчик - клиент
+     * @param client          заказчик - клиент
      * @return заказ
      */
     public Order createOrderByClient(Long restaurantId, List<OrderItem> orderItems,
                                      String deliveryAddress, User client) {
+        boolean allItemsBelongToRestaurant = orderItems.stream()
+                .allMatch(item -> item.getMenuItem().getRestaurant().getId().equals(restaurantId));
+
+        if (!allItemsBelongToRestaurant) {
+            throw new WebException(
+                    HttpStatus.BAD_REQUEST,
+                    "Все позиции заказа должны принадлежать ресторану с id '%d'",
+                    restaurantId);
+        }
+
         User restaurant = userService.getById(restaurantId);
 
         Order order = new Order();
@@ -245,9 +263,20 @@ public class OrderService {
     }
 
     /**
+     * Получение заказов клиента
+     *
+     * @param client клиент
+     * @return страница с заказами клиента
+     */
+    public List<Order> getOrdersByClient(User client) {
+        return orderRepository.findOrdersByClient(client);
+    }
+
+    /**
      * Получить информацию по заказу. Для клиента. Проверяется, что заказ принадлежит клиенту
+     *
      * @param orderId id заказа
-     * @param client текущий клиент
+     * @param client  текущий клиент
      * @return заказ
      */
     public Order getOrderByClient(Long orderId, User client) {
@@ -258,12 +287,22 @@ public class OrderService {
 
     /**
      * Удалить заказ. Т.е. перевести в статус DELETED
+     *
      * @param orderId id заказа
-     * @param client текущий клиент
+     * @param client  текущий клиент
      */
     public void deleteOrderByClient(Long orderId, User client) {
         Order order = getOrderById(orderId);
+
         assertBelongsToClient(order, client);
+        if (order.getStatus() != OrderStatus.CREATED ||
+                order.getCourier() != null) {
+            throw new WebException(
+                    HttpStatus.BAD_REQUEST,
+                    "Заказ с id '%d' уже принят в работу",
+                    orderId);
+        }
+
         order.setStatus(OrderStatus.DELETED);
         orderRepository.save(order);
     }
@@ -291,7 +330,7 @@ public class OrderService {
      */
     private void assertBelongsToCourier(Order order, User courier) {
         if (order.getCourier() == null ||
-            !order.getCourier().getId().equals(courier.getId())) {
+                !order.getCourier().getId().equals(courier.getId())) {
             throw new WebException(
                     HttpStatus.FORBIDDEN,
                     "Заказ с id '%d' не принадлежит вам",
@@ -307,7 +346,7 @@ public class OrderService {
      */
     private void assertBelongsToRestaurant(Order order, User restaurant) {
         if (order.getRestaurant() == null ||
-            !order.getRestaurant().getId().equals(restaurant.getId())) {
+                !order.getRestaurant().getId().equals(restaurant.getId())) {
             throw new WebException(
                     HttpStatus.FORBIDDEN,
                     "Заказ с id '%d' не принадлежит вашему ресторану",
@@ -315,12 +354,18 @@ public class OrderService {
         }
     }
 
+    /**
+     * Проверяет, принадлежит ли заказ указанному клиенту
+     *
+     * @param order  заказ
+     * @param client клиент
+     */
     private void assertBelongsToClient(Order order, User client) {
         if (!order.getClient().getId().equals(client.getId())) {
             throw new WebException(
                     HttpStatus.FORBIDDEN,
-                    "Заказ c '%d' вам не принадлежит"
-            );
+                    "Заказ c id '%d' не принадлежит вам",
+                    order.getId());
         }
     }
 }

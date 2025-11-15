@@ -8,6 +8,8 @@ import java.math.BigDecimal;
 
 /**
  * Логика работы с пунктами меню в заказе
+ *
+ * @see MenuService
  */
 @Service
 public class OrderItemService {
@@ -22,8 +24,9 @@ public class OrderItemService {
 
     /**
      * Создать пункт меню, без сохранения. Происходит расчет цены.
+     *
      * @param menuItemId id пункта меню
-     * @param quantity количество для заказа
+     * @param quantity   количество для заказа
      * @return объект {@link OrderItem}. Ещё не сохраненный.
      */
     public OrderItem buildOrderItem(Long menuItemId, Integer quantity) {

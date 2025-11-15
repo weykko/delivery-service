@@ -87,7 +87,7 @@ public class UserServiceTest {
         userToUpdate.setEmail("another@example.com");
         userToUpdate.setName("Updated Name");
         userToUpdate.setPhone(existingPhone);
-        userToUpdate.setRole(Role.USER);
+        userToUpdate.setRole(Role.CLIENT);
 
         User existingUser = new User();
         existingUser.setId(3L); // другой пользователь с таким телефоном
@@ -145,7 +145,7 @@ public class UserServiceTest {
         user.setEmail("test@example.com");
         user.setName("Test User");
         user.setPhone("+79991234567");
-        user.setRole(Role.USER);
+        user.setRole(Role.CLIENT);
         return user;
     }
 }

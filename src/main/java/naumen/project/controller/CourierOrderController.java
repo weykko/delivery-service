@@ -1,7 +1,7 @@
 package naumen.project.controller;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import naumen.project.dto.order.OrderCourierResponseDto;
+import naumen.project.dto.order.courier.OrderCourierResponseDto;
 import naumen.project.dto.paged.PagedResponseDto;
 import naumen.project.entity.User;
 import naumen.project.mapper.OrderMapper;
@@ -54,7 +54,7 @@ public class CourierOrderController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Page<OrderCourierResponseDto> orderPages = orderService
-                .getAvailableOrders(PageRequest.of(page, size))
+                .getAvailableOrdersForCourier(PageRequest.of(page, size))
                 .map(orderMapper::toCourierResponse);
 
         return pageMapper.toOrderCourierResponse(orderPages);

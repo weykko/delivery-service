@@ -1,4 +1,4 @@
-package naumen.project.dto.order;
+package naumen.project.dto.order.restaurant;
 
 import java.math.BigDecimal;
 
@@ -9,7 +9,7 @@ import java.math.BigDecimal;
  * @param status     статус заказа
  * @param totalPrice общая стоимость заказа
  */
-public record OrderRestaurantResponseDto(
+public record OrderRestaurantShortResponseDto(
         Long id,
         String status,
         BigDecimal totalPrice

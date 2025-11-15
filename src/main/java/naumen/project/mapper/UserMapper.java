@@ -39,6 +39,7 @@ public interface UserMapper {
      * @return сущность пользователя
      */
     @Mapping(target = "password", ignore = true)
+    @Mapping(target = "address", source = "address")
     User toEntity(RegisterRequestDto request);
 
     /**

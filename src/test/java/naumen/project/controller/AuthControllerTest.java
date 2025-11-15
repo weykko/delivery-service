@@ -50,8 +50,8 @@ class AuthControllerTest {
         RegisterResponseDto expectedResponse = new RegisterResponseDto(
                 1L,
                 registerRequest.email(),
-                registerRequest.name(),
-                registerRequest.role()
+                registerRequest.role(),
+                registerRequest.name()
         );
 
         Mockito.when(userMapper.toEntity(registerRequest)).thenReturn(userEntity);
@@ -126,7 +126,7 @@ class AuthControllerTest {
         user.setEmail("test@example.com");
         user.setName("Test User");
         user.setPhone("+79991234567");
-        user.setRole(Role.USER);
+        user.setRole(Role.CLIENT);
         return user;
     }
 
@@ -137,7 +137,7 @@ class AuthControllerTest {
         return new RegisterRequestDto(
                 "test@example.com",
                 "password123",
-                Role.USER,
+                Role.CLIENT,
                 "Test User",
                 "+79991234567",
                 "Ул Пушкина"
