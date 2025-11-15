@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 
 public class ForbiddenException extends AppBaseException {
 
-    private static final HttpStatus STATUS = HttpStatus.BAD_REQUEST;
+    private static final HttpStatus STATUS = HttpStatus.FORBIDDEN;
 
     public ForbiddenException(String message) {
         super(STATUS, message);
