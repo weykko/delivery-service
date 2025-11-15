@@ -358,7 +358,7 @@ public class OrderService {
         if (!order.getClient().getId().equals(client.getId())) {
             throw new WebException(
                     HttpStatus.FORBIDDEN,
-                    "Заказ c '%d' вам не принадлежит",
+                    "Заказ c id '%d' не принадлежит вам",
                     order.getId());
         }
     }

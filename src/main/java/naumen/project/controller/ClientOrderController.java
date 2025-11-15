@@ -115,7 +115,8 @@ public class ClientOrderController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{orderId}")
     @Transactional
-    public void deleteOrderByClient(@PathVariable Long orderId, @AuthenticationPrincipal User client) {
+    public void deleteOrderByClient(@PathVariable Long orderId,
+                                    @AuthenticationPrincipal User client) {
         orderService.deleteOrderByClient(orderId, client);
     }
 }
