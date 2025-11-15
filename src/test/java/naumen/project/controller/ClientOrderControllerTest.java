@@ -11,7 +11,7 @@ import naumen.project.entity.enums.OrderStatus;
 import naumen.project.entity.enums.Role;
 import naumen.project.mapper.OrderMapper;
 import naumen.project.service.OrderItemService;
-import naumen.project.service.OrderService;
+import naumen.project.service.order.OrderClientService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,7 +31,7 @@ import java.util.List;
 class ClientOrderControllerTest {
 
     @Mock
-    private OrderService orderService;
+    private OrderClientService orderClientService;
 
     @Mock
     private OrderItemService orderItemService;
@@ -66,7 +66,7 @@ class ClientOrderControllerTest {
         );
 
         Mockito.when(orderItemService.buildOrderItem(1L, 2)).thenReturn(orderItem);
-        Mockito.when(orderService.createOrderByClient(
+        Mockito.when(orderClientService.createOrder(
                 createRequest.restaurantId(),
                 orderItemList,
                 createRequest.deliveryAddress(),
@@ -82,7 +82,7 @@ class ClientOrderControllerTest {
         Assertions.assertEquals(expectedResponse.totalPrice(), result.totalPrice());
         Assertions.assertEquals(expectedResponse.deliveryAddress(), result.deliveryAddress());
         Mockito.verify(orderItemService).buildOrderItem(1L, 2);
-        Mockito.verify(orderService).createOrderByClient(
+        Mockito.verify(orderClientService).createOrder(
                 createRequest.restaurantId(),
                 orderItemList,
                 createRequest.deliveryAddress(),
@@ -103,17 +103,17 @@ class ClientOrderControllerTest {
                 "Test Restaurant"
         );
 
-        Mockito.when(orderService.getOrdersByClient(testClient)).thenReturn(List.of(testOrder));
+        Mockito.when(orderClientService.getOrders(testClient)).thenReturn(List.of(testOrder));
         Mockito.when(orderMapper.toClientShortResponse(testOrder)).thenReturn(orderResponse);
 
         List<OrderClientShortResponseDto> result = clientOrderController.getOrders(testClient);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1, result.size());
-        Assertions.assertEquals(orderResponse.id(), result.get(0).id());
-        Assertions.assertEquals(orderResponse.status(), result.get(0).status());
-        Assertions.assertEquals(orderResponse.totalPrice(), result.get(0).totalPrice());
-        Mockito.verify(orderService).getOrdersByClient(testClient);
+        Assertions.assertEquals(orderResponse.id(), result.getFirst().id());
+        Assertions.assertEquals(orderResponse.status(), result.getFirst().status());
+        Assertions.assertEquals(orderResponse.totalPrice(), result.getFirst().totalPrice());
+        Mockito.verify(orderClientService).getOrders(testClient);
         Mockito.verify(orderMapper).toClientShortResponse(testOrder);
     }
 
@@ -134,7 +134,7 @@ class ClientOrderControllerTest {
                 List.of()
         );
 
-        Mockito.when(orderService.getOrderByClient(orderId, testClient)).thenReturn(testOrder);
+        Mockito.when(orderClientService.getOrder(orderId, testClient)).thenReturn(testOrder);
         Mockito.when(orderMapper.toClientInfoResponse(testOrder)).thenReturn(expectedResponse);
 
         OrderClientInfoResponseDto result = clientOrderController.getOrderInfoById(orderId, testClient);
@@ -143,7 +143,7 @@ class ClientOrderControllerTest {
         Assertions.assertEquals(expectedResponse.id(), result.id());
         Assertions.assertEquals(expectedResponse.status(), result.status());
         Assertions.assertEquals(expectedResponse.deliveryAddress(), result.deliveryAddress());
-        Mockito.verify(orderService).getOrderByClient(orderId, testClient);
+        Mockito.verify(orderClientService).getOrder(orderId, testClient);
         Mockito.verify(orderMapper).toClientInfoResponse(testOrder);
     }
 
@@ -156,7 +156,7 @@ class ClientOrderControllerTest {
 
         clientOrderController.deleteOrderByClient(orderId, testClient);
 
-        Mockito.verify(orderService).deleteOrderByClient(orderId, testClient);
+        Mockito.verify(orderClientService).deleteOrder(orderId, testClient);
     }
 
     // Вспомогательные методы для создания тестовых данных
