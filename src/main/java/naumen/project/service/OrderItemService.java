@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 /**
  * Логика работы с пунктами меню в заказе
  *
- * @see OrderItem
+ * @see MenuService
  */
 @Service
 public class OrderItemService {

@@ -14,6 +14,12 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
 
+/**
+ * Сервис для работы с заказами.
+ *
+ * @see OrderRepository
+ * @see UserService
+ */
 @Service
 public class OrderService {
 
