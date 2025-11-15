@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import naumen.project.dto.error.ErrorResponseDto;
 import naumen.project.dto.error.ViolationConstraintDto;
-import naumen.project.exception.WebException;
+import naumen.project.exception.AppBaseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -51,10 +51,10 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Обрабатывает кастомные исключения приложения {@link WebException}
+     * Обрабатывает кастомные исключения приложения {@link AppBaseException}
      */
     @ExceptionHandler
-    public ResponseEntity<ErrorResponseDto> handleWebException(WebException ex, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponseDto> handleWebException(AppBaseException ex, HttpServletRequest request) {
         ErrorResponseDto response = new ErrorResponseDto(
                 Instant.now(),
                 ex.getStatus().value(),

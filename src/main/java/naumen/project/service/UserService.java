@@ -1,9 +1,9 @@
 package naumen.project.service;
 
 import naumen.project.entity.User;
-import naumen.project.exception.WebException;
+import naumen.project.exception.IllegalDataException;
+import naumen.project.exception.NotFoundException;
 import naumen.project.repository.UserRepository;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -36,7 +36,7 @@ public class UserService {
     public User updateInfo(User updatedUser) {
         Optional<User> userWithPhone = userRepository.findByPhone(updatedUser.getPhone());
         if (userWithPhone.isPresent() && !userWithPhone.get().getId().equals(updatedUser.getId())) {
-            throw new WebException(HttpStatus.BAD_REQUEST, "Телефон уже занят");
+            throw new IllegalDataException("Телефон уже занят");
         }
 
         saveUser(updatedUser);
@@ -68,11 +68,11 @@ public class UserService {
      */
     public void checkUniqueFieldsRegistration(User user) {
         if (userRepository.existsByEmail(user.getEmail())) {
-            throw new WebException(HttpStatus.BAD_REQUEST, "Email уже занят");
+            throw new IllegalDataException("Email уже занят");
         }
 
         if (userRepository.existsByPhone(user.getPhone())) {
-            throw new WebException(HttpStatus.BAD_REQUEST, "Телефон уже занят");
+            throw new IllegalDataException("Телефон уже занят");
         }
     }
 
@@ -84,10 +84,6 @@ public class UserService {
      */
     public User getById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new WebException(
-                        HttpStatus.NOT_FOUND,
-                        "Пользователь не найден с id=%d",
-                        id
-                ));
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден с id=%d", id));
     }
 }

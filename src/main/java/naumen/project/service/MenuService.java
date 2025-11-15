@@ -3,12 +3,12 @@ package naumen.project.service;
 import naumen.project.dto.menu.UpdateMenuItemRequestDto;
 import naumen.project.entity.MenuItem;
 import naumen.project.entity.User;
-import naumen.project.exception.WebException;
+import naumen.project.exception.ForbiddenException;
+import naumen.project.exception.NotFoundException;
 import naumen.project.mapper.MenuMapper;
 import naumen.project.repository.MenuRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 /**
@@ -98,10 +98,7 @@ public class MenuService {
     public MenuItem getMenuItemById(Long id) {
         return menuRepository
                 .findById(id)
-                .orElseThrow(() -> new WebException(
-                        HttpStatus.NOT_FOUND,
-                        "Позиция меню с id '%d' не найдена",
-                        id));
+                .orElseThrow(() -> new NotFoundException("Позиция меню с id '%d' не найдена", id));
     }
 
     /**
@@ -112,10 +109,7 @@ public class MenuService {
      */
     private void assertBelongsToRestaurant(MenuItem menuItem, User user) {
         if (!menuItem.getRestaurant().getId().equals(user.getId())) {
-            throw new WebException(
-                    HttpStatus.FORBIDDEN,
-                    "Позиция меню с id '%d' не принадлежит вашему ресторану",
-                    menuItem.getId());
+            throw new ForbiddenException("Позиция меню с id '%d' не принадлежит вашему ресторану", menuItem.getId());
         }
     }
 }

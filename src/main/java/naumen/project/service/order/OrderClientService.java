@@ -4,9 +4,9 @@ import naumen.project.entity.Order;
 import naumen.project.entity.OrderItem;
 import naumen.project.entity.User;
 import naumen.project.entity.enums.OrderStatus;
-import naumen.project.exception.WebException;
+import naumen.project.exception.ForbiddenException;
+import naumen.project.exception.IllegalDataException;
 import naumen.project.service.UserService;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -42,10 +42,7 @@ public class OrderClientService {
                 .allMatch(item -> item.getMenuItem().getRestaurant().getId().equals(restaurantId));
 
         if (!allItemsBelongToRestaurant) {
-            throw new WebException(
-                    HttpStatus.BAD_REQUEST,
-                    "Все позиции заказа должны принадлежать ресторану с id '%d'",
-                    restaurantId);
+            throw new IllegalDataException("Все позиции заказа должны принадлежать ресторану с id '%d'", restaurantId);
         }
 
         User restaurant = userService.getById(restaurantId);
@@ -103,10 +100,7 @@ public class OrderClientService {
         assertBelongsToClient(order, client);
         if (order.getStatus() != OrderStatus.CREATED ||
             order.getCourier() != null) {
-            throw new WebException(
-                    HttpStatus.BAD_REQUEST,
-                    "Заказ с id '%d' уже принят в работу",
-                    orderId);
+            throw new IllegalDataException("Заказ с id '%d' уже принят в работу", orderId);
         }
 
         order.setStatus(OrderStatus.DELETED);
@@ -121,10 +115,7 @@ public class OrderClientService {
      */
     private void assertBelongsToClient(Order order, User client) {
         if (!order.getClient().getId().equals(client.getId())) {
-            throw new WebException(
-                    HttpStatus.FORBIDDEN,
-                    "Заказ c id '%d' не принадлежит вам",
-                    order.getId());
+            throw new ForbiddenException("Заказ c id '%d' не принадлежит вам", order.getId());
         }
     }
 }
