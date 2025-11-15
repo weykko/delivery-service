@@ -3,8 +3,8 @@ package naumen.project.controller;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import naumen.project.dto.order.client.OrderClientCreateRequestDto;
-import naumen.project.dto.order.client.OrderClientCreateResponseDto;
 import naumen.project.dto.order.client.OrderClientInfoResponseDto;
+import naumen.project.dto.order.client.OrderClientShortResponseDto;
 import naumen.project.entity.Order;
 import naumen.project.entity.OrderItem;
 import naumen.project.entity.User;
@@ -19,7 +19,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * Работа с заказами для клиентов
+ * Контроллер для работы с заказами со стороны клиента
+ * Предоставляет endpoints для создания, получения информации и удаления заказов
+ * Требует аутентификации с JWT токеном и права доступа CLIENT
+ *
+ * @see OrderService
+ * @see OrderItemService
+ * @see OrderMapper
  */
 @SecurityRequirement(name = "JWT")
 @RestController
@@ -40,17 +46,18 @@ public class ClientOrderController {
     }
 
     /**
-     * Создание заказа. Заказ получает статус CREATED
+     * Создание заказа. Заказ получает статус CREATED.
+     * Все позиции заказа должны принадлежать указанному ресторану
      *
      * @param request запрос на создание
-     * @param user    клиент, который оформляет заказ
+     * @param client  клиент, который оформляет заказ
      * @return информация о заказе
      */
     @PostMapping
     @Transactional
-    public OrderClientCreateResponseDto createOrder(
+    public OrderClientInfoResponseDto createOrder(
             @RequestBody @Valid OrderClientCreateRequestDto request,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal User client
     ) {
         List<OrderItem> orderItemList = request.items().stream()
                 .map(orderItem -> orderItemService.buildOrderItem(orderItem.menuItemId(), orderItem.quantity()))
@@ -59,9 +66,26 @@ public class ClientOrderController {
                 request.restaurantId(),
                 orderItemList,
                 request.deliveryAddress(),
-                user
+                client
         );
-        return orderMapper.toClientCreateResponse(order);
+        return orderMapper.toClientInfoResponse(order);
+    }
+
+    /**
+     * Получение списка заказов текущего клиента
+     *
+     * @param client текущий клиент
+     * @return страница с заказами клиента
+     */
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    @Transactional(readOnly = true)
+    public List<OrderClientShortResponseDto> getOrders(
+            @AuthenticationPrincipal User client
+    ) {
+        return orderService.getOrdersByClient(client).stream()
+                .map(orderMapper::toClientShortResponse)
+                .toList();
     }
 
     /**
@@ -69,16 +93,16 @@ public class ClientOrderController {
      * Проверяется доступ, что заказ принадлежит текущему клиенту
      *
      * @param orderId id заказа
-     * @param user    текущий клиент
+     * @param client  текущий клиент
      * @return информация о заказе или 403 с ошибкой, если заказ не принадлежит текущему клиенту
      */
     @GetMapping("/{orderId}")
     @Transactional(readOnly = true)
     public OrderClientInfoResponseDto getOrderInfoById(
             @PathVariable Long orderId,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal User client
     ) {
-        Order order = orderService.getOrderByClient(orderId, user);
+        Order order = orderService.getOrderByClient(orderId, client);
         return orderMapper.toClientInfoResponse(order);
     }
 
@@ -86,13 +110,12 @@ public class ClientOrderController {
      * Удаление заказа. Статус заказа переводится в DELETED
      *
      * @param orderId id заказа
-     * @param user    текущий клиент
+     * @param client  текущий клиент
      */
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{orderId}")
     @Transactional
-    public void deleteOrderByClient(@PathVariable Long orderId, @AuthenticationPrincipal User user) {
-        orderService.deleteOrderByClient(orderId, user);
+    public void deleteOrderByClient(@PathVariable Long orderId, @AuthenticationPrincipal User client) {
+        orderService.deleteOrderByClient(orderId, client);
     }
-
 }

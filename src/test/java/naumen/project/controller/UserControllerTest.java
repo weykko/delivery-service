@@ -39,9 +39,10 @@ class UserControllerTest {
         UserResponseDto expectedResponse = new UserResponseDto(
                 testUser.getId(),
                 testUser.getEmail(),
+                testUser.getRole(),
                 testUser.getName(),
                 testUser.getPhone(),
-                testUser.getRole()
+                null
         );
 
         Mockito.when(userMapper.toResponse(testUser)).thenReturn(expectedResponse);
@@ -76,9 +77,10 @@ class UserControllerTest {
         UserResponseDto expectedResponse = new UserResponseDto(
                 updatedUser.getId(),
                 updatedUser.getEmail(),
+                updatedUser.getRole(),
                 updatedUser.getName(),
                 updatedUser.getPhone(),
-                updatedUser.getRole()
+                null
         );
 
         Mockito.when(userMapper.updateUserEntityFromRequest(updateRequest, testUser)).thenReturn(updatedUser);
@@ -116,7 +118,7 @@ class UserControllerTest {
         user.setEmail("test@example.com");
         user.setName("Test User");
         user.setPhone("+79991234567");
-        user.setRole(Role.USER);
+        user.setRole(Role.CLIENT);
         return user;
     }
 }

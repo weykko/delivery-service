@@ -1,9 +1,8 @@
 package naumen.project.mapper;
 
 import naumen.project.dto.menu.MenuItemResponseDto;
-import naumen.project.dto.order.OrderCourierResponseDto;
-import naumen.project.dto.order.OrderResponseDto;
-import naumen.project.dto.order.OrderRestaurantResponseDto;
+import naumen.project.dto.order.courier.OrderCourierResponseDto;
+import naumen.project.dto.order.restaurant.OrderRestaurantShortResponseDto;
 import naumen.project.dto.paged.PagedResponseDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -26,15 +25,6 @@ public interface PageMapper {
     PagedResponseDto<MenuItemResponseDto> toMenuResponse(Page<MenuItemResponseDto> request);
 
     /**
-     * Преобразует Spring Page<OrderResponseDto> в кастомный DTO пагинации.
-     *
-     * @param request страница Spring с элементами OrderResponseDto
-     * @return DTO с пагинированными данными
-     */
-    @Mapping(source = "number", target = "page")
-    PagedResponseDto<OrderResponseDto> toOrderResponse(Page<OrderResponseDto> request);
-
-    /**
      * Преобразует Spring Page<OrderCourierResponseDto> в кастомный DTO пагинации.
      *
      * @param request страница Spring с элементами OrderCourierResponseDto
@@ -50,5 +40,5 @@ public interface PageMapper {
      * @return DTO с пагинированными данными
      */
     @Mapping(source = "number", target = "page")
-    PagedResponseDto<OrderRestaurantResponseDto> toOrderRestaurantResponse(Page<OrderRestaurantResponseDto> request);
+    PagedResponseDto<OrderRestaurantShortResponseDto> toOrderRestaurantResponse(Page<OrderRestaurantShortResponseDto> request);
 }

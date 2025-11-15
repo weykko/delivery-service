@@ -25,7 +25,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT o FROM Order o " +
             "WHERE o.courier IS NULL " +
             "AND o.status IN ('CREATED', 'ACCEPTED', 'PREPARED')")
-    Page<Order> findAvailableOrders(Pageable pageable);
+    Page<Order> findAvailableOrdersForCourier(Pageable pageable);
 
     /**
      * Поиск активных заказов курьера
@@ -42,6 +42,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
      * Поиск активных заказов ресторана
      *
      * @param restaurant ресторан
+     * @param pageable   параметры пагинации
      * @return список активных заказов ресторана
      */
     @Query("SELECT o FROM Order o " +
@@ -49,4 +50,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "AND o.status IN ('CREATED', 'ACCEPTED', 'PREPARED')")
     Page<Order> findActiveOrdersByRestaurant(User restaurant, Pageable pageable);
 
+    /**
+     * Поиск заказов клиента
+     *
+     * @param client клиент
+     * @return страница с заказами клиента
+     */
+    List<Order> findOrdersByClient(User client);
 }

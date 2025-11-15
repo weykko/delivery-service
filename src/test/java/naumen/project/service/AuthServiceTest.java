@@ -148,7 +148,7 @@ public class AuthServiceTest {
         user.setEmail("test@notexists.ru");
         user.setName("Alexey");
         user.setPhone("73454562345");
-        user.setRole(Role.USER);
+        user.setRole(Role.CLIENT);
         return user;
     }
 }

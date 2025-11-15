@@ -1,8 +1,8 @@
 package naumen.project.controller;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import naumen.project.dto.order.OrderResponseDto;
-import naumen.project.dto.order.OrderRestaurantResponseDto;
+import naumen.project.dto.order.restaurant.OrderRestaurantResponseDto;
+import naumen.project.dto.order.restaurant.OrderRestaurantShortResponseDto;
 import naumen.project.dto.paged.PagedResponseDto;
 import naumen.project.entity.Order;
 import naumen.project.entity.User;
@@ -51,13 +51,13 @@ public class RestaurantOrderController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @Transactional(readOnly = true)
-    public PagedResponseDto<OrderRestaurantResponseDto> getActiveOrders(
+    public PagedResponseDto<OrderRestaurantShortResponseDto> getActiveOrders(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @AuthenticationPrincipal User restaurant) {
-        Page<OrderRestaurantResponseDto> orderPages = orderService
+        Page<OrderRestaurantShortResponseDto> orderPages = orderService
                 .getActiveOrdersByRestaurant(restaurant, PageRequest.of(page, size))
-                .map(orderMapper::toRestaurantResponse);
+                .map(orderMapper::toRestaurantShortResponse);
 
         return pageMapper.toOrderRestaurantResponse(orderPages);
     }
@@ -72,12 +72,12 @@ public class RestaurantOrderController {
     @GetMapping("/{orderId}")
     @ResponseStatus(HttpStatus.OK)
     @Transactional(readOnly = true)
-    public OrderResponseDto getOrder(
+    public OrderRestaurantResponseDto getOrder(
             @PathVariable Long orderId,
             @AuthenticationPrincipal User restaurant) {
         Order order = orderService.getOrderByRestaurant(orderId, restaurant);
 
-        return orderMapper.toResponse(order);
+        return orderMapper.toRestaurantResponse(order);
     }
 
     /**

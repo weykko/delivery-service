@@ -274,7 +274,7 @@ class AuthTokenServiceTest {
         user.setId(1L);
         user.setEmail("test@example.com");
         user.setName("Test User");
-        user.setRole(Role.USER);
+        user.setRole(Role.CLIENT);
 
         return user;
     }
