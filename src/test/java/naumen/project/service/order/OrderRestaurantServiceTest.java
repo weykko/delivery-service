@@ -3,8 +3,8 @@ package naumen.project.service.order;
 import naumen.project.entity.Order;
 import naumen.project.entity.User;
 import naumen.project.entity.enums.OrderStatus;
-import naumen.project.entity.enums.Role;
-import naumen.project.exception.WebException;
+import naumen.project.exception.ForbiddenException;
+import naumen.project.exception.IllegalDataException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,16 +16,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 /**
  * Модульные тесты для {@link OrderRestaurantService}
  */
 @ExtendWith(MockitoExtension.class)
-class OrderRestaurantServiceTest extends OrderTestBase{
+class OrderRestaurantServiceTest extends OrderTestBase {
 
     @Mock
     private OrderService orderService;
@@ -81,10 +79,9 @@ class OrderRestaurantServiceTest extends OrderTestBase{
 
         Mockito.when(orderService.getById(orderId)).thenReturn(testOrder);
 
-        WebException exception = Assertions.assertThrows(WebException.class,
+        ForbiddenException exception = Assertions.assertThrows(ForbiddenException.class,
                 () -> orderRestaurantService.getOrder(orderId, differentRestaurant));
 
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, exception.getStatus());
         Assertions.assertTrue(exception.getMessage().contains("не принадлежит вашему ресторану"));
         Mockito.verify(orderService).getById(orderId);
     }
@@ -119,10 +116,9 @@ class OrderRestaurantServiceTest extends OrderTestBase{
 
         Mockito.when(orderService.getById(orderId)).thenReturn(order);
 
-        WebException exception = Assertions.assertThrows(WebException.class,
+        IllegalDataException exception = Assertions.assertThrows(IllegalDataException.class,
                 () -> orderRestaurantService.prepareOrder(orderId, testRestaurant));
 
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
         Assertions.assertTrue(exception.getMessage().contains("уже готовиться"));
         Mockito.verify(orderService).getById(orderId);
         Mockito.verify(orderService, Mockito.never()).save(Mockito.any());
@@ -139,10 +135,9 @@ class OrderRestaurantServiceTest extends OrderTestBase{
 
         Mockito.when(orderService.getById(orderId)).thenReturn(order);
 
-        WebException exception = Assertions.assertThrows(WebException.class,
+        IllegalDataException exception = Assertions.assertThrows(IllegalDataException.class,
                 () -> orderRestaurantService.prepareOrder(orderId, testRestaurant));
 
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
         Assertions.assertTrue(exception.getMessage().contains("уже приготовлен"));
         Mockito.verify(orderService).getById(orderId);
         Mockito.verify(orderService, Mockito.never()).save(Mockito.any());
@@ -159,10 +154,9 @@ class OrderRestaurantServiceTest extends OrderTestBase{
 
         Mockito.when(orderService.getById(orderId)).thenReturn(order);
 
-        WebException exception = Assertions.assertThrows(WebException.class,
+        IllegalDataException exception = Assertions.assertThrows(IllegalDataException.class,
                 () -> orderRestaurantService.prepareOrder(orderId, testRestaurant));
 
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
         Assertions.assertTrue(exception.getMessage().contains("уже был отдан курьеру"));
         Mockito.verify(orderService).getById(orderId);
         Mockito.verify(orderService, Mockito.never()).save(Mockito.any());
@@ -180,10 +174,9 @@ class OrderRestaurantServiceTest extends OrderTestBase{
 
         Mockito.when(orderService.getById(orderId)).thenReturn(order);
 
-        WebException exception = Assertions.assertThrows(WebException.class,
+        ForbiddenException exception = Assertions.assertThrows(ForbiddenException.class,
                 () -> orderRestaurantService.prepareOrder(orderId, differentRestaurant));
 
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, exception.getStatus());
         Assertions.assertTrue(exception.getMessage().contains("не принадлежит вашему ресторану"));
         Mockito.verify(orderService).getById(orderId);
         Mockito.verify(orderService, Mockito.never()).save(Mockito.any());
@@ -219,10 +212,9 @@ class OrderRestaurantServiceTest extends OrderTestBase{
 
         Mockito.when(orderService.getById(orderId)).thenReturn(order);
 
-        WebException exception = Assertions.assertThrows(WebException.class,
+        IllegalDataException exception = Assertions.assertThrows(IllegalDataException.class,
                 () -> orderRestaurantService.readyOrder(orderId, testRestaurant));
 
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
         Assertions.assertTrue(exception.getMessage().contains("еще не начал готовиться"));
         Mockito.verify(orderService).getById(orderId);
         Mockito.verify(orderService, Mockito.never()).save(Mockito.any());
@@ -239,10 +231,9 @@ class OrderRestaurantServiceTest extends OrderTestBase{
 
         Mockito.when(orderService.getById(orderId)).thenReturn(order);
 
-        WebException exception = Assertions.assertThrows(WebException.class,
+        IllegalDataException exception = Assertions.assertThrows(IllegalDataException.class,
                 () -> orderRestaurantService.readyOrder(orderId, testRestaurant));
 
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
         Assertions.assertTrue(exception.getMessage().contains("уже приготовлен"));
         Mockito.verify(orderService).getById(orderId);
         Mockito.verify(orderService, Mockito.never()).save(Mockito.any());
@@ -259,10 +250,9 @@ class OrderRestaurantServiceTest extends OrderTestBase{
 
         Mockito.when(orderService.getById(orderId)).thenReturn(order);
 
-        WebException exception = Assertions.assertThrows(WebException.class,
+        IllegalDataException exception = Assertions.assertThrows(IllegalDataException.class,
                 () -> orderRestaurantService.readyOrder(orderId, testRestaurant));
 
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
         Assertions.assertTrue(exception.getMessage().contains("уже был отдан курьеру"));
         Mockito.verify(orderService).getById(orderId);
         Mockito.verify(orderService, Mockito.never()).save(Mockito.any());
@@ -280,10 +270,9 @@ class OrderRestaurantServiceTest extends OrderTestBase{
 
         Mockito.when(orderService.getById(orderId)).thenReturn(order);
 
-        WebException exception = Assertions.assertThrows(WebException.class,
+        ForbiddenException exception = Assertions.assertThrows(ForbiddenException.class,
                 () -> orderRestaurantService.readyOrder(orderId, differentRestaurant));
 
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, exception.getStatus());
         Assertions.assertTrue(exception.getMessage().contains("не принадлежит вашему ресторану"));
         Mockito.verify(orderService).getById(orderId);
         Mockito.verify(orderService, Mockito.never()).save(Mockito.any());

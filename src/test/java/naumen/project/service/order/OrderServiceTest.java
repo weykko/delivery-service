@@ -2,7 +2,7 @@ package naumen.project.service.order;
 
 import naumen.project.entity.Order;
 import naumen.project.entity.User;
-import naumen.project.exception.WebException;
+import naumen.project.exception.NotFoundException;
 import naumen.project.repository.OrderRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -62,10 +61,9 @@ class OrderServiceTest extends OrderTestBase {
 
         Mockito.when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
 
-        WebException exception = Assertions.assertThrows(WebException.class,
+        NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
                 () -> orderService.getById(orderId));
 
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
         Assertions.assertTrue(exception.getMessage().contains("не найден"));
         Mockito.verify(orderRepository).findById(orderId);
     }

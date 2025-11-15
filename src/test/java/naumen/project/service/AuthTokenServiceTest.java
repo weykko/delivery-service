@@ -6,7 +6,8 @@ import naumen.project.entity.AuthToken;
 import naumen.project.entity.User;
 import naumen.project.entity.enums.Role;
 import naumen.project.entity.enums.TokenType;
-import naumen.project.exception.WebException;
+import naumen.project.exception.IllegalDataException;
+import naumen.project.exception.NotFoundException;
 import naumen.project.repository.AuthTokenRepository;
 import naumen.project.util.JwtUtil;
 import org.junit.jupiter.api.Assertions;
@@ -16,7 +17,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -139,10 +139,9 @@ class AuthTokenServiceTest {
     void refresh_WithInvalidJwtToken_ShouldThrowException() {
         Mockito.when(jwtUtil.validateRefreshToken(refreshToken)).thenReturn(false);
 
-        WebException exception = Assertions.assertThrows(WebException.class,
+        IllegalDataException exception = Assertions.assertThrows(IllegalDataException.class,
                 () -> authTokenService.refresh(refreshToken));
 
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
         Assertions.assertEquals("Токен невалиден", exception.getMessage());
         Mockito.verify(jwtUtil).validateRefreshToken(refreshToken);
         Mockito.verify(authTokenRepository, Mockito.never()).existsByTokenAndType(Mockito.any(), Mockito.any());
@@ -157,10 +156,9 @@ class AuthTokenServiceTest {
         Mockito.when(authTokenRepository.existsByTokenAndType(refreshToken, TokenType.REFRESH))
                 .thenReturn(false);
 
-        WebException exception = Assertions.assertThrows(WebException.class,
+        IllegalDataException exception = Assertions.assertThrows(IllegalDataException.class,
                 () -> authTokenService.refresh(refreshToken));
 
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
         Assertions.assertEquals("Токен невалиден", exception.getMessage());
         Mockito.verify(jwtUtil).validateRefreshToken(refreshToken);
         Mockito.verify(authTokenRepository).existsByTokenAndType(refreshToken, TokenType.REFRESH);
@@ -196,8 +194,8 @@ class AuthTokenServiceTest {
         Mockito.verify(jwtUtil).generateAccessToken(testUser);
         Mockito.verify(authTokenRepository, Mockito.atLeastOnce()).save(Mockito.argThat(token ->
                 token.getType() == TokenType.ACCESS &&
-                        token.getToken().equals(accessToken) &&
-                        token.getUser().equals(testUser)
+                token.getToken().equals(accessToken) &&
+                token.getUser().equals(testUser)
         ));
     }
 
@@ -220,8 +218,8 @@ class AuthTokenServiceTest {
         Mockito.verify(jwtUtil).generateRefreshToken(testUser);
         Mockito.verify(authTokenRepository, Mockito.atLeastOnce()).save(Mockito.argThat(token ->
                 token.getType() == TokenType.REFRESH &&
-                        token.getToken().equals(refreshToken) &&
-                        token.getUser().equals(testUser)
+                token.getToken().equals(refreshToken) &&
+                token.getUser().equals(testUser)
         ));
     }
 
@@ -257,10 +255,9 @@ class AuthTokenServiceTest {
         Mockito.when(authTokenRepository.findByTokenAndType(refreshToken, TokenType.REFRESH))
                 .thenReturn(Optional.empty());
 
-        WebException exception = Assertions.assertThrows(WebException.class,
+        NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
                 () -> authTokenService.refresh(refreshToken));
 
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
         Assertions.assertEquals("Токен не найден", exception.getMessage());
     }
 

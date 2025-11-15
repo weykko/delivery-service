@@ -3,10 +3,10 @@ package naumen.project.service.order;
 import naumen.project.entity.Order;
 import naumen.project.entity.User;
 import naumen.project.entity.enums.OrderStatus;
-import naumen.project.exception.WebException;
+import naumen.project.exception.ForbiddenException;
+import naumen.project.exception.IllegalDataException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -53,10 +53,7 @@ public class OrderCourierService {
         Order order = orderService.getById(orderId);
 
         if (order.getCourier() != null) {
-            throw new WebException(
-                    HttpStatus.BAD_REQUEST,
-                    "Заказ с id '%d' уже принят курьером",
-                    orderId);
+            throw new IllegalDataException("Заказ с id '%d' уже принят курьером", orderId);
         }
 
         order.setCourier(courier);
@@ -76,17 +73,10 @@ public class OrderCourierService {
 
         switch (order.getStatus()) {
             case PREPARED -> order.setStatus(OrderStatus.DELIVERING);
-            case DELIVERING -> throw new WebException(
-                    HttpStatus.BAD_REQUEST,
-                    "Заказ с id '%d' уже доставляется",
+            case DELIVERING -> throw new IllegalDataException("Заказ с id '%d' уже доставляется", orderId);
+            case COMPLETED -> throw new IllegalDataException("Заказ с id '%d' уже доставлен",
                     orderId);
-            case COMPLETED -> throw new WebException(
-                    HttpStatus.BAD_REQUEST,
-                    "Заказ с id '%d' уже доставлен",
-                    orderId);
-            default -> throw new WebException(
-                    HttpStatus.BAD_REQUEST,
-                    "Заказ с id '%d' ещё не готов",
+            default -> throw new IllegalDataException("Заказ с id '%d' ещё не готов",
                     orderId
             );
         }
@@ -107,14 +97,8 @@ public class OrderCourierService {
 
         switch (order.getStatus()) {
             case DELIVERING -> order.setStatus(OrderStatus.COMPLETED);
-            case COMPLETED -> throw new WebException(
-                    HttpStatus.BAD_REQUEST,
-                    "Заказ с id '%d' уже доставлен",
-                    orderId);
-            default -> throw new WebException(
-                    HttpStatus.BAD_REQUEST,
-                    "Заказ с id '%d' ещё не доставляется",
-                    orderId
+            case COMPLETED -> throw new IllegalDataException("Заказ с id '%d' уже доставлен", orderId);
+            default -> throw new IllegalDataException("Заказ с id '%d' ещё не доставляется", orderId
             );
         }
 
@@ -130,10 +114,7 @@ public class OrderCourierService {
     private void assertBelongsToCourier(Order order, User courier) {
         if (order.getCourier() == null ||
             !order.getCourier().getId().equals(courier.getId())) {
-            throw new WebException(
-                    HttpStatus.FORBIDDEN,
-                    "Заказ с id '%d' не принадлежит вам",
-                    order.getId());
+            throw new ForbiddenException("Заказ с id '%d' не принадлежит вам", order.getId());
         }
     }
 
