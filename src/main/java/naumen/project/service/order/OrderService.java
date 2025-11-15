@@ -12,10 +12,16 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * Общие методы по работе с заказами
+ * Общие методы по работе с заказами.
+ * Это внутренний сервис, который далее используют более "высокоуровневые" сервисы.
+ * Доступ к классу и его методам только в пакете Order
+ *
+ * @see OrderClientService
+ * @see OrderCourierService
+ * @see OrderRestaurantService
  */
 @Service
-public class OrderService {
+class OrderService {
 
     private final OrderRepository orderRepository;
 
@@ -29,7 +35,7 @@ public class OrderService {
      * @param id идентификатор заказа
      * @return заказ
      */
-    public Order getById(Long id) {
+    Order getById(Long id) {
         return orderRepository
                 .findById(id)
                 .orElseThrow(() -> new WebException(
@@ -44,7 +50,7 @@ public class OrderService {
      * @param order заказ
      * @return сохраненный заказ
      */
-    public Order save(Order order) {
+    Order save(Order order) {
         return orderRepository.save(order);
     }
 
@@ -54,7 +60,7 @@ public class OrderService {
      * @param client клиент
      * @return список заказов клиента
      */
-    public List<Order> getByClient(User client) {
+    List<Order> getByClient(User client) {
         return orderRepository.findOrdersByClient(client);
     }
 
@@ -64,7 +70,7 @@ public class OrderService {
      * @param pageable параметры пагинации
      * @return страница с доступными заказами
      */
-    public Page<Order> getAvailableOrdersForCourier(Pageable pageable) {
+    Page<Order> getAvailableOrdersForCourier(Pageable pageable) {
         return orderRepository.findAvailableOrdersForCourier(pageable);
     }
 
@@ -74,7 +80,7 @@ public class OrderService {
      * @param courier курьер
      * @return список активных заказов курьера
      */
-    public List<Order> getActiveOrdersByCourier(User courier) {
+    List<Order> getActiveOrdersByCourier(User courier) {
         return orderRepository.findActiveOrdersByCourier(courier);
     }
 
@@ -85,7 +91,7 @@ public class OrderService {
      * @param pageable   параметры пагинации
      * @return страница с активными заказами ресторана
      */
-    public Page<Order> getActiveOrdersByRestaurant(User restaurant, Pageable pageable) {
+    Page<Order> getActiveOrdersByRestaurant(User restaurant, Pageable pageable) {
         return orderRepository.findActiveOrdersByRestaurant(restaurant, pageable);
     }
 }
