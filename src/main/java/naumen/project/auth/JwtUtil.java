@@ -1,4 +1,4 @@
-package naumen.project.util;
+package naumen.project.auth;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -8,7 +8,6 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.io.DecodingException;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
-import naumen.project.auth.AuthProps;
 import naumen.project.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,16 +92,6 @@ public class JwtUtil {
      */
     public Claims getAccessClaims(String token) {
         return getClaims(token, getSignKey(authProps.getAccess().getToken()));
-    }
-
-    /**
-     * Извлекает claims из refresh токена.
-     *
-     * @param token refresh токен
-     * @return claims токена
-     */
-    public Claims getRefreshClaims(String token) {
-        return getClaims(token, getSignKey(authProps.getRefresh().getToken()));
     }
 
     /**
