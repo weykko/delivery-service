@@ -2,7 +2,7 @@ package naumen.project.service;
 
 import naumen.project.entity.User;
 import naumen.project.entity.enums.Role;
-import naumen.project.exception.WebException;
+import naumen.project.exception.InvalidInputException;
 import naumen.project.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -11,7 +11,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 
 import java.util.Optional;
 
@@ -95,10 +94,9 @@ public class UserServiceTest {
 
         Mockito.when(userRepository.findByPhone(existingPhone)).thenReturn(Optional.of(existingUser));
 
-        WebException exception = Assertions.assertThrows(WebException.class,
+        InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
                 () -> userService.updateInfo(userToUpdate));
 
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
         Assertions.assertEquals("Телефон уже занят", exception.getMessage());
         Mockito.verify(userRepository).findByPhone(existingPhone);
         Mockito.verify(userRepository, Mockito.never()).save(Mockito.any());

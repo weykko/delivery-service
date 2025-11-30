@@ -4,7 +4,7 @@ import naumen.project.auth.JwtUserDetails;
 import naumen.project.dto.auth.TokenResponseDto;
 import naumen.project.entity.User;
 import naumen.project.entity.enums.Role;
-import naumen.project.exception.WebException;
+import naumen.project.exception.InvalidInputException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,7 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -71,12 +70,11 @@ public class AuthServiceTest {
     public void register_WithExistingEmail_ShouldThrowWebException() {
         String password = "strongPassword";
 
-        Mockito.doThrow(new WebException(HttpStatus.BAD_REQUEST, "Email уже занят"))
+        Mockito.doThrow(new InvalidInputException("Email уже занят"))
                 .when(userService).checkUniqueFieldsRegistration(testUser);
 
-        WebException exception = Assertions.assertThrows(WebException.class,
+        InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
                 () -> authService.register(testUser, password));
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
         Assertions.assertEquals("Email уже занят", exception.getMessage());
     }
 
@@ -87,12 +85,11 @@ public class AuthServiceTest {
     public void register_WithExistingPhone_ShouldThrowWebException() {
         String password = "strongPassword";
 
-        Mockito.doThrow(new WebException(HttpStatus.BAD_REQUEST, "Телефон уже занят"))
+        Mockito.doThrow(new InvalidInputException("Телефон уже занят"))
                 .when(userService).checkUniqueFieldsRegistration(testUser);
 
-        WebException exception = Assertions.assertThrows(WebException.class,
+        InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
                 () -> authService.register(testUser, password));
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
         Assertions.assertEquals("Телефон уже занят", exception.getMessage());
         Mockito.verify(userService).checkUniqueFieldsRegistration(testUser);
     }

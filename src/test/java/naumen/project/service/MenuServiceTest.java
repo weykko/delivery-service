@@ -4,7 +4,8 @@ import naumen.project.dto.menu.UpdateMenuItemRequestDto;
 import naumen.project.entity.MenuItem;
 import naumen.project.entity.User;
 import naumen.project.entity.enums.Role;
-import naumen.project.exception.WebException;
+import naumen.project.exception.EntityNotFoundException;
+import naumen.project.exception.PermissionCheckFailedException;
 import naumen.project.mapper.MenuMapper;
 import naumen.project.repository.MenuRepository;
 import org.junit.jupiter.api.Assertions;
@@ -18,7 +19,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -138,11 +138,10 @@ class MenuServiceTest {
 
         Mockito.when(menuRepository.findById(menuItemId)).thenReturn(Optional.empty());
 
-        WebException exception = Assertions.assertThrows(WebException.class,
+        EntityNotFoundException exception = Assertions.assertThrows(EntityNotFoundException.class,
                 () -> menuService.updateMenuItem(menuItemId, request, restaurantUser));
 
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
-        Assertions.assertTrue(exception.getMessage().contains("не найдена"));
+        Assertions.assertEquals("Позиция меню с id '999' не найдена", exception.getMessage());
         Mockito.verify(menuRepository).findById(menuItemId);
         Mockito.verify(menuMapper, Mockito.never()).updateEntityFromRequest(Mockito.any(), Mockito.any());
         Mockito.verify(menuRepository, Mockito.never()).save(Mockito.any());
@@ -163,11 +162,11 @@ class MenuServiceTest {
 
         Mockito.when(menuRepository.findById(menuItemId)).thenReturn(Optional.of(menuItem));
 
-        WebException exception = Assertions.assertThrows(WebException.class,
+        PermissionCheckFailedException exception = Assertions.assertThrows(PermissionCheckFailedException.class,
                 () -> menuService.updateMenuItem(menuItemId, request, differentUser));
 
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, exception.getStatus());
-        Assertions.assertTrue(exception.getMessage().contains("не принадлежит вашему ресторану"));
+        Assertions.assertEquals("Позиция меню с id '1' не принадлежит вашему ресторану",
+                exception.getMessage());
         Mockito.verify(menuRepository).findById(menuItemId);
         Mockito.verify(menuMapper, Mockito.never()).updateEntityFromRequest(Mockito.any(), Mockito.any());
         Mockito.verify(menuRepository, Mockito.never()).save(Mockito.any());
@@ -195,10 +194,10 @@ class MenuServiceTest {
         Long menuItemId = 999L;
         Mockito.when(menuRepository.findById(menuItemId)).thenReturn(Optional.empty());
 
-        WebException exception = Assertions.assertThrows(WebException.class,
+        EntityNotFoundException exception = Assertions.assertThrows(EntityNotFoundException.class,
                 () -> menuService.deleteMenuItem(menuItemId, restaurantUser));
 
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+        Assertions.assertEquals("Позиция меню с id '999' не найдена", exception.getMessage());
         Mockito.verify(menuRepository).findById(menuItemId);
         Mockito.verify(menuRepository, Mockito.never()).delete(Mockito.any());
     }
@@ -212,10 +211,11 @@ class MenuServiceTest {
         User differentUser = createDifferentUser();
         Mockito.when(menuRepository.findById(menuItemId)).thenReturn(Optional.of(menuItem));
 
-        WebException exception = Assertions.assertThrows(WebException.class,
+        PermissionCheckFailedException exception = Assertions.assertThrows(PermissionCheckFailedException.class,
                 () -> menuService.deleteMenuItem(menuItemId, differentUser));
 
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, exception.getStatus());
+        Assertions.assertEquals("Позиция меню с id '1' не принадлежит вашему ресторану",
+                exception.getMessage());
         Mockito.verify(menuRepository).findById(menuItemId);
         Mockito.verify(menuRepository, Mockito.never()).delete(Mockito.any());
     }
