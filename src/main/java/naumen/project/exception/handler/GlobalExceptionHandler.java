@@ -5,11 +5,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import naumen.project.dto.error.ErrorResponseDto;
 import naumen.project.dto.error.ViolationConstraintDto;
-import naumen.project.exception.WebException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -27,6 +25,7 @@ import java.util.Objects;
 /**
  * Глобальный обработчик исключений для REST API.
  * Перехватывает и обрабатывает исключения на уровне всего приложения, возвращая структурированные ответы.
+ * Обработчик предназначен для более "технических" ошибок, таких как ошибки валидации, ошибки аутентификации и подобное.
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -48,21 +47,6 @@ public class GlobalExceptionHandler {
                 request.getServletPath(),
                 null
         );
-    }
-
-    /**
-     * Обрабатывает кастомные исключения приложения {@link WebException}
-     */
-    @ExceptionHandler
-    public ResponseEntity<ErrorResponseDto> handleWebException(WebException ex, HttpServletRequest request) {
-        ErrorResponseDto response = new ErrorResponseDto(
-                Instant.now(),
-                ex.getStatus().value(),
-                ex.getMessage(),
-                request.getServletPath(),
-                null
-        );
-        return ResponseEntity.status(ex.getStatus()).body(response);
     }
 
     /**

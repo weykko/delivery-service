@@ -36,14 +36,6 @@ class CleanExpiredTokenTaskTest {
     }
 
     /**
-     * Тестирование успешного выполнения задачи без исключений
-     */
-    @Test
-    void run_ShouldExecuteSuccessfullyWithoutExceptions() {
-        Assertions.assertDoesNotThrow(() -> cleanExpiredTokenTask.run());
-    }
-
-    /**
      * Тестирование передачи текущего времени в репозиторий
      */
     @Test

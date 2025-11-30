@@ -1,14 +1,14 @@
 package naumen.project.service;
 
 import naumen.project.auth.AuthProps;
+import naumen.project.auth.JwtUtil;
 import naumen.project.dto.auth.TokenResponseDto;
 import naumen.project.entity.AuthToken;
 import naumen.project.entity.User;
 import naumen.project.entity.enums.TokenType;
-import naumen.project.exception.WebException;
+import naumen.project.exception.EntityNotFoundException;
+import naumen.project.exception.InvalidInputException;
 import naumen.project.repository.AuthTokenRepository;
-import naumen.project.util.JwtUtil;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,7 +74,7 @@ public class AuthTokenService {
     public TokenResponseDto refresh(String refreshToken) {
         if (!jwtUtil.validateRefreshToken(refreshToken) ||
             !isTokenAllowed(refreshToken, TokenType.REFRESH)) {
-            throw new WebException(HttpStatus.BAD_REQUEST, "Токен невалиден");
+            throw new InvalidInputException("Токен невалиден");
         }
 
         AuthToken currentRefreshToken = getToken(refreshToken, TokenType.REFRESH);
@@ -137,6 +137,6 @@ public class AuthTokenService {
      */
     private AuthToken getToken(String token, TokenType type) {
         return authTokenRepository.findByTokenAndType(token, type)
-                .orElseThrow(() -> new WebException(HttpStatus.NOT_FOUND, "Токен не найден"));
+                .orElseThrow(() -> new EntityNotFoundException("Токен не найден"));
     }
 }
