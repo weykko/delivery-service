@@ -1,6 +1,7 @@
 package naumen.project.entity;
 
 import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 
 /**
@@ -36,6 +37,26 @@ public class MenuItem extends IdEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id", nullable = false)
     private User restaurant;
+
+    /**
+     * Конструктор для создания позиции меню
+     *
+     * @param title       название блюда
+     * @param description описание блюда
+     * @param price       цена блюда
+     */
+    public MenuItem(String title, String description, BigDecimal price) {
+        this.title = title;
+        this.description = description;
+        this.price = price;
+    }
+
+    /**
+     * Пустой конструктор для JPA
+     */
+    public MenuItem() {
+
+    }
 
     public String getTitle() {
         return title;

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
  * Отвечает за регистрацию новых пользователей и их вход в систему.
  *
  * @see AuthTokenService
+ * @see UserService
  */
 @Service
 public class AuthService {

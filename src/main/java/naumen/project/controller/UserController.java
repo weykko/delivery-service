@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
  * Требует аутентификации с JWT токеном.
  *
  * @see UserService
+ * @see UserMapper
  */
 @SecurityRequirement(name = "JWT")
 @RestController
@@ -60,8 +61,12 @@ public class UserController {
             @AuthenticationPrincipal User user,
             @RequestBody @Valid UpdateUserRequestDto request
     ) {
-        User updatedUser = userMapper.updateUserEntityFromRequest(request, user);
-        return userMapper.toResponse(userService.updateInfo(updatedUser));
+        user.setName(request.name());
+        user.setPhone(request.phone());
+
+        User updatedUser = userService.updateInfo(user);
+
+        return userMapper.toResponse(updatedUser);
     }
 
     /**
