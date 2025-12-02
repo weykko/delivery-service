@@ -13,7 +13,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "\"user\"")
-public class User extends IdEntity{
+public class User extends IdEntity {
     /**
      * Email пользователя (используется для входа)
      */
@@ -56,6 +56,28 @@ public class User extends IdEntity{
      */
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<MenuItem> menuItems;
+
+    /**
+     * Конструктор пользователя
+     *
+     * @param email электронная почта пользователя
+     * @param name  имя пользователя
+     * @param phone номер телефона пользователя
+     * @param role  роль пользователя в системе
+     */
+    public User(String email, String name, String phone, Role role) {
+        this.email = email;
+        this.name = name;
+        this.phone = phone;
+        this.role = role;
+    }
+
+    /**
+     * Пустой конструктор для JPA.
+     */
+    public User() {
+
+    }
 
     public String getEmail() {
         return email;

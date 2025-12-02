@@ -2,7 +2,6 @@ package naumen.project.service;
 
 import naumen.project.entity.User;
 import naumen.project.exception.InvalidInputException;
-import naumen.project.mapper.UserMapper;
 import naumen.project.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +13,6 @@ import java.util.Optional;
  * Предоставляет методы для получения, обновления и удаления пользователей.
  *
  * @see UserRepository
- * @see UserMapper
  */
 @Service
 public class UserService {
