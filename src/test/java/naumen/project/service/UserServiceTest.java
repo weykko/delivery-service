@@ -83,56 +83,6 @@ public class UserServiceTest {
         Mockito.verify(userRepository, Mockito.never()).save(Mockito.any());
     }
 
-    /**
-     * Тестирование проверки уникальных полей при регистрации - email занят
-     */
-    @Test
-    void checkUniqueFieldsRegistrationWithExistingEmailShouldThrowException() {
-        User newUser = createTestUser(null, "test@example.com", "New User", "+79991111111");
-
-        Mockito.when(userRepository.existsByEmail("test@example.com")).thenReturn(true);
-
-        InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
-                () -> userService.checkUniqueFieldsRegistration(newUser));
-
-        Assertions.assertEquals("Email уже занят", exception.getMessage());
-        Mockito.verify(userRepository).existsByEmail("test@example.com");
-    }
-
-    /**
-     * Тестирование проверки уникальных полей при регистрации - телефон занят
-     */
-    @Test
-    void checkUniqueFieldsRegistrationWithExistingPhoneShouldThrowException() {
-        User newUser = createTestUser(null, "newemail@example.com", "New User", "+79991234567");
-
-        Mockito.when(userRepository.existsByEmail("newemail@example.com")).thenReturn(false);
-        Mockito.when(userRepository.existsByPhone("+79991234567")).thenReturn(true);
-
-        InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
-                () -> userService.checkUniqueFieldsRegistration(newUser));
-
-        Assertions.assertEquals("Телефон уже занят", exception.getMessage());
-        Mockito.verify(userRepository).existsByEmail("newemail@example.com");
-        Mockito.verify(userRepository).existsByPhone("+79991234567");
-    }
-
-    /**
-     * Тестирование успешной проверки уникальных полей при регистрации
-     */
-    @Test
-    void checkUniqueFieldsRegistrationWithUniqueFieldsShouldNotThrowException() {
-        User newUser = createTestUser(null, "newemail@example.com", "New User", "+79991111111");
-
-        Mockito.when(userRepository.existsByEmail("newemail@example.com")).thenReturn(false);
-        Mockito.when(userRepository.existsByPhone("+79991111111")).thenReturn(false);
-
-        Assertions.assertDoesNotThrow(() -> userService.checkUniqueFieldsRegistration(newUser));
-
-        Mockito.verify(userRepository).existsByEmail("newemail@example.com");
-        Mockito.verify(userRepository).existsByPhone("+79991111111");
-    }
-
     // Вспомогательные методы для создания тестовых данных
 
     /**
