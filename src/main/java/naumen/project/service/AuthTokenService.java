@@ -98,11 +98,14 @@ public class AuthTokenService {
      */
     private AuthToken generateAccessToken(User user) {
         String accessToken = jwtUtil.generateAccessToken(user);
-        AuthToken accessAuthToken = new AuthToken();
-        accessAuthToken.setToken(accessToken);
-        accessAuthToken.setType(TokenType.ACCESS);
-        accessAuthToken.setExpireAt(Instant.now().plusSeconds(authProps.getAccess().getLifetime()));
-        accessAuthToken.setUser(user);
+        Instant expireAt = Instant.now().plusSeconds(authProps.getAccess().getLifetime());
+
+        AuthToken accessAuthToken = new AuthToken(
+                accessToken,
+                TokenType.ACCESS,
+                expireAt,
+                user
+        );
 
         authTokenRepository.save(accessAuthToken);
 
@@ -117,11 +120,14 @@ public class AuthTokenService {
      */
     private AuthToken generateRefreshToken(User user) {
         String refreshToken = jwtUtil.generateRefreshToken(user);
-        AuthToken refreshAuthToken = new AuthToken();
-        refreshAuthToken.setToken(refreshToken);
-        refreshAuthToken.setType(TokenType.REFRESH);
-        refreshAuthToken.setExpireAt(Instant.now().plusSeconds(authProps.getRefresh().getLifetime()));
-        refreshAuthToken.setUser(user);
+        Instant expireAt = Instant.now().plusSeconds(authProps.getRefresh().getLifetime());
+
+        AuthToken refreshAuthToken = new AuthToken(
+                refreshToken,
+                TokenType.REFRESH,
+                expireAt,
+                user
+        );
 
         authTokenRepository.save(refreshAuthToken);
 
