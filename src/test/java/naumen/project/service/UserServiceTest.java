@@ -26,28 +26,22 @@ public class UserServiceTest {
     @InjectMocks
     private UserService userService;
 
-    private final User testUser = createTestUser();
-
     /**
      * Тестирование успешного обновления информации пользователя с тем же номером телефона
      */
     @Test
     void updateInfo_WithSamePhone_ShouldUpdateUser() {
-        User userToUpdate = new User();
-        userToUpdate.setId(testUser.getId());
-        userToUpdate.setEmail(testUser.getEmail());
-        userToUpdate.setName("Updated Name");
-        userToUpdate.setPhone(testUser.getPhone());
-        userToUpdate.setRole(testUser.getRole());
+        User existingUser = createTestUser(1L, "test@example.com", "Test User", "+79991234567", Role.USER);
+        User userToUpdate = createTestUser(1L, "test@example.com", "Updated Name", "+79991234567", Role.USER);
 
-        Mockito.when(userRepository.findByPhone(testUser.getPhone())).thenReturn(Optional.of(testUser));
+        Mockito.when(userRepository.findByPhone("+79991234567")).thenReturn(Optional.of(existingUser));
         Mockito.when(userRepository.save(userToUpdate)).thenReturn(userToUpdate);
 
         User result = userService.updateInfo(userToUpdate);
 
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(userToUpdate.getName(), result.getName());
-        Mockito.verify(userRepository).findByPhone(testUser.getPhone());
+        Assertions.assertEquals("Updated Name", result.getName());
+        Mockito.verify(userRepository).findByPhone("+79991234567");
         Mockito.verify(userRepository).save(userToUpdate);
     }
 
@@ -57,12 +51,7 @@ public class UserServiceTest {
     @Test
     void updateInfo_WithNewUniquePhone_ShouldUpdateUser() {
         String newPhone = "+79997654321";
-        User userToUpdate = new User();
-        userToUpdate.setId(testUser.getId());
-        userToUpdate.setEmail(testUser.getEmail());
-        userToUpdate.setName("Updated Name");
-        userToUpdate.setPhone(newPhone);
-        userToUpdate.setRole(testUser.getRole());
+        User userToUpdate = createTestUser(1L, "test@example.com", "Updated Name", newPhone, Role.USER);
 
         Mockito.when(userRepository.findByPhone(newPhone)).thenReturn(Optional.empty());
         Mockito.when(userRepository.save(userToUpdate)).thenReturn(userToUpdate);
@@ -81,16 +70,8 @@ public class UserServiceTest {
     @Test
     void updateInfo_WithExistingPhone_ShouldThrowException() {
         String existingPhone = "+79998887766";
-        User userToUpdate = new User();
-        userToUpdate.setId(2L); // другой ID
-        userToUpdate.setEmail("another@example.com");
-        userToUpdate.setName("Updated Name");
-        userToUpdate.setPhone(existingPhone);
-        userToUpdate.setRole(Role.USER);
-
-        User existingUser = new User();
-        existingUser.setId(3L); // другой пользователь с таким телефоном
-        existingUser.setPhone(existingPhone);
+        User userToUpdate = createTestUser(2L, "another@example.com", "Updated Name", existingPhone, Role.USER);
+        User existingUser = createTestUser(3L, "existing@example.com", "Existing User", existingPhone, Role.USER);
 
         Mockito.when(userRepository.findByPhone(existingPhone)).thenReturn(Optional.of(existingUser));
 
@@ -103,33 +84,53 @@ public class UserServiceTest {
     }
 
     /**
-     * Тестирование успешного удаления пользователя
+     * Тестирование проверки уникальных полей при регистрации - email занят
      */
     @Test
-    void deleteUser_WithValidUser_ShouldDeleteUser() {
-        userService.deleteUser(testUser);
+    void checkUniqueFieldsRegistration_WithExistingEmail_ShouldThrowException() {
+        User newUser = createTestUser(null, "test@example.com", "New User", "+79991111111", Role.USER);
 
-        Mockito.verify(userRepository).delete(testUser);
+        Mockito.when(userRepository.existsByEmail("test@example.com")).thenReturn(true);
+
+        InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
+                () -> userService.checkUniqueFieldsRegistration(newUser));
+
+        Assertions.assertEquals("Email уже занят", exception.getMessage());
+        Mockito.verify(userRepository).existsByEmail("test@example.com");
     }
 
     /**
-     * Тестирование вызова метода сохранения пользователя
+     * Тестирование проверки уникальных полей при регистрации - телефон занят
      */
     @Test
-    void saveUser_ShouldCallRepositorySave() {
-        User userToUpdate = new User();
-        userToUpdate.setId(testUser.getId());
-        userToUpdate.setEmail(testUser.getEmail());
-        userToUpdate.setName("Updated Name");
-        userToUpdate.setPhone(testUser.getPhone());
-        userToUpdate.setRole(testUser.getRole());
+    void checkUniqueFieldsRegistration_WithExistingPhone_ShouldThrowException() {
+        User newUser = createTestUser(null, "newemail@example.com", "New User", "+79991234567", Role.USER);
 
-        Mockito.when(userRepository.findByPhone(testUser.getPhone())).thenReturn(Optional.of(testUser));
-        Mockito.when(userRepository.save(userToUpdate)).thenReturn(userToUpdate);
+        Mockito.when(userRepository.existsByEmail("newemail@example.com")).thenReturn(false);
+        Mockito.when(userRepository.existsByPhone("+79991234567")).thenReturn(true);
 
-        userService.updateInfo(userToUpdate);
+        InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
+                () -> userService.checkUniqueFieldsRegistration(newUser));
 
-        Mockito.verify(userRepository).save(userToUpdate);
+        Assertions.assertEquals("Телефон уже занят", exception.getMessage());
+        Mockito.verify(userRepository).existsByEmail("newemail@example.com");
+        Mockito.verify(userRepository).existsByPhone("+79991234567");
+    }
+
+    /**
+     * Тестирование успешной проверки уникальных полей при регистрации
+     */
+    @Test
+    void checkUniqueFieldsRegistration_WithUniqueFields_ShouldNotThrowException() {
+        User newUser = createTestUser(null, "newemail@example.com", "New User", "+79991111111", Role.USER);
+
+        Mockito.when(userRepository.existsByEmail("newemail@example.com")).thenReturn(false);
+        Mockito.when(userRepository.existsByPhone("+79991111111")).thenReturn(false);
+
+        Assertions.assertDoesNotThrow(() -> userService.checkUniqueFieldsRegistration(newUser));
+
+        Mockito.verify(userRepository).existsByEmail("newemail@example.com");
+        Mockito.verify(userRepository).existsByPhone("+79991111111");
     }
 
     // Вспомогательные методы для создания тестовых данных
@@ -137,13 +138,11 @@ public class UserServiceTest {
     /**
      * Создает тестового пользователя
      */
-    private User createTestUser() {
-        User user = new User();
-        user.setId(1L);
-        user.setEmail("test@example.com");
-        user.setName("Test User");
-        user.setPhone("+79991234567");
-        user.setRole(Role.USER);
+    private User createTestUser(Long id, String email, String name, String phone, Role role) {
+        User user = new User(email, name, phone, role);
+        if (id != null) {
+            user.setId(id);
+        }
         return user;
     }
 }

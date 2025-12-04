@@ -41,14 +41,15 @@ class MenuControllerTest {
     @InjectMocks
     private MenuController menuController;
 
-    private final MenuItem menuItem = createMenuItem();
-    private final MenuItemResponseDto menuItemResponse = createMenuItemResponse();
-
     /**
      * Тестирование получения списка позиций меню с фильтрацией по ресторану и названию
      */
     @Test
     void getMenuItems_WithFilters_ShouldReturnPagedResults() {
+        User restaurantUser = createRestaurantUser(1L);
+        MenuItem menuItem = createMenuItem(1L, "Пицца", "Вкусная пицца", new BigDecimal("450.00"), restaurantUser);
+        MenuItemResponseDto menuItemResponse = createMenuItemResponse(1L, "Пицца", "Вкусная пицца", new BigDecimal("450.00"), 1L);
+
         Long restaurantId = 1L;
         String title = "Пицца";
         int page = 0;
@@ -82,6 +83,10 @@ class MenuControllerTest {
      */
     @Test
     void getMenuItems_WithoutFilters_ShouldReturnAllResults() {
+        User restaurantUser = createRestaurantUser(1L);
+        MenuItem menuItem = createMenuItem(1L, "Пицца", "Вкусная пицца", new BigDecimal("450.00"), restaurantUser);
+        MenuItemResponseDto menuItemResponse = createMenuItemResponse(1L, "Пицца", "Вкусная пицца", new BigDecimal("450.00"), 1L);
+
         int page = 0;
         int size = 10;
         Pageable pageable = PageRequest.of(page, size);
@@ -111,6 +116,9 @@ class MenuControllerTest {
      */
     @Test
     void getMenuItem_WithValidId_ShouldReturnMenuItem() {
+        User restaurantUser = createRestaurantUser(1L);
+        MenuItem menuItem = createMenuItem(1L, "Пицца", "Вкусная пицца", new BigDecimal("450.00"), restaurantUser);
+        MenuItemResponseDto menuItemResponse = createMenuItemResponse(1L, "Пицца", "Вкусная пицца", new BigDecimal("450.00"), 1L);
         Long menuId = 1L;
 
         Mockito.when(menuService.getMenuItemById(menuId)).thenReturn(menuItem);
@@ -131,39 +139,29 @@ class MenuControllerTest {
     /**
      * Создает тестового пользователя-ресторана
      */
-    private User createRestaurantUser() {
-        User user = new User();
-        user.setId(1L);
-        user.setEmail("restaurant@example.com");
-        user.setName("Test Restaurant");
-        user.setRole(Role.RESTAURANT);
+    private User createRestaurantUser(Long id) {
+        User user = new User("restaurant@example.com", "Test Restaurant", "+79991234567", Role.RESTAURANT);
+        if (id != null) {
+            user.setId(id);
+        }
         return user;
     }
 
     /**
      * Создает тестовый пункт меню
      */
-    private MenuItem createMenuItem() {
-        MenuItem item = new MenuItem();
-        item.setId(1L);
-        item.setTitle("Тестовая пицца");
-        item.setDescription("Описание тестовой пиццы");
-        item.setPrice(new BigDecimal("450.00"));
-        item.setRestaurant(createRestaurantUser());
+    private MenuItem createMenuItem(Long id, String title, String description, BigDecimal price, User restaurant) {
+        MenuItem item = new MenuItem(title, description, price);
+        item.setId(id);
+        item.setRestaurant(restaurant);
         return item;
     }
 
     /**
      * Создает тестовый ответ с информацией о пункте меню
      */
-    private MenuItemResponseDto createMenuItemResponse() {
-        return new MenuItemResponseDto(
-                1L,
-                "Тестовая пицца",
-                "Описание тестовой пиццы",
-                new BigDecimal("450.00"),
-                1L
-        );
+    private MenuItemResponseDto createMenuItemResponse(Long id, String title, String description, BigDecimal price, Long restaurantId) {
+        return new MenuItemResponseDto(id, title, description, price, restaurantId);
     }
 }
 

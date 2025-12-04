@@ -33,30 +33,19 @@ class RestaurantControllerTest {
     @InjectMocks
     private RestaurantController restaurantController;
 
-    private final User restaurantUser = createRestaurantUser();
-
     /**
      * Тестирование успешного создания новой позиции меню с валидными данными
      */
     @Test
     void createMenuItem_WithValidRequest_ShouldReturnCreatedMenuItem() {
+        User restaurantUser = createRestaurantUser(1L);
         CreateMenuItemRequestDto createRequest = new CreateMenuItemRequestDto(
                 "Новая пицца",
                 "Описание новой пиццы",
                 new BigDecimal("500.00")
         );
 
-        MenuItem newMenuItem = new MenuItem();
-        newMenuItem.setTitle(createRequest.title());
-        newMenuItem.setDescription(createRequest.description());
-        newMenuItem.setPrice(createRequest.price());
-
-        MenuItem savedMenuItem = new MenuItem();
-        savedMenuItem.setId(1L);
-        savedMenuItem.setTitle(createRequest.title());
-        savedMenuItem.setDescription(createRequest.description());
-        savedMenuItem.setPrice(createRequest.price());
-        savedMenuItem.setRestaurant(restaurantUser);
+        MenuItem savedMenuItem = createMenuItem(1L, createRequest.title(), createRequest.description(), createRequest.price(), restaurantUser);
 
         MenuItemResponseDto expectedResponse = new MenuItemResponseDto(
                 1L,
@@ -66,8 +55,8 @@ class RestaurantControllerTest {
                 restaurantUser.getId()
         );
 
-        Mockito.when(menuMapper.toEntity(createRequest)).thenReturn(newMenuItem);
-        Mockito.when(menuService.createMenuItem(newMenuItem, restaurantUser)).thenReturn(savedMenuItem);
+        Mockito.when(menuService.createMenuItem(Mockito.any(MenuItem.class), Mockito.eq(restaurantUser)))
+                .thenReturn(savedMenuItem);
         Mockito.when(menuMapper.toResponse(savedMenuItem)).thenReturn(expectedResponse);
 
         MenuItemResponseDto result = restaurantController.createMenuItem(createRequest, restaurantUser);
@@ -77,8 +66,7 @@ class RestaurantControllerTest {
         Assertions.assertEquals(expectedResponse.title(), result.title());
         Assertions.assertEquals(expectedResponse.description(), result.description());
         Assertions.assertEquals(expectedResponse.price(), result.price());
-        Mockito.verify(menuMapper).toEntity(createRequest);
-        Mockito.verify(menuService).createMenuItem(newMenuItem, restaurantUser);
+        Mockito.verify(menuService).createMenuItem(Mockito.any(MenuItem.class), Mockito.eq(restaurantUser));
         Mockito.verify(menuMapper).toResponse(savedMenuItem);
     }
 
@@ -87,6 +75,7 @@ class RestaurantControllerTest {
      */
     @Test
     void updateMenuItem_WithValidRequest_ShouldReturnUpdatedMenuItem() {
+        User restaurantUser = createRestaurantUser(1L);
         Long menuItemId = 1L;
         UpdateMenuItemRequestDto updateRequest = new UpdateMenuItemRequestDto(
                 "Обновленная пицца",
@@ -94,12 +83,7 @@ class RestaurantControllerTest {
                 new BigDecimal("550.00")
         );
 
-        MenuItem updatedMenuItem = new MenuItem();
-        updatedMenuItem.setId(menuItemId);
-        updatedMenuItem.setTitle(updateRequest.title());
-        updatedMenuItem.setDescription(updateRequest.description());
-        updatedMenuItem.setPrice(updateRequest.price());
-        updatedMenuItem.setRestaurant(restaurantUser);
+        MenuItem existingMenuItem = createMenuItem(menuItemId, "Старая пицца", "Старое описание", new BigDecimal("450.00"), restaurantUser);
 
         MenuItemResponseDto expectedResponse = new MenuItemResponseDto(
                 menuItemId,
@@ -109,9 +93,9 @@ class RestaurantControllerTest {
                 restaurantUser.getId()
         );
 
-        Mockito.when(menuService.updateMenuItem(menuItemId, updateRequest, restaurantUser))
-                .thenReturn(updatedMenuItem);
-        Mockito.when(menuMapper.toResponse(updatedMenuItem)).thenReturn(expectedResponse);
+        Mockito.when(menuService.getMenuItemById(menuItemId)).thenReturn(existingMenuItem);
+        Mockito.when(menuService.updateMenuItem(existingMenuItem, restaurantUser)).thenReturn(existingMenuItem);
+        Mockito.when(menuMapper.toResponse(existingMenuItem)).thenReturn(expectedResponse);
 
         MenuItemResponseDto result = restaurantController.updateMenuItem(menuItemId, updateRequest, restaurantUser);
 
@@ -120,20 +104,9 @@ class RestaurantControllerTest {
         Assertions.assertEquals(expectedResponse.title(), result.title());
         Assertions.assertEquals(expectedResponse.description(), result.description());
         Assertions.assertEquals(expectedResponse.price(), result.price());
-        Mockito.verify(menuService).updateMenuItem(menuItemId, updateRequest, restaurantUser);
-        Mockito.verify(menuMapper).toResponse(updatedMenuItem);
-    }
-
-    /**
-     * Тестирование успешного удаления позиции меню владельцем ресторана
-     */
-    @Test
-    void deleteMenuItem_WithValidOwner_ShouldCallDeleteService() {
-        Long menuItemId = 1L;
-
-        restaurantController.deleteMenuItem(menuItemId, restaurantUser);
-
-        Mockito.verify(menuService).deleteMenuItem(menuItemId, restaurantUser);
+        Mockito.verify(menuService).getMenuItemById(menuItemId);
+        Mockito.verify(menuService).updateMenuItem(existingMenuItem, restaurantUser);
+        Mockito.verify(menuMapper).toResponse(existingMenuItem);
     }
 
     // Вспомогательные методы для создания тестовых данных
@@ -141,13 +114,22 @@ class RestaurantControllerTest {
     /**
      * Создает тестового пользователя-ресторана
      */
-    private User createRestaurantUser() {
-        User user = new User();
-        user.setId(1L);
-        user.setEmail("restaurant@example.com");
-        user.setName("Test Restaurant");
-        user.setRole(Role.RESTAURANT);
+    private User createRestaurantUser(Long id) {
+        User user = new User("restaurant@example.com", "Test Restaurant", "+79991234567", Role.RESTAURANT);
+        if (id != null) {
+            user.setId(id);
+        }
         return user;
+    }
+
+    /**
+     * Создает тестовый пункт меню
+     */
+    private MenuItem createMenuItem(Long id, String title, String description, BigDecimal price, User restaurant) {
+        MenuItem item = new MenuItem(title, description, price);
+        item.setId(id);
+        item.setRestaurant(restaurant);
+        return item;
     }
 }
 

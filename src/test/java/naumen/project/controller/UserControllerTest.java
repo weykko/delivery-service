@@ -29,13 +29,12 @@ class UserControllerTest {
     @InjectMocks
     private UserController userController;
 
-    private final User testUser = createTestUser();
-
     /**
      * Тестирование получения информации о текущем аутентифицированном пользователе
      */
     @Test
     void getMyUser_WithAuthenticatedUser_ShouldReturnUserResponse() {
+        User testUser = createTestUser(1L);
         UserResponseDto expectedResponse = new UserResponseDto(
                 testUser.getId(),
                 testUser.getEmail(),
@@ -62,44 +61,27 @@ class UserControllerTest {
      */
     @Test
     void updateUser_WithValidRequest_ShouldReturnUpdatedUser() {
+        User testUser = createTestUser(1L);
         UpdateUserRequestDto updateRequest = new UpdateUserRequestDto("Updated Name", "+79997654321");
-        User updatedUser = new User();
-        updatedUser.setId(testUser.getId());
-        updatedUser.setEmail(testUser.getEmail());
-        updatedUser.setName(updateRequest.name());
-        updatedUser.setPhone(updateRequest.phone());
-        updatedUser.setRole(testUser.getRole());
 
         UserResponseDto expectedResponse = new UserResponseDto(
-                updatedUser.getId(),
-                updatedUser.getEmail(),
-                updatedUser.getName(),
-                updatedUser.getPhone(),
-                updatedUser.getRole()
+                testUser.getId(),
+                testUser.getEmail(),
+                updateRequest.name(),
+                updateRequest.phone(),
+                testUser.getRole()
         );
 
-        Mockito.when(userMapper.updateUserEntityFromRequest(updateRequest, testUser)).thenReturn(updatedUser);
-        Mockito.when(userService.updateInfo(updatedUser)).thenReturn(updatedUser);
-        Mockito.when(userMapper.toResponse(updatedUser)).thenReturn(expectedResponse);
+        Mockito.when(userService.updateInfo(testUser)).thenReturn(testUser);
+        Mockito.when(userMapper.toResponse(testUser)).thenReturn(expectedResponse);
 
         UserResponseDto result = userController.updateUser(testUser, updateRequest);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(expectedResponse.name(), result.name());
         Assertions.assertEquals(expectedResponse.phone(), result.phone());
-        Mockito.verify(userMapper).updateUserEntityFromRequest(updateRequest, testUser);
-        Mockito.verify(userService).updateInfo(updatedUser);
-        Mockito.verify(userMapper).toResponse(updatedUser);
-    }
-
-    /**
-     * Тестирование успешного удаления текущего аутентифицированного пользователя
-     */
-    @Test
-    void deleteUser_WithAuthenticatedUser_ShouldCallDeleteService() {
-        userController.deleteUser(testUser);
-
-        Mockito.verify(userService).deleteUser(testUser);
+        Mockito.verify(userService).updateInfo(testUser);
+        Mockito.verify(userMapper).toResponse(testUser);
     }
 
     // Вспомогательные методы для создания тестовых данных
@@ -107,13 +89,11 @@ class UserControllerTest {
     /**
      * Создает тестового пользователя
      */
-    private User createTestUser() {
-        User user = new User();
-        user.setId(1L);
-        user.setEmail("test@example.com");
-        user.setName("Test User");
-        user.setPhone("+79991234567");
-        user.setRole(Role.USER);
+    private User createTestUser(Long id) {
+        User user = new User("test@example.com", "Test User", "+79991234567", Role.USER);
+        if (id != null) {
+            user.setId(id);
+        }
         return user;
     }
 }

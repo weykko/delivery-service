@@ -38,13 +38,12 @@ public class AuthServiceTest {
     @InjectMocks
     private AuthService authService;
 
-    private final User testUser = createTestUser();
-
     /**
      * Тестирование успешной регистрации пользователя с валидными данными
      */
     @Test
     public void register_WithValidData_ShouldReturnSuccessResponse() {
+        User testUser = createTestUser(null);
         String password = "strongPassword";
         String encodedPassword = "encodedPassword";
 
@@ -68,6 +67,7 @@ public class AuthServiceTest {
      */
     @Test
     public void register_WithExistingEmail_ShouldThrowWebException() {
+        User testUser = createTestUser(null);
         String password = "strongPassword";
 
         Mockito.doThrow(new InvalidInputException("Email уже занят"))
@@ -83,6 +83,7 @@ public class AuthServiceTest {
      */
     @Test
     public void register_WithExistingPhone_ShouldThrowWebException() {
+        User testUser = createTestUser(null);
         String password = "strongPassword";
 
         Mockito.doThrow(new InvalidInputException("Телефон уже занят"))
@@ -99,9 +100,10 @@ public class AuthServiceTest {
      */
     @Test
     public void login_WithValidCredentials_ShouldReturnTokens() {
+        User testUser = createTestUser(1L);
         String password = "strongPassword";
-        String aToken = "a";
-        String rToken = "r";
+        String aToken = "access-token";
+        String rToken = "refresh-token";
 
         Mockito.when(authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(testUser.getEmail(), password))
@@ -114,6 +116,7 @@ public class AuthServiceTest {
         Mockito.when(authTokenService.generateAndSave(testUser)).thenReturn(new TokenResponseDto(aToken, rToken));
 
         TokenResponseDto result = authService.login(testUser.getEmail(), password);
+
         Assertions.assertAll(
                 () -> Assertions.assertEquals(aToken, result.accessToken()),
                 () -> Assertions.assertEquals(rToken, result.refreshToken())
@@ -125,7 +128,8 @@ public class AuthServiceTest {
      */
     @Test
     public void login_WithInvalidCredentials_ShouldThrowBadCredentialsException() {
-        String password = "strongPassword";
+        User testUser = createTestUser(1L);
+        String password = "wrongPassword";
 
         Mockito.when(authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(testUser.getEmail(), password))
@@ -139,13 +143,11 @@ public class AuthServiceTest {
     /**
      * Создает тестового пользователя
      */
-    private User createTestUser() {
-        User user = new User();
-        user.setId(1L);
-        user.setEmail("test@notexists.ru");
-        user.setName("Alexey");
-        user.setPhone("73454562345");
-        user.setRole(Role.USER);
+    private User createTestUser(Long id) {
+        User user = new User("test@notexists.ru", "Alexey", "73454562345", Role.USER);
+        if (id != null) {
+            user.setId(id);
+        }
         return user;
     }
 }
