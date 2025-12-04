@@ -41,6 +41,27 @@ public class AuthToken extends IdEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    /**
+     * Конструктор с параметрами
+     *
+     * @param token    JWT токен
+     * @param type     тип токена
+     * @param expireAt время истечения срока действия токена
+     * @param user     пользователь, которому принадлежит токен
+     */
+    public AuthToken(String token, TokenType type, Instant expireAt, User user) {
+        this.token = token;
+        this.type = type;
+        this.expireAt = expireAt;
+        this.user = user;
+    }
+
+    /**
+     * Конструктор по умолчанию для JPA
+     */
+    public AuthToken() {
+    }
+
     public String getToken() {
         return token;
     }
