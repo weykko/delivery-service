@@ -9,6 +9,7 @@ import naumen.project.service.AuthTokenService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -40,6 +41,7 @@ class AuthControllerTest {
         RegisterRequestDto registerRequest = createRegisterRequest();
         User testUser = createTestUser(registerRequest);
         RegisterResponseDto expectedResponse = createRegisterResponse(testUser);
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
 
         Mockito.when(authService.register(Mockito.any(User.class), Mockito.eq(registerRequest.password())))
                 .thenReturn(testUser);
@@ -51,7 +53,14 @@ class AuthControllerTest {
         Assertions.assertEquals(expectedResponse.email(), result.email());
         Assertions.assertEquals(expectedResponse.name(), result.name());
         Assertions.assertEquals(expectedResponse.role(), result.role());
-        Mockito.verify(authService).register(Mockito.any(User.class), Mockito.eq(registerRequest.password()));
+
+        Mockito.verify(authService).register(userCaptor.capture(), Mockito.eq(registerRequest.password()));
+        User capturedUser = userCaptor.getValue();
+        Assertions.assertEquals(registerRequest.email(), capturedUser.getEmail());
+        Assertions.assertEquals(registerRequest.name(), capturedUser.getName());
+        Assertions.assertEquals(registerRequest.phone(), capturedUser.getPhone());
+        Assertions.assertEquals(registerRequest.role(), capturedUser.getRole());
+
         Mockito.verify(userMapper).toRegisterResponse(testUser);
     }
 

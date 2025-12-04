@@ -11,6 +11,7 @@ import naumen.project.service.MenuService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -55,6 +56,8 @@ class RestaurantControllerTest {
                 restaurantUser.getId()
         );
 
+        ArgumentCaptor<MenuItem> menuItemCaptor = ArgumentCaptor.forClass(MenuItem.class);
+
         Mockito.when(menuService.createMenuItem(Mockito.any(MenuItem.class), Mockito.eq(restaurantUser)))
                 .thenReturn(savedMenuItem);
         Mockito.when(menuMapper.toResponse(savedMenuItem)).thenReturn(expectedResponse);
@@ -66,7 +69,13 @@ class RestaurantControllerTest {
         Assertions.assertEquals(expectedResponse.title(), result.title());
         Assertions.assertEquals(expectedResponse.description(), result.description());
         Assertions.assertEquals(expectedResponse.price(), result.price());
-        Mockito.verify(menuService).createMenuItem(Mockito.any(MenuItem.class), Mockito.eq(restaurantUser));
+
+        Mockito.verify(menuService).createMenuItem(menuItemCaptor.capture(), Mockito.eq(restaurantUser));
+        MenuItem capturedMenuItem = menuItemCaptor.getValue();
+        Assertions.assertEquals(createRequest.title(), capturedMenuItem.getTitle());
+        Assertions.assertEquals(createRequest.description(), capturedMenuItem.getDescription());
+        Assertions.assertEquals(createRequest.price(), capturedMenuItem.getPrice());
+
         Mockito.verify(menuMapper).toResponse(savedMenuItem);
     }
 

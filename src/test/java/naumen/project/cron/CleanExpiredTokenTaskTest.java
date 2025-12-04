@@ -26,17 +26,7 @@ class CleanExpiredTokenTaskTest {
     private CleanExpiredTokenTask cleanExpiredTokenTask;
 
     /**
-     * Тестирование вызова метода удаления просроченных токенов с текущим временем
-     */
-    @Test
-    void runShouldCallRemoveAllExpiredWithCurrentTime() {
-        cleanExpiredTokenTask.run();
-
-        Mockito.verify(authTokenRepository).removeAllExpired(ArgumentMatchers.any(Instant.class));
-    }
-
-    /**
-     * Тестирование передачи текущего времени в репозиторий
+     * Тестирование вызова метода удаления просроченных токенов и передачи текущего времени в репозиторий
      */
     @Test
     void runShouldPassCurrentInstantToRepository() {
@@ -51,5 +41,7 @@ class CleanExpiredTokenTaskTest {
         Assertions.assertNotNull(capturedInstant[0]);
         Assertions.assertTrue(Instant.now().minusSeconds(60).isBefore(capturedInstant[0]));
         Assertions.assertTrue(Instant.now().plusSeconds(1).isAfter(capturedInstant[0]));
+
+        Mockito.verify(authTokenRepository).removeAllExpired(ArgumentMatchers.any(Instant.class));
     }
 }
