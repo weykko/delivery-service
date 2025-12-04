@@ -36,16 +36,10 @@ class AuthControllerTest {
      * Тестирование успешной регистрации нового пользователя
      */
     @Test
-    void register_WithValidRequest_ShouldReturnRegisterResponse() {
+    void registerWithValidRequestShouldReturnRegisterResponse() {
         RegisterRequestDto registerRequest = createRegisterRequest();
-        User testUser = createTestUser(1L);
-
-        RegisterResponseDto expectedResponse = new RegisterResponseDto(
-                1L,
-                registerRequest.email(),
-                registerRequest.name(),
-                registerRequest.role()
-        );
+        User testUser = createTestUser(registerRequest);
+        RegisterResponseDto expectedResponse = createRegisterResponse(testUser);
 
         Mockito.when(authService.register(Mockito.any(User.class), Mockito.eq(registerRequest.password())))
                 .thenReturn(testUser);
@@ -65,7 +59,7 @@ class AuthControllerTest {
      * Тестирование успешного входа пользователя с корректными учетными данными
      */
     @Test
-    void login_WithValidCredentials_ShouldReturnTokenResponse() {
+    void loginWithValidCredentialsShouldReturnTokenResponse() {
         LoginRequestDto loginRequest = createLoginRequest();
         TokenResponseDto expectedTokens = new TokenResponseDto("accessToken", "refreshToken");
 
@@ -84,7 +78,7 @@ class AuthControllerTest {
      * Тестирование обновления токенов с валидным refresh токеном
      */
     @Test
-    void refresh_WithValidRefreshToken_ShouldReturnNewTokens() {
+    void refreshWithValidRefreshTokenShouldReturnNewTokens() {
         RefreshRequestDto refreshRequest = new RefreshRequestDto("validRefreshToken");
         TokenResponseDto expectedTokens = new TokenResponseDto("newAccessToken", "newRefreshToken");
 
@@ -101,17 +95,6 @@ class AuthControllerTest {
     // Вспомогательные методы для создания тестовых данных
 
     /**
-     * Создает тестового пользователя
-     */
-    private User createTestUser(Long id) {
-        User user = new User("test@example.com", "Test User", "+79991234567", Role.USER);
-        if (id != null) {
-            user.setId(id);
-        }
-        return user;
-    }
-
-    /**
      * Создает тестовый запрос регистрации
      */
     private RegisterRequestDto createRegisterRequest() {
@@ -121,6 +104,34 @@ class AuthControllerTest {
                 Role.USER,
                 "Test User",
                 "+79991234567"
+        );
+    }
+
+    /**
+     * Создает тестового пользователя
+     */
+    private User createTestUser(RegisterRequestDto request) {
+        User user = new User(
+                request.email(),
+                request.name(),
+                request.phone(),
+                request.role()
+        );
+
+        user.setId(1L);
+
+        return user;
+    }
+
+    /**
+     * Создает тестовый ответ регистрации
+     */
+    private RegisterResponseDto createRegisterResponse(User testUser) {
+        return new RegisterResponseDto(
+                testUser.getId(),
+                testUser.getEmail(),
+                testUser.getName(),
+                testUser.getRole()
         );
     }
 

@@ -30,7 +30,7 @@ public class UserServiceTest {
      * Тестирование успешного обновления информации пользователя с тем же номером телефона
      */
     @Test
-    void updateInfo_WithSamePhone_ShouldUpdateUser() {
+    void updateInfoWithSamePhoneShouldUpdateUser() {
         User existingUser = createTestUser(1L, "test@example.com", "Test User", "+79991234567");
         User userToUpdate = createTestUser(1L, "test@example.com", "Updated Name", "+79991234567");
 
@@ -49,7 +49,7 @@ public class UserServiceTest {
      * Тестирование успешного обновления информации пользователя с новым уникальным номером телефона
      */
     @Test
-    void updateInfo_WithNewUniquePhone_ShouldUpdateUser() {
+    void updateInfoWithNewUniquePhoneShouldUpdateUser() {
         String newPhone = "+79997654321";
         User userToUpdate = createTestUser(1L, "test@example.com", "Updated Name", newPhone);
 
@@ -68,7 +68,7 @@ public class UserServiceTest {
      * Тестирование обновления информации пользователя с уже существующим номером телефона
      */
     @Test
-    void updateInfo_WithExistingPhone_ShouldThrowException() {
+    void updateInfoWithExistingPhoneShouldThrowException() {
         String existingPhone = "+79998887766";
         User userToUpdate = createTestUser(2L, "another@example.com", "Updated Name", existingPhone);
         User existingUser = createTestUser(3L, "existing@example.com", "Existing User", existingPhone);
@@ -87,7 +87,7 @@ public class UserServiceTest {
      * Тестирование проверки уникальных полей при регистрации - email занят
      */
     @Test
-    void checkUniqueFieldsRegistration_WithExistingEmail_ShouldThrowException() {
+    void checkUniqueFieldsRegistrationWithExistingEmailShouldThrowException() {
         User newUser = createTestUser(null, "test@example.com", "New User", "+79991111111");
 
         Mockito.when(userRepository.existsByEmail("test@example.com")).thenReturn(true);
@@ -103,7 +103,7 @@ public class UserServiceTest {
      * Тестирование проверки уникальных полей при регистрации - телефон занят
      */
     @Test
-    void checkUniqueFieldsRegistration_WithExistingPhone_ShouldThrowException() {
+    void checkUniqueFieldsRegistrationWithExistingPhoneShouldThrowException() {
         User newUser = createTestUser(null, "newemail@example.com", "New User", "+79991234567");
 
         Mockito.when(userRepository.existsByEmail("newemail@example.com")).thenReturn(false);
@@ -121,7 +121,7 @@ public class UserServiceTest {
      * Тестирование успешной проверки уникальных полей при регистрации
      */
     @Test
-    void checkUniqueFieldsRegistration_WithUniqueFields_ShouldNotThrowException() {
+    void checkUniqueFieldsRegistrationWithUniqueFieldsShouldNotThrowException() {
         User newUser = createTestUser(null, "newemail@example.com", "New User", "+79991111111");
 
         Mockito.when(userRepository.existsByEmail("newemail@example.com")).thenReturn(false);

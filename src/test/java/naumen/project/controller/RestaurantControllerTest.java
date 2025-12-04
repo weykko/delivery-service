@@ -37,7 +37,7 @@ class RestaurantControllerTest {
      * Тестирование успешного создания новой позиции меню с валидными данными
      */
     @Test
-    void createMenuItem_WithValidRequest_ShouldReturnCreatedMenuItem() {
+    void createMenuItemWithValidRequestShouldReturnCreatedMenuItem() {
         User restaurantUser = createRestaurantUser(1L);
         CreateMenuItemRequestDto createRequest = new CreateMenuItemRequestDto(
                 "Новая пицца",
@@ -74,7 +74,7 @@ class RestaurantControllerTest {
      * Тестирование успешного обновления существующей позиции меню
      */
     @Test
-    void updateMenuItem_WithValidRequest_ShouldReturnUpdatedMenuItem() {
+    void updateMenuItemWithValidRequestShouldReturnUpdatedMenuItem() {
         User restaurantUser = createRestaurantUser(2L);
         Long menuItemId = 1L;
         UpdateMenuItemRequestDto updateRequest = new UpdateMenuItemRequestDto(

@@ -49,7 +49,7 @@ class AuthTokenServiceTest {
      * Тестирование проверки допустимости токена
      */
     @Test
-    void isTokenAllowed_WithValidToken_ShouldReturnTrue() {
+    void isTokenAllowedWithValidTokenShouldReturnTrue() {
         String accessToken = "access-token-123";
 
         Mockito.when(authTokenRepository.existsByTokenAndType(accessToken, TokenType.ACCESS))
@@ -65,7 +65,7 @@ class AuthTokenServiceTest {
      * Тестирование проверки допустимости токена с невалидным токеном
      */
     @Test
-    void isTokenAllowed_WithInvalidToken_ShouldReturnFalse() {
+    void isTokenAllowedWithInvalidTokenShouldReturnFalse() {
         String accessToken = "invalid-token";
 
         Mockito.when(authTokenRepository.existsByTokenAndType(accessToken, TokenType.ACCESS))
@@ -81,7 +81,7 @@ class AuthTokenServiceTest {
      * Тестирование генерации и сохранения токенов
      */
     @Test
-    void generateAndSave_WithValidUser_ShouldGenerateAndSaveTokens() {
+    void generateAndSaveWithValidUserShouldGenerateAndSaveTokens() {
         User testUser = createTestUser(1L);
         String accessToken = "access-token";
         String refreshToken = "refresh-token";
@@ -112,7 +112,7 @@ class AuthTokenServiceTest {
      * Тестирование обновления токенов с валидным рефреш токеном
      */
     @Test
-    void refresh_WithValidRefreshToken_ShouldReturnNewTokens() {
+    void refreshWithValidRefreshTokenShouldReturnNewTokens() {
         User testUser = createTestUser(2L);
         String refreshToken = "valid-refresh-token";
         AuthToken authRefreshToken = createRefreshToken(refreshToken, testUser);
@@ -141,7 +141,7 @@ class AuthTokenServiceTest {
      * Тестирование обновления токенов с невалидным рефреш токеном
      */
     @Test
-    void refresh_WithInvalidJwtToken_ShouldThrowException() {
+    void refreshWithInvalidJwtTokenShouldThrowException() {
         String refreshToken = "invalid-refresh-token";
 
         Mockito.when(jwtUtil.validateRefreshToken(refreshToken)).thenReturn(false);
@@ -158,7 +158,7 @@ class AuthTokenServiceTest {
      * Тестирование обновления токенов с отсутствующим в базе рефреш токеном
      */
     @Test
-    void refresh_WithTokenNotInDatabase_ShouldThrowException() {
+    void refreshWithTokenNotInDatabaseShouldThrowException() {
         String refreshToken = "not-in-db-token";
 
         Mockito.when(jwtUtil.validateRefreshToken(refreshToken)).thenReturn(true);
@@ -178,7 +178,7 @@ class AuthTokenServiceTest {
      * Тестирование обновления токенов когда токен не найден в БД при поиске
      */
     @Test
-    void refresh_WithNonExistingToken_ShouldThrowException() {
+    void refreshWithNonExistingTokenShouldThrowException() {
         String refreshToken = "refresh-token";
 
         Mockito.when(jwtUtil.validateRefreshToken(refreshToken)).thenReturn(true);

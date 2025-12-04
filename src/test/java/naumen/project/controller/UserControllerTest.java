@@ -33,7 +33,7 @@ class UserControllerTest {
      * Тестирование получения информации о текущем аутентифицированном пользователе
      */
     @Test
-    void getMyUser_WithAuthenticatedUser_ShouldReturnUserResponse() {
+    void getMyUserWithAuthenticatedUserShouldReturnUserResponse() {
         User testUser = createTestUser(1L);
         UserResponseDto expectedResponse = new UserResponseDto(
                 testUser.getId(),
@@ -60,7 +60,7 @@ class UserControllerTest {
      * Тестирование успешного обновления информации пользователя с валидными данными
      */
     @Test
-    void updateUser_WithValidRequest_ShouldReturnUpdatedUser() {
+    void updateUserWithValidRequestShouldReturnUpdatedUser() {
         User testUser = createTestUser(2L);
         UpdateUserRequestDto updateRequest = new UpdateUserRequestDto("Updated Name", "+79997654321");
 

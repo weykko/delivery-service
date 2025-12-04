@@ -45,7 +45,7 @@ class MenuControllerTest {
      * Тестирование получения списка позиций меню с фильтрацией по ресторану и названию
      */
     @Test
-    void getMenuItems_WithFilters_ShouldReturnPagedResults() {
+    void getMenuItemsWithFiltersShouldReturnPagedResults() {
         User restaurantUser = createRestaurantUser(1L);
         MenuItem menuItem = createMenuItem(restaurantUser);
         MenuItemResponseDto menuItemResponse = createMenuItemResponse(menuItem);
@@ -82,7 +82,7 @@ class MenuControllerTest {
      * Тестирование получения списка позиций меню без фильтров
      */
     @Test
-    void getMenuItems_WithoutFilters_ShouldReturnAllResults() {
+    void getMenuItemsWithoutFiltersShouldReturnAllResults() {
         User restaurantUser = createRestaurantUser(2L);
         MenuItem menuItem = createMenuItem(restaurantUser);
         MenuItemResponseDto menuItemResponse = createMenuItemResponse(menuItem);
@@ -115,7 +115,7 @@ class MenuControllerTest {
      * Тестирование получения конкретной позиции меню по идентификатору
      */
     @Test
-    void getMenuItem_WithValidId_ShouldReturnMenuItem() {
+    void getMenuItemWithValidIdShouldReturnMenuItem() {
         User restaurantUser = createRestaurantUser(3L);
         MenuItem menuItem = createMenuItem(restaurantUser);
         MenuItemResponseDto menuItemResponse = createMenuItemResponse(menuItem);

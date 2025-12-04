@@ -38,7 +38,7 @@ class MenuServiceTest {
      * Тестирование метода получения пунктов меню с различными параметрами фильтрации и пагинации
      */
     @Test
-    void getMenuItems_WithAllParameters_ShouldReturnPagedResults() {
+    void getMenuItemsWithAllParametersShouldReturnPagedResults() {
         User restaurantUser = createRestaurantUser(1L);
         MenuItem menuItem = createMenuItem(restaurantUser);
         Long restaurantId = 1L;
@@ -61,7 +61,7 @@ class MenuServiceTest {
      * Тестирование метода получения пунктов меню с null параметрами (без фильтрации)
      */
     @Test
-    void getMenuItems_WithNullParameters_ShouldReturnAllResults() {
+    void getMenuItemsWithNullParametersShouldReturnAllResults() {
         User restaurantUser = createRestaurantUser(1L);
         MenuItem menuItem = createMenuItem(restaurantUser);
         Pageable pageable = PageRequest.of(0, 10);
@@ -81,7 +81,7 @@ class MenuServiceTest {
      * Тестирование метода создания нового пункта меню
      */
     @Test
-    void createMenuItem_WithValidRequest_ShouldCreateAndReturnMenuItem() {
+    void createMenuItemWithValidRequestShouldCreateAndReturnMenuItem() {
         User restaurantUser = createRestaurantUser(1L);
         MenuItem newMenuItem = createMenuItem();
 
@@ -98,7 +98,7 @@ class MenuServiceTest {
      * Тестирование метода обновления пункта меню с валидным владельцем
      */
     @Test
-    void updateMenuItem_WithValidOwner_ShouldUpdateAndReturnMenuItem() {
+    void updateMenuItemWithValidOwnerShouldUpdateAndReturnMenuItem() {
         User restaurantUser = createRestaurantUser(1L);
         MenuItem menuItem = createMenuItem(restaurantUser);
 
@@ -115,7 +115,7 @@ class MenuServiceTest {
      * Тестирование метода обновления пункта меню при попытке обновления чужого пункта
      */
     @Test
-    void updateMenuItem_WithDifferentOwner_ShouldThrowForbiddenException() {
+    void updateMenuItemWithDifferentOwnerShouldThrowForbiddenException() {
         User restaurantUser = createRestaurantUser(1L);
         User differentUser = createRestaurantUser(2L);
         MenuItem menuItem = createMenuItem(restaurantUser);
@@ -132,7 +132,7 @@ class MenuServiceTest {
      * Тестирование метода удаления пункта меню с валидным владельцем
      */
     @Test
-    void deleteMenuItem_WithValidOwner_ShouldDeleteMenuItem() {
+    void deleteMenuItemWithValidOwnerShouldDeleteMenuItem() {
         User restaurantUser = createRestaurantUser(1L);
         MenuItem menuItem = createMenuItem(restaurantUser);
         Long menuItemId = 1L;
@@ -149,7 +149,7 @@ class MenuServiceTest {
      * Тестирование метода удаления пункта меню при отсутствии пункта
      */
     @Test
-    void deleteMenuItem_WithNotFoundMenuItem_ShouldThrowException() {
+    void deleteMenuItemWithNotFoundMenuItemShouldThrowException() {
         User restaurantUser = createRestaurantUser(1L);
         Long menuItemId = 999L;
 
@@ -167,7 +167,7 @@ class MenuServiceTest {
      * Тестирование метода удаления пункта меню при попытке удаления чужого пункта
      */
     @Test
-    void deleteMenuItem_WithDifferentOwner_ShouldThrowForbiddenException() {
+    void deleteMenuItemWithDifferentOwnerShouldThrowForbiddenException() {
         User restaurantUser = createRestaurantUser(1L);
         User differentUser = createRestaurantUser(2L);
         MenuItem menuItem = createMenuItem(restaurantUser);
@@ -188,7 +188,7 @@ class MenuServiceTest {
      * Тестирование получения позиции меню по ID
      */
     @Test
-    void getMenuItemById_WithExistingId_ShouldReturnMenuItem() {
+    void getMenuItemByIdWithExistingIdShouldReturnMenuItem() {
         User restaurantUser = createRestaurantUser(1L);
         MenuItem menuItem = createMenuItem(restaurantUser);
         Long menuItemId = 1L;
@@ -206,7 +206,7 @@ class MenuServiceTest {
      * Тестирование получения позиции меню по несуществующему ID
      */
     @Test
-    void getMenuItemById_WithNonExistingId_ShouldThrowException() {
+    void getMenuItemByIdWithNonExistingIdShouldThrowException() {
         Long menuItemId = 999L;
 
         Mockito.when(menuRepository.findById(menuItemId)).thenReturn(Optional.empty());

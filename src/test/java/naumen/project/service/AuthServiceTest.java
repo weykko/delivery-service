@@ -42,7 +42,7 @@ public class AuthServiceTest {
      * Тестирование успешной регистрации пользователя с валидными данными
      */
     @Test
-    public void register_WithValidData_ShouldReturnSuccessResponse() {
+    public void registerWithValidDataShouldReturnSuccessResponse() {
         User testUser = createTestUser(null);
         String password = "strongPassword";
         String encodedPassword = "encodedPassword";
@@ -66,7 +66,7 @@ public class AuthServiceTest {
      * Тестирование регистрации пользователя с уже существующим email
      */
     @Test
-    public void register_WithExistingEmail_ShouldThrowWebException() {
+    public void registerWithExistingEmailShouldThrowWebException() {
         User testUser = createTestUser(null);
         String password = "strongPassword";
 
@@ -82,7 +82,7 @@ public class AuthServiceTest {
      * Тестирование регистрации пользователя с уже существующим номером телефона
      */
     @Test
-    public void register_WithExistingPhone_ShouldThrowWebException() {
+    public void registerWithExistingPhoneShouldThrowWebException() {
         User testUser = createTestUser(null);
         String password = "strongPassword";
 
@@ -99,7 +99,7 @@ public class AuthServiceTest {
      * Тестирование успешного входа пользователя с валидными учетными данными
      */
     @Test
-    public void login_WithValidCredentials_ShouldReturnTokens() {
+    public void loginWithValidCredentialsShouldReturnTokens() {
         User testUser = createTestUser(1L);
         String password = "strongPassword";
         String aToken = "access-token";
@@ -127,7 +127,7 @@ public class AuthServiceTest {
      * Тестирование входа пользователя с невалидными учетными данными
      */
     @Test
-    public void login_WithInvalidCredentials_ShouldThrowBadCredentialsException() {
+    public void loginWithInvalidCredentialsShouldThrowBadCredentialsException() {
         User testUser = createTestUser(1L);
         String password = "wrongPassword";
 
