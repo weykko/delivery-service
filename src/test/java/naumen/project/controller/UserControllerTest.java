@@ -61,7 +61,7 @@ class UserControllerTest {
      */
     @Test
     void updateUser_WithValidRequest_ShouldReturnUpdatedUser() {
-        User testUser = createTestUser(1L);
+        User testUser = createTestUser(2L);
         UpdateUserRequestDto updateRequest = new UpdateUserRequestDto("Updated Name", "+79997654321");
 
         UserResponseDto expectedResponse = new UserResponseDto(

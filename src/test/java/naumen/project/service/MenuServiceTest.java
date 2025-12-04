@@ -40,7 +40,7 @@ class MenuServiceTest {
     @Test
     void getMenuItems_WithAllParameters_ShouldReturnPagedResults() {
         User restaurantUser = createRestaurantUser(1L);
-        MenuItem menuItem = createMenuItem(1L, "Пицца", "Вкусная пицца", new BigDecimal("450.00"), restaurantUser);
+        MenuItem menuItem = createMenuItem(restaurantUser);
         Long restaurantId = 1L;
         String title = "Пицца";
         Pageable pageable = PageRequest.of(0, 10);
@@ -63,7 +63,7 @@ class MenuServiceTest {
     @Test
     void getMenuItems_WithNullParameters_ShouldReturnAllResults() {
         User restaurantUser = createRestaurantUser(1L);
-        MenuItem menuItem = createMenuItem(1L, "Пицца", "Вкусная пицца", new BigDecimal("450.00"), restaurantUser);
+        MenuItem menuItem = createMenuItem(restaurantUser);
         Pageable pageable = PageRequest.of(0, 10);
         Page<MenuItem> menuPage = new PageImpl<>(List.of(menuItem));
 
@@ -83,7 +83,7 @@ class MenuServiceTest {
     @Test
     void createMenuItem_WithValidRequest_ShouldCreateAndReturnMenuItem() {
         User restaurantUser = createRestaurantUser(1L);
-        MenuItem newMenuItem = new MenuItem("Новая пицца", "Описание новой пиццы", new BigDecimal("500.00"));
+        MenuItem newMenuItem = createMenuItem();
 
         Mockito.when(menuRepository.save(newMenuItem)).thenReturn(newMenuItem);
 
@@ -100,7 +100,7 @@ class MenuServiceTest {
     @Test
     void updateMenuItem_WithValidOwner_ShouldUpdateAndReturnMenuItem() {
         User restaurantUser = createRestaurantUser(1L);
-        MenuItem menuItem = createMenuItem(1L, "Пицца", "Описание", new BigDecimal("450.00"), restaurantUser);
+        MenuItem menuItem = createMenuItem(restaurantUser);
 
         Mockito.when(menuRepository.save(menuItem)).thenReturn(menuItem);
 
@@ -118,7 +118,7 @@ class MenuServiceTest {
     void updateMenuItem_WithDifferentOwner_ShouldThrowForbiddenException() {
         User restaurantUser = createRestaurantUser(1L);
         User differentUser = createRestaurantUser(2L);
-        MenuItem menuItem = createMenuItem(1L, "Пицца", "Описание", new BigDecimal("450.00"), restaurantUser);
+        MenuItem menuItem = createMenuItem(restaurantUser);
 
         PermissionCheckFailedException exception = Assertions.assertThrows(PermissionCheckFailedException.class,
                 () -> menuService.updateMenuItem(menuItem, differentUser));
@@ -134,7 +134,7 @@ class MenuServiceTest {
     @Test
     void deleteMenuItem_WithValidOwner_ShouldDeleteMenuItem() {
         User restaurantUser = createRestaurantUser(1L);
-        MenuItem menuItem = createMenuItem(1L, "Пицца", "Описание", new BigDecimal("450.00"), restaurantUser);
+        MenuItem menuItem = createMenuItem(restaurantUser);
         Long menuItemId = 1L;
 
         Mockito.when(menuRepository.findById(menuItemId)).thenReturn(Optional.of(menuItem));
@@ -170,7 +170,7 @@ class MenuServiceTest {
     void deleteMenuItem_WithDifferentOwner_ShouldThrowForbiddenException() {
         User restaurantUser = createRestaurantUser(1L);
         User differentUser = createRestaurantUser(2L);
-        MenuItem menuItem = createMenuItem(1L, "Пицца", "Описание", new BigDecimal("450.00"), restaurantUser);
+        MenuItem menuItem = createMenuItem(restaurantUser);
         Long menuItemId = 1L;
 
         Mockito.when(menuRepository.findById(menuItemId)).thenReturn(Optional.of(menuItem));
@@ -190,7 +190,7 @@ class MenuServiceTest {
     @Test
     void getMenuItemById_WithExistingId_ShouldReturnMenuItem() {
         User restaurantUser = createRestaurantUser(1L);
-        MenuItem menuItem = createMenuItem(1L, "Пицца", "Описание", new BigDecimal("450.00"), restaurantUser);
+        MenuItem menuItem = createMenuItem(restaurantUser);
         Long menuItemId = 1L;
 
         Mockito.when(menuRepository.findById(menuItemId)).thenReturn(Optional.of(menuItem));
@@ -232,10 +232,19 @@ class MenuServiceTest {
     /**
      * Создание тестового пункта меню
      */
-    private MenuItem createMenuItem(Long id, String title, String description, BigDecimal price, User restaurant) {
-        MenuItem item = new MenuItem(title, description, price);
-        item.setId(id);
+    private MenuItem createMenuItem(User restaurant) {
+        MenuItem item = new MenuItem("Pizza", "description", new BigDecimal(450));
+        item.setId(1L);
         item.setRestaurant(restaurant);
+        return item;
+    }
+
+    /**
+     * Создание новго тестового пункта меню
+     */
+    private MenuItem createMenuItem() {
+        MenuItem item = new MenuItem("Pizza", "description", new BigDecimal(450));
+        item.setId(1L);
         return item;
     }
 }

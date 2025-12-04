@@ -31,8 +31,8 @@ public class UserServiceTest {
      */
     @Test
     void updateInfo_WithSamePhone_ShouldUpdateUser() {
-        User existingUser = createTestUser(1L, "test@example.com", "Test User", "+79991234567", Role.USER);
-        User userToUpdate = createTestUser(1L, "test@example.com", "Updated Name", "+79991234567", Role.USER);
+        User existingUser = createTestUser(1L, "test@example.com", "Test User", "+79991234567");
+        User userToUpdate = createTestUser(1L, "test@example.com", "Updated Name", "+79991234567");
 
         Mockito.when(userRepository.findByPhone("+79991234567")).thenReturn(Optional.of(existingUser));
         Mockito.when(userRepository.save(userToUpdate)).thenReturn(userToUpdate);
@@ -51,7 +51,7 @@ public class UserServiceTest {
     @Test
     void updateInfo_WithNewUniquePhone_ShouldUpdateUser() {
         String newPhone = "+79997654321";
-        User userToUpdate = createTestUser(1L, "test@example.com", "Updated Name", newPhone, Role.USER);
+        User userToUpdate = createTestUser(1L, "test@example.com", "Updated Name", newPhone);
 
         Mockito.when(userRepository.findByPhone(newPhone)).thenReturn(Optional.empty());
         Mockito.when(userRepository.save(userToUpdate)).thenReturn(userToUpdate);
@@ -70,8 +70,8 @@ public class UserServiceTest {
     @Test
     void updateInfo_WithExistingPhone_ShouldThrowException() {
         String existingPhone = "+79998887766";
-        User userToUpdate = createTestUser(2L, "another@example.com", "Updated Name", existingPhone, Role.USER);
-        User existingUser = createTestUser(3L, "existing@example.com", "Existing User", existingPhone, Role.USER);
+        User userToUpdate = createTestUser(2L, "another@example.com", "Updated Name", existingPhone);
+        User existingUser = createTestUser(3L, "existing@example.com", "Existing User", existingPhone);
 
         Mockito.when(userRepository.findByPhone(existingPhone)).thenReturn(Optional.of(existingUser));
 
@@ -88,7 +88,7 @@ public class UserServiceTest {
      */
     @Test
     void checkUniqueFieldsRegistration_WithExistingEmail_ShouldThrowException() {
-        User newUser = createTestUser(null, "test@example.com", "New User", "+79991111111", Role.USER);
+        User newUser = createTestUser(null, "test@example.com", "New User", "+79991111111");
 
         Mockito.when(userRepository.existsByEmail("test@example.com")).thenReturn(true);
 
@@ -104,7 +104,7 @@ public class UserServiceTest {
      */
     @Test
     void checkUniqueFieldsRegistration_WithExistingPhone_ShouldThrowException() {
-        User newUser = createTestUser(null, "newemail@example.com", "New User", "+79991234567", Role.USER);
+        User newUser = createTestUser(null, "newemail@example.com", "New User", "+79991234567");
 
         Mockito.when(userRepository.existsByEmail("newemail@example.com")).thenReturn(false);
         Mockito.when(userRepository.existsByPhone("+79991234567")).thenReturn(true);
@@ -122,7 +122,7 @@ public class UserServiceTest {
      */
     @Test
     void checkUniqueFieldsRegistration_WithUniqueFields_ShouldNotThrowException() {
-        User newUser = createTestUser(null, "newemail@example.com", "New User", "+79991111111", Role.USER);
+        User newUser = createTestUser(null, "newemail@example.com", "New User", "+79991111111");
 
         Mockito.when(userRepository.existsByEmail("newemail@example.com")).thenReturn(false);
         Mockito.when(userRepository.existsByPhone("+79991111111")).thenReturn(false);
@@ -138,8 +138,8 @@ public class UserServiceTest {
     /**
      * Создает тестового пользователя
      */
-    private User createTestUser(Long id, String email, String name, String phone, Role role) {
-        User user = new User(email, name, phone, role);
+    private User createTestUser(Long id, String email, String name, String phone) {
+        User user = new User(email, name, phone, Role.USER);
         if (id != null) {
             user.setId(id);
         }

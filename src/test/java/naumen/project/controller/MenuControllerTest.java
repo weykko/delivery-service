@@ -47,8 +47,8 @@ class MenuControllerTest {
     @Test
     void getMenuItems_WithFilters_ShouldReturnPagedResults() {
         User restaurantUser = createRestaurantUser(1L);
-        MenuItem menuItem = createMenuItem(1L, "Пицца", "Вкусная пицца", new BigDecimal("450.00"), restaurantUser);
-        MenuItemResponseDto menuItemResponse = createMenuItemResponse(1L, "Пицца", "Вкусная пицца", new BigDecimal("450.00"), 1L);
+        MenuItem menuItem = createMenuItem(restaurantUser);
+        MenuItemResponseDto menuItemResponse = createMenuItemResponse(menuItem);
 
         Long restaurantId = 1L;
         String title = "Пицца";
@@ -67,7 +67,7 @@ class MenuControllerTest {
 
         Mockito.when(menuService.getMenuItems(restaurantId, title, pageable)).thenReturn(menuItemPage);
         Mockito.when(menuMapper.toResponse(menuItem)).thenReturn(menuItemResponse);
-        Mockito.when(pageMapper.toResponse(Mockito.<Page<MenuItemResponseDto>>any())).thenReturn(expectedPagedResponse);
+        Mockito.when(pageMapper.toResponse(Mockito.any())).thenReturn(expectedPagedResponse);
 
         PagedResponseDto<MenuItemResponseDto> result = menuController.getMenuItems(restaurantId, title, page, size);
 
@@ -75,7 +75,7 @@ class MenuControllerTest {
         Assertions.assertEquals(1, result.totalElements());
         Assertions.assertEquals(1, result.content().size());
         Mockito.verify(menuService).getMenuItems(restaurantId, title, pageable);
-        Mockito.verify(pageMapper).toResponse(Mockito.<Page<MenuItemResponseDto>>any());
+        Mockito.verify(pageMapper).toResponse(Mockito.any());
     }
 
     /**
@@ -83,9 +83,9 @@ class MenuControllerTest {
      */
     @Test
     void getMenuItems_WithoutFilters_ShouldReturnAllResults() {
-        User restaurantUser = createRestaurantUser(1L);
-        MenuItem menuItem = createMenuItem(1L, "Пицца", "Вкусная пицца", new BigDecimal("450.00"), restaurantUser);
-        MenuItemResponseDto menuItemResponse = createMenuItemResponse(1L, "Пицца", "Вкусная пицца", new BigDecimal("450.00"), 1L);
+        User restaurantUser = createRestaurantUser(2L);
+        MenuItem menuItem = createMenuItem(restaurantUser);
+        MenuItemResponseDto menuItemResponse = createMenuItemResponse(menuItem);
 
         int page = 0;
         int size = 10;
@@ -102,7 +102,7 @@ class MenuControllerTest {
 
         Mockito.when(menuService.getMenuItems(null, null, pageable)).thenReturn(menuItemPage);
         Mockito.when(menuMapper.toResponse(menuItem)).thenReturn(menuItemResponse);
-        Mockito.when(pageMapper.toResponse(Mockito.<Page<MenuItemResponseDto>>any())).thenReturn(expectedPagedResponse);
+        Mockito.when(pageMapper.toResponse(Mockito.any())).thenReturn(expectedPagedResponse);
 
         PagedResponseDto<MenuItemResponseDto> result = menuController.getMenuItems(null, null, page, size);
 
@@ -116,9 +116,9 @@ class MenuControllerTest {
      */
     @Test
     void getMenuItem_WithValidId_ShouldReturnMenuItem() {
-        User restaurantUser = createRestaurantUser(1L);
-        MenuItem menuItem = createMenuItem(1L, "Пицца", "Вкусная пицца", new BigDecimal("450.00"), restaurantUser);
-        MenuItemResponseDto menuItemResponse = createMenuItemResponse(1L, "Пицца", "Вкусная пицца", new BigDecimal("450.00"), 1L);
+        User restaurantUser = createRestaurantUser(3L);
+        MenuItem menuItem = createMenuItem(restaurantUser);
+        MenuItemResponseDto menuItemResponse = createMenuItemResponse(menuItem);
         Long menuId = 1L;
 
         Mockito.when(menuService.getMenuItemById(menuId)).thenReturn(menuItem);
@@ -150,9 +150,9 @@ class MenuControllerTest {
     /**
      * Создает тестовый пункт меню
      */
-    private MenuItem createMenuItem(Long id, String title, String description, BigDecimal price, User restaurant) {
-        MenuItem item = new MenuItem(title, description, price);
-        item.setId(id);
+    private MenuItem createMenuItem(User restaurant) {
+        MenuItem item = new MenuItem("Pizza", "description", new BigDecimal(450));
+        item.setId(1L);
         item.setRestaurant(restaurant);
         return item;
     }
@@ -160,8 +160,14 @@ class MenuControllerTest {
     /**
      * Создает тестовый ответ с информацией о пункте меню
      */
-    private MenuItemResponseDto createMenuItemResponse(Long id, String title, String description, BigDecimal price, Long restaurantId) {
-        return new MenuItemResponseDto(id, title, description, price, restaurantId);
+    private MenuItemResponseDto createMenuItemResponse(MenuItem menuItem) {
+        return new MenuItemResponseDto(
+                menuItem.getId(),
+                menuItem.getTitle(),
+                menuItem.getDescription(),
+                menuItem.getPrice(),
+                menuItem.getRestaurant().getId()
+        );
     }
 }
 

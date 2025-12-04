@@ -113,9 +113,9 @@ class AuthTokenServiceTest {
      */
     @Test
     void refresh_WithValidRefreshToken_ShouldReturnNewTokens() {
-        User testUser = createTestUser(1L);
+        User testUser = createTestUser(2L);
         String refreshToken = "valid-refresh-token";
-        AuthToken authRefreshToken = createAuthToken(1L, refreshToken, TokenType.REFRESH, testUser);
+        AuthToken authRefreshToken = createRefreshToken(refreshToken, testUser);
         TokenResponseDto newTokens = new TokenResponseDto("new-access", "new-refresh");
 
         Mockito.when(jwtUtil.validateRefreshToken(refreshToken)).thenReturn(true);
@@ -209,15 +209,9 @@ class AuthTokenServiceTest {
     /**
      * Создание тестового токена
      */
-    private AuthToken createAuthToken(Long id, String token, TokenType type, User user) {
-        AuthToken authToken = new AuthToken();
-        if (id != null) {
-            authToken.setId(id);
-        }
-        authToken.setToken(token);
-        authToken.setType(type);
-        authToken.setExpireAt(Instant.now().plusSeconds(3600));
-        authToken.setUser(user);
+    private AuthToken createRefreshToken(String token, User user) {
+        AuthToken authToken = new AuthToken(token, TokenType.REFRESH, Instant.now().plusSeconds(3600), user);
+        authToken.setId(1L);
         return authToken;
     }
 }

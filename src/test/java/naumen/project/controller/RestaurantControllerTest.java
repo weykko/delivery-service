@@ -75,7 +75,7 @@ class RestaurantControllerTest {
      */
     @Test
     void updateMenuItem_WithValidRequest_ShouldReturnUpdatedMenuItem() {
-        User restaurantUser = createRestaurantUser(1L);
+        User restaurantUser = createRestaurantUser(2L);
         Long menuItemId = 1L;
         UpdateMenuItemRequestDto updateRequest = new UpdateMenuItemRequestDto(
                 "Обновленная пицца",
