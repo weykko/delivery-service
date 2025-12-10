@@ -26,7 +26,6 @@ public class BusinessExceptionHandler {
     public ResponseEntity<ErrorResponseDto> handleEntityNotFoundException(EntityNotFoundException ex, HttpServletRequest request) {
         ErrorResponseDto response = new ErrorResponseDto(
                 Instant.now(),
-                HttpStatus.NOT_FOUND.value(),
                 ex.getMessage(),
                 request.getServletPath(),
                 null
@@ -41,7 +40,6 @@ public class BusinessExceptionHandler {
     public ResponseEntity<ErrorResponseDto> handleInvalidInputException(InvalidInputException ex, HttpServletRequest request) {
         ErrorResponseDto response = new ErrorResponseDto(
                 Instant.now(),
-                HttpStatus.BAD_REQUEST.value(),
                 ex.getMessage(),
                 request.getServletPath(),
                 null
@@ -56,7 +54,6 @@ public class BusinessExceptionHandler {
     public ResponseEntity<ErrorResponseDto> handlePermissionCheckFailedException(PermissionCheckFailedException ex, HttpServletRequest request) {
         ErrorResponseDto response = new ErrorResponseDto(
                 Instant.now(),
-                HttpStatus.FORBIDDEN.value(),
                 ex.getMessage(),
                 request.getServletPath(),
                 null
