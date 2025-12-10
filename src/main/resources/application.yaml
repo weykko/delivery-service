@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: delivery-service
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:delivery}
+    username: ${POSTGRES_USER:user}
+    password: ${POSTGRES_PASSWORD:password}
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+security:
+  jwt:
+    access:
+      token: ${ACCESS_TOKEN}
+      lifetime: ${ACCESS_LIFETIME:1800}
+    refresh:
+      token: ${REFRESH_TOKEN}
+      lifetime: ${REFRESH_LIFETIME:86400}
