@@ -104,15 +104,29 @@ class AuthControllerTest {
     // Вспомогательные методы для создания тестовых данных
 
     /**
+     * Создает тестового пользователя
+     */
+    private User createTestUser() {
+        User user = new User();
+        user.setId(1L);
+        user.setEmail("test@example.com");
+        user.setName("Test User");
+        user.setPhone("+79991234567");
+        user.setRole(Role.CLIENT);
+        return user;
+    }
+
+    /**
      * Создает тестовый запрос регистрации
      */
     private RegisterRequestDto createRegisterRequest() {
         return new RegisterRequestDto(
                 "test@example.com",
                 "password123",
-                Role.USER,
+                Role.CLIENT,
                 "Test User",
-                "+79991234567"
+                "+79991234567",
+                "Ул Пушкина"
         );
     }
 

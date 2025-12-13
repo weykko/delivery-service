@@ -5,6 +5,7 @@ import naumen.project.dto.auth.TokenResponseDto;
 import naumen.project.entity.User;
 import naumen.project.entity.enums.Role;
 import naumen.project.exception.InvalidInputException;
+import naumen.project.exception.IllegalDataException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -20,10 +20,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 
 /**
- * Модульные тесты для {@link RestaurantController}
+ * Модульные тесты для {@link RestaurantMenuController}
  */
 @ExtendWith(MockitoExtension.class)
-class RestaurantControllerTest {
+class RestaurantMenuControllerTest {
 
     @Mock
     private MenuService menuService;
@@ -32,7 +32,7 @@ class RestaurantControllerTest {
     private MenuMapper menuMapper;
 
     @InjectMocks
-    private RestaurantController restaurantController;
+    private RestaurantMenuController restaurantMenuController;
 
     /**
      * Тестирование успешного создания новой позиции меню с валидными данными
@@ -62,7 +62,7 @@ class RestaurantControllerTest {
                 .thenReturn(savedMenuItem);
         Mockito.when(menuMapper.toResponse(savedMenuItem)).thenReturn(expectedResponse);
 
-        MenuItemResponseDto result = restaurantController.createMenuItem(createRequest, restaurantUser);
+        MenuItemResponseDto result = restaurantMenuController.createMenuItem(createRequest, restaurantUser);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(expectedResponse.id(), result.id());
@@ -106,13 +106,27 @@ class RestaurantControllerTest {
         Mockito.when(menuService.updateMenuItem(existingMenuItem, restaurantUser)).thenReturn(existingMenuItem);
         Mockito.when(menuMapper.toResponse(existingMenuItem)).thenReturn(expectedResponse);
 
-        MenuItemResponseDto result = restaurantController.updateMenuItem(menuItemId, updateRequest, restaurantUser);
+        MenuItemResponseDto result = restaurantMenuController.updateMenuItem(menuItemId, updateRequest, restaurantUser);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(expectedResponse.id(), result.id());
         Assertions.assertEquals(expectedResponse.title(), result.title());
         Assertions.assertEquals(expectedResponse.description(), result.description());
         Assertions.assertEquals(expectedResponse.price(), result.price());
+        Mockito.verify(menuService).updateMenuItem(menuItemId, updateRequest, restaurantUser);
+        Mockito.verify(menuMapper).toResponse(updatedMenuItem);
+    }
+
+    /**
+     * Тестирование успешного удаления позиции меню владельцем ресторана
+     */
+    @Test
+    void deleteMenuItem_WithValidOwner_ShouldCallDeleteService() {
+        Long menuItemId = 1L;
+
+        restaurantMenuController.deleteMenuItem(menuItemId, restaurantUser);
+
+        Mockito.verify(menuService).deleteMenuItem(menuItemId, restaurantUser);
         Mockito.verify(menuService).getMenuItemById(menuItemId);
         Mockito.verify(menuService).updateMenuItem(existingMenuItem, restaurantUser);
         Mockito.verify(menuMapper).toResponse(existingMenuItem);

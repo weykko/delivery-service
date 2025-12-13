@@ -38,9 +38,10 @@ class UserControllerTest {
         UserResponseDto expectedResponse = new UserResponseDto(
                 testUser.getId(),
                 testUser.getEmail(),
+                testUser.getRole(),
                 testUser.getName(),
                 testUser.getPhone(),
-                testUser.getRole()
+                null
         );
 
         Mockito.when(userMapper.toResponse(testUser)).thenReturn(expectedResponse);
@@ -65,11 +66,12 @@ class UserControllerTest {
         UpdateUserRequestDto updateRequest = new UpdateUserRequestDto("Updated Name", "+79997654321");
 
         UserResponseDto expectedResponse = new UserResponseDto(
-                testUser.getId(),
-                testUser.getEmail(),
-                updateRequest.name(),
-                updateRequest.phone(),
-                testUser.getRole()
+                updatedUser.getId(),
+                updatedUser.getEmail(),
+                updatedUser.getRole(),
+                updatedUser.getName(),
+                updatedUser.getPhone(),
+                null
         );
 
         Mockito.when(userService.updateInfo(testUser)).thenReturn(testUser);

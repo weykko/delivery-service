@@ -33,6 +33,12 @@ public class User extends IdEntity {
     private String phone;
 
     /**
+     * Адрес пользователя. Поле необязательное
+     */
+    @Column(name = "address")
+    private String address;
+
+    /**
      * Роль пользователя в системе
      */
     @Column(name = "role", nullable = false)
@@ -117,5 +123,13 @@ public class User extends IdEntity {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }
