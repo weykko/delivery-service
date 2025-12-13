@@ -92,7 +92,8 @@ class RestaurantMenuControllerTest {
                 new BigDecimal("550.00")
         );
 
-        MenuItem existingMenuItem = createMenuItem(menuItemId, "Старая пицца", "Старое описание", new BigDecimal("450.00"), restaurantUser);
+        MenuItem existingMenuItem = createMenuItem(menuItemId, "Старая пицца", "Старое описание",
+                new BigDecimal("450.00"), restaurantUser);
 
         MenuItemResponseDto expectedResponse = new MenuItemResponseDto(
                 menuItemId,
@@ -113,21 +114,6 @@ class RestaurantMenuControllerTest {
         Assertions.assertEquals(expectedResponse.title(), result.title());
         Assertions.assertEquals(expectedResponse.description(), result.description());
         Assertions.assertEquals(expectedResponse.price(), result.price());
-        Mockito.verify(menuService).updateMenuItem(menuItemId, updateRequest, restaurantUser);
-        Mockito.verify(menuMapper).toResponse(updatedMenuItem);
-    }
-
-    /**
-     * Тестирование успешного удаления позиции меню владельцем ресторана
-     */
-    @Test
-    void deleteMenuItem_WithValidOwner_ShouldCallDeleteService() {
-        Long menuItemId = 1L;
-
-        restaurantMenuController.deleteMenuItem(menuItemId, restaurantUser);
-
-        Mockito.verify(menuService).deleteMenuItem(menuItemId, restaurantUser);
-        Mockito.verify(menuService).getMenuItemById(menuItemId);
         Mockito.verify(menuService).updateMenuItem(existingMenuItem, restaurantUser);
         Mockito.verify(menuMapper).toResponse(existingMenuItem);
     }

@@ -89,7 +89,7 @@ public class UserServiceTest {
      * Создает тестового пользователя
      */
     private User createTestUser(Long id, String email, String name, String phone) {
-        User user = new User(email, name, phone, Role.USER);
+        User user = new User(email, name, phone, Role.CLIENT);
         if (id != null) {
             user.setId(id);
         }

@@ -5,7 +5,6 @@ import naumen.project.dto.auth.TokenResponseDto;
 import naumen.project.entity.User;
 import naumen.project.entity.enums.Role;
 import naumen.project.exception.InvalidInputException;
-import naumen.project.exception.IllegalDataException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -145,7 +144,7 @@ public class AuthServiceTest {
      * Создает тестового пользователя
      */
     private User createTestUser(Long id) {
-        User user = new User("test@notexists.ru", "Alexey", "73454562345", Role.USER);
+        User user = new User("test@notexists.ru", "Alexey", "73454562345", Role.CLIENT);
         if (id != null) {
             user.setId(id);
         }

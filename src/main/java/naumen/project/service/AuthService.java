@@ -4,8 +4,7 @@ import naumen.project.auth.JwtUserDetails;
 import naumen.project.dto.auth.TokenResponseDto;
 import naumen.project.entity.User;
 import naumen.project.entity.enums.Role;
-import naumen.project.exception.IllegalDataException;
-import org.springframework.http.HttpStatus;
+import naumen.project.exception.InvalidInputException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -78,7 +77,7 @@ public class AuthService {
         }
 
         if (user.getAddress() == null) {
-            throw new IllegalDataException("У ресторана должен быть адрес");
+            throw new InvalidInputException("У ресторана должен быть адрес");
         }
     }
 }

@@ -3,8 +3,8 @@ package naumen.project.service.order;
 import naumen.project.entity.Order;
 import naumen.project.entity.User;
 import naumen.project.entity.enums.OrderStatus;
-import naumen.project.exception.ForbiddenException;
-import naumen.project.exception.IllegalDataException;
+import naumen.project.exception.InvalidInputException;
+import naumen.project.exception.PermissionCheckFailedException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -79,7 +79,7 @@ class OrderRestaurantServiceTest extends OrderTestBase {
 
         Mockito.when(orderService.getById(orderId)).thenReturn(testOrder);
 
-        ForbiddenException exception = Assertions.assertThrows(ForbiddenException.class,
+        PermissionCheckFailedException exception = Assertions.assertThrows(PermissionCheckFailedException.class,
                 () -> orderRestaurantService.getOrder(orderId, differentRestaurant));
 
         Assertions.assertTrue(exception.getMessage().contains("не принадлежит вашему ресторану"));
@@ -116,7 +116,7 @@ class OrderRestaurantServiceTest extends OrderTestBase {
 
         Mockito.when(orderService.getById(orderId)).thenReturn(order);
 
-        IllegalDataException exception = Assertions.assertThrows(IllegalDataException.class,
+        InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
                 () -> orderRestaurantService.prepareOrder(orderId, testRestaurant));
 
         Assertions.assertTrue(exception.getMessage().contains("уже готовиться"));
@@ -135,7 +135,7 @@ class OrderRestaurantServiceTest extends OrderTestBase {
 
         Mockito.when(orderService.getById(orderId)).thenReturn(order);
 
-        IllegalDataException exception = Assertions.assertThrows(IllegalDataException.class,
+        InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
                 () -> orderRestaurantService.prepareOrder(orderId, testRestaurant));
 
         Assertions.assertTrue(exception.getMessage().contains("уже приготовлен"));
@@ -154,7 +154,7 @@ class OrderRestaurantServiceTest extends OrderTestBase {
 
         Mockito.when(orderService.getById(orderId)).thenReturn(order);
 
-        IllegalDataException exception = Assertions.assertThrows(IllegalDataException.class,
+        InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
                 () -> orderRestaurantService.prepareOrder(orderId, testRestaurant));
 
         Assertions.assertTrue(exception.getMessage().contains("уже был отдан курьеру"));
@@ -174,7 +174,7 @@ class OrderRestaurantServiceTest extends OrderTestBase {
 
         Mockito.when(orderService.getById(orderId)).thenReturn(order);
 
-        ForbiddenException exception = Assertions.assertThrows(ForbiddenException.class,
+        PermissionCheckFailedException exception = Assertions.assertThrows(PermissionCheckFailedException.class,
                 () -> orderRestaurantService.prepareOrder(orderId, differentRestaurant));
 
         Assertions.assertTrue(exception.getMessage().contains("не принадлежит вашему ресторану"));
@@ -212,7 +212,7 @@ class OrderRestaurantServiceTest extends OrderTestBase {
 
         Mockito.when(orderService.getById(orderId)).thenReturn(order);
 
-        IllegalDataException exception = Assertions.assertThrows(IllegalDataException.class,
+        InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
                 () -> orderRestaurantService.readyOrder(orderId, testRestaurant));
 
         Assertions.assertTrue(exception.getMessage().contains("еще не начал готовиться"));
@@ -231,7 +231,7 @@ class OrderRestaurantServiceTest extends OrderTestBase {
 
         Mockito.when(orderService.getById(orderId)).thenReturn(order);
 
-        IllegalDataException exception = Assertions.assertThrows(IllegalDataException.class,
+        InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
                 () -> orderRestaurantService.readyOrder(orderId, testRestaurant));
 
         Assertions.assertTrue(exception.getMessage().contains("уже приготовлен"));
@@ -250,7 +250,7 @@ class OrderRestaurantServiceTest extends OrderTestBase {
 
         Mockito.when(orderService.getById(orderId)).thenReturn(order);
 
-        IllegalDataException exception = Assertions.assertThrows(IllegalDataException.class,
+        InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
                 () -> orderRestaurantService.readyOrder(orderId, testRestaurant));
 
         Assertions.assertTrue(exception.getMessage().contains("уже был отдан курьеру"));
@@ -270,7 +270,7 @@ class OrderRestaurantServiceTest extends OrderTestBase {
 
         Mockito.when(orderService.getById(orderId)).thenReturn(order);
 
-        ForbiddenException exception = Assertions.assertThrows(ForbiddenException.class,
+        PermissionCheckFailedException exception = Assertions.assertThrows(PermissionCheckFailedException.class,
                 () -> orderRestaurantService.readyOrder(orderId, differentRestaurant));
 
         Assertions.assertTrue(exception.getMessage().contains("не принадлежит вашему ресторану"));

@@ -62,7 +62,7 @@ public class MenuController {
                 .getMenuItems(restaurantId, title, PageRequest.of(page, size))
                 .map(menuMapper::toResponse);
 
-        return pageMapper.toResponse(menuPages);
+        return pageMapper.toMenuResponse(menuPages);
     }
 
     /**

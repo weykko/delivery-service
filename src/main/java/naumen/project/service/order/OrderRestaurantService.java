@@ -3,8 +3,8 @@ package naumen.project.service.order;
 import naumen.project.entity.Order;
 import naumen.project.entity.User;
 import naumen.project.entity.enums.OrderStatus;
-import naumen.project.exception.ForbiddenException;
-import naumen.project.exception.IllegalDataException;
+import naumen.project.exception.InvalidInputException;
+import naumen.project.exception.PermissionCheckFailedException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -60,9 +60,9 @@ public class OrderRestaurantService {
 
         switch (order.getStatus()) {
             case CREATED -> order.setStatus(OrderStatus.ACCEPTED);
-            case ACCEPTED -> throw new IllegalDataException("Заказ с id '%d' уже готовиться", orderId);
-            case PREPARED -> throw new IllegalDataException("Заказ с id '%d' уже приготовлен", orderId);
-            default -> throw new IllegalDataException("Заказ с id '%d' уже был отдан курьеру", orderId
+            case ACCEPTED -> throw new InvalidInputException("Заказ с id '%d' уже готовиться", orderId);
+            case PREPARED -> throw new InvalidInputException("Заказ с id '%d' уже приготовлен", orderId);
+            default -> throw new InvalidInputException("Заказ с id '%d' уже был отдан курьеру", orderId
             );
         }
 
@@ -82,9 +82,9 @@ public class OrderRestaurantService {
 
         switch (order.getStatus()) {
             case ACCEPTED -> order.setStatus(OrderStatus.PREPARED);
-            case CREATED -> throw new IllegalDataException("Заказ с id '%d' еще не начал готовиться", orderId);
-            case PREPARED -> throw new IllegalDataException("Заказ с id '%d' уже приготовлен", orderId);
-            default -> throw new IllegalDataException("Заказ с id '%d' уже был отдан курьеру", orderId
+            case CREATED -> throw new InvalidInputException("Заказ с id '%d' еще не начал готовиться", orderId);
+            case PREPARED -> throw new InvalidInputException("Заказ с id '%d' уже приготовлен", orderId);
+            default -> throw new InvalidInputException("Заказ с id '%d' уже был отдан курьеру", orderId
             );
         }
 
@@ -100,7 +100,7 @@ public class OrderRestaurantService {
     private void assertBelongsToRestaurant(Order order, User restaurant) {
         if (order.getRestaurant() == null ||
             !order.getRestaurant().getId().equals(restaurant.getId())) {
-            throw new ForbiddenException("Заказ с id '%d' не принадлежит вашему ресторану", order.getId());
+            throw new PermissionCheckFailedException("Заказ с id '%d' не принадлежит вашему ресторану", order.getId());
         }
     }
 }

@@ -1,6 +1,7 @@
 package naumen.project.service;
 
 import naumen.project.entity.User;
+import naumen.project.exception.EntityNotFoundException;
 import naumen.project.exception.InvalidInputException;
 import naumen.project.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -83,6 +84,6 @@ public class UserService {
      */
     public User getById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден с id=%d", id));
+                .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден с id=%d", id));
     }
 }
