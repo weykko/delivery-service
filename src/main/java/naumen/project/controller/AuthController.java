@@ -55,7 +55,8 @@ public class AuthController {
                 request.email(),
                 request.name(),
                 request.phone(),
-                request.role()
+                request.role(),
+                request.address()
         );
 
         User user = authService.register(newUser, request.password());

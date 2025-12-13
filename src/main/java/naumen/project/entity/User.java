@@ -79,6 +79,23 @@ public class User extends IdEntity {
     }
 
     /**
+     * Конструктор пользователя с адресом
+     *
+     * @param email   электронная почта пользователя
+     * @param name    имя пользователя
+     * @param phone   номер телефона пользователя
+     * @param role    роль пользователя в системе
+     * @param address адрес пользователя
+     */
+    public User(String email, String name, String phone, Role role, String address) {
+        this.email = email;
+        this.name = name;
+        this.phone = phone;
+        this.role = role;
+        this.address = address;
+    }
+
+    /**
      * Пустой конструктор для JPA.
      */
     public User() {
