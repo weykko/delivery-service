@@ -62,12 +62,14 @@ public class ClientOrderController {
         List<OrderItem> orderItemList = request.items().stream()
                 .map(orderItem -> orderItemService.buildOrderItem(orderItem.menuItemId(), orderItem.quantity()))
                 .toList();
+
         Order order = orderClientService.createOrder(
                 request.restaurantId(),
                 orderItemList,
                 request.deliveryAddress(),
                 client
         );
+
         return orderMapper.toClientInfoResponse(order);
     }
 

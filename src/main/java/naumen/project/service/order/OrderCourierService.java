@@ -19,7 +19,7 @@ public class OrderCourierService {
 
     private final OrderService orderService;
 
-    public OrderCourierService(OrderService orderService) {
+    OrderCourierService(OrderService orderService) {
         this.orderService = orderService;
     }
 

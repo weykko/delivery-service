@@ -21,7 +21,7 @@ public class OrderClientService {
     private final OrderService orderService;
     private final UserService userService;
 
-    public OrderClientService(OrderService orderService, UserService userService) {
+    OrderClientService(OrderService orderService, UserService userService) {
         this.orderService = orderService;
         this.userService = userService;
     }
@@ -47,18 +47,19 @@ public class OrderClientService {
 
         User restaurant = userService.getById(restaurantId);
 
-        Order order = new Order();
-        order.setDeliveryAddress(deliveryAddress);
-        order.setStatus(OrderStatus.CREATED);
-        order.setItems(orderItems);
-        order.setTotalPrice(
-                orderItems.stream()
-                        .map(OrderItem::getItemPrice)
-                        .reduce(BigDecimal::add)
-                        .orElse(BigDecimal.ZERO)
+        BigDecimal totalPrice = orderItems.stream()
+                .map(OrderItem::getItemPrice)
+                .reduce(BigDecimal::add)
+                .orElse(BigDecimal.ZERO);
+
+        Order order = new Order(
+                deliveryAddress,
+                OrderStatus.CREATED,
+                orderItems,
+                totalPrice,
+                restaurant,
+                client
         );
-        order.setRestaurant(restaurant);
-        order.setClient(client);
 
         orderItems.forEach(item -> item.setOrder(order));
 
@@ -99,7 +100,7 @@ public class OrderClientService {
 
         assertBelongsToClient(order, client);
         if (order.getStatus() != OrderStatus.CREATED ||
-            order.getCourier() != null) {
+                order.getCourier() != null) {
             throw new InvalidInputException("Заказ с id '%d' уже принят в работу", orderId);
         }
 

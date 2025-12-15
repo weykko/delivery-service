@@ -1,5 +1,7 @@
 package naumen.project.dto.order.courier;
 
+import naumen.project.entity.enums.OrderStatus;
+
 import java.math.BigDecimal;
 
 /**
@@ -13,7 +15,7 @@ import java.math.BigDecimal;
  */
 public record OrderCourierResponseDto(
         Long id,
-        String status,
+        OrderStatus status,
         String restaurantAddress,
         String deliveryAddress,
         BigDecimal totalPrice

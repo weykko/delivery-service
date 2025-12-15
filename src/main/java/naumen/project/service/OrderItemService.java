@@ -16,9 +16,7 @@ public class OrderItemService {
 
     private final MenuService menuService;
 
-    public OrderItemService(
-            MenuService menuService
-    ) {
+    public OrderItemService(MenuService menuService) {
         this.menuService = menuService;
     }
 
@@ -32,10 +30,10 @@ public class OrderItemService {
     public OrderItem buildOrderItem(Long menuItemId, Integer quantity) {
         MenuItem menuItem = menuService.getMenuItemById(menuItemId);
 
-        OrderItem orderItem = new OrderItem();
-        orderItem.setMenuItem(menuItem);
-        orderItem.setQuantity(quantity);
-        orderItem.setItemPrice(menuItem.getPrice().multiply(BigDecimal.valueOf(quantity)));
-        return orderItem;
+        return new OrderItem(
+                menuItem,
+                menuItem.getPrice().multiply(BigDecimal.valueOf(quantity)),
+                quantity
+        );
     }
 }

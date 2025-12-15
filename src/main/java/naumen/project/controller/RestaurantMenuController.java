@@ -74,9 +74,15 @@ public class RestaurantMenuController {
                                               @AuthenticationPrincipal User user) {
         MenuItem menuItem = menuService.getMenuItemById(id);
 
-        menuItem.setTitle(request.title());
-        menuItem.setDescription(request.description());
-        menuItem.setPrice(request.price());
+        if (request.title() != null) {
+            menuItem.setTitle(request.title());
+        }
+        if (request.description() != null) {
+            menuItem.setDescription(request.description());
+        }
+        if (request.price() != null) {
+            menuItem.setPrice(request.price());
+        }
 
         menuService.updateMenuItem(menuItem, user);
 
