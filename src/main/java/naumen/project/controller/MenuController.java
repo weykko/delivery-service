@@ -61,6 +61,7 @@ public class MenuController {
         Page<MenuItemResponseDto> menuPages = menuService
                 .getMenuItems(restaurantId, title, PageRequest.of(page, size))
                 .map(menuMapper::toResponse);
+
         return pageMapper.toMenuResponse(menuPages);
     }
 
@@ -75,6 +76,7 @@ public class MenuController {
     @Transactional(readOnly = true)
     public MenuItemResponseDto getMenuItem(@PathVariable Long menuId) {
         MenuItem menuItem = menuService.getMenuItemById(menuId);
+
         return menuMapper.toResponse(menuItem);
     }
 }

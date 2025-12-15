@@ -4,8 +4,8 @@ import naumen.project.entity.Order;
 import naumen.project.entity.OrderItem;
 import naumen.project.entity.User;
 import naumen.project.entity.enums.OrderStatus;
-import naumen.project.exception.ForbiddenException;
-import naumen.project.exception.IllegalDataException;
+import naumen.project.exception.InvalidInputException;
+import naumen.project.exception.PermissionCheckFailedException;
 import naumen.project.service.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -71,7 +71,7 @@ class OrderClientServiceTest extends OrderTestBase {
         List<OrderItem> orderItems = List.of(createOrderItem(differentRestaurant));
         String deliveryAddress = "Ул Пушкина";
 
-        IllegalDataException exception = Assertions.assertThrows(IllegalDataException.class,
+        InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
                 () -> orderClientService.createOrder(restaurantId, orderItems, deliveryAddress, testClient));
 
         Assertions.assertTrue(exception.getMessage().contains("Все позиции заказа должны принадлежать ресторану"));
@@ -122,7 +122,7 @@ class OrderClientServiceTest extends OrderTestBase {
 
         Mockito.when(orderService.getById(orderId)).thenReturn(testOrder);
 
-        ForbiddenException exception = Assertions.assertThrows(ForbiddenException.class,
+        PermissionCheckFailedException exception = Assertions.assertThrows(PermissionCheckFailedException.class,
                 () -> orderClientService.getOrder(orderId, differentClient));
 
         Assertions.assertTrue(exception.getMessage().contains("не принадлежит вам"));
@@ -141,7 +141,7 @@ class OrderClientServiceTest extends OrderTestBase {
 
         Mockito.when(orderService.getById(orderId)).thenReturn(order);
 
-        IllegalDataException exception = Assertions.assertThrows(IllegalDataException.class,
+        InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
                 () -> orderClientService.deleteOrder(orderId, testClient));
 
         Assertions.assertTrue(exception.getMessage().contains("уже принят в работу"));
@@ -162,7 +162,7 @@ class OrderClientServiceTest extends OrderTestBase {
 
         Mockito.when(orderService.getById(orderId)).thenReturn(order);
 
-        ForbiddenException exception = Assertions.assertThrows(ForbiddenException.class,
+        PermissionCheckFailedException exception = Assertions.assertThrows(PermissionCheckFailedException.class,
                 () -> orderClientService.deleteOrder(orderId, differentClient));
 
         Assertions.assertTrue(exception.getMessage().contains("не принадлежит вам"));

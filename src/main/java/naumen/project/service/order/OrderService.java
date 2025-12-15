@@ -2,7 +2,7 @@ package naumen.project.service.order;
 
 import naumen.project.entity.Order;
 import naumen.project.entity.User;
-import naumen.project.exception.NotFoundException;
+import naumen.project.exception.EntityNotFoundException;
 import naumen.project.repository.OrderRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,7 +37,7 @@ class OrderService {
     Order getById(Long id) {
         return orderRepository
                 .findById(id)
-                .orElseThrow(() -> new NotFoundException("Заказ с id '%d' не найден", id));
+                .orElseThrow(() -> new EntityNotFoundException("Заказ с id '%d' не найден", id));
     }
 
     /**

@@ -1,14 +1,14 @@
 package naumen.project.service;
 
 import naumen.project.auth.AuthProps;
+import naumen.project.auth.JwtUtil;
 import naumen.project.dto.auth.TokenResponseDto;
 import naumen.project.entity.AuthToken;
 import naumen.project.entity.User;
 import naumen.project.entity.enums.TokenType;
-import naumen.project.exception.IllegalDataException;
-import naumen.project.exception.NotFoundException;
+import naumen.project.exception.EntityNotFoundException;
+import naumen.project.exception.InvalidInputException;
 import naumen.project.repository.AuthTokenRepository;
-import naumen.project.util.JwtUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,7 +74,7 @@ public class AuthTokenService {
     public TokenResponseDto refresh(String refreshToken) {
         if (!jwtUtil.validateRefreshToken(refreshToken) ||
             !isTokenAllowed(refreshToken, TokenType.REFRESH)) {
-            throw new IllegalDataException("Токен невалиден");
+            throw new InvalidInputException("Токен невалиден");
         }
 
         AuthToken currentRefreshToken = getToken(refreshToken, TokenType.REFRESH);
@@ -98,11 +98,14 @@ public class AuthTokenService {
      */
     private AuthToken generateAccessToken(User user) {
         String accessToken = jwtUtil.generateAccessToken(user);
-        AuthToken accessAuthToken = new AuthToken();
-        accessAuthToken.setToken(accessToken);
-        accessAuthToken.setType(TokenType.ACCESS);
-        accessAuthToken.setExpireAt(Instant.now().plusSeconds(authProps.getAccess().getLifetime()));
-        accessAuthToken.setUser(user);
+        Instant expireAt = Instant.now().plusSeconds(authProps.getAccess().getLifetime());
+
+        AuthToken accessAuthToken = new AuthToken(
+                accessToken,
+                TokenType.ACCESS,
+                expireAt,
+                user
+        );
 
         authTokenRepository.save(accessAuthToken);
 
@@ -117,11 +120,14 @@ public class AuthTokenService {
      */
     private AuthToken generateRefreshToken(User user) {
         String refreshToken = jwtUtil.generateRefreshToken(user);
-        AuthToken refreshAuthToken = new AuthToken();
-        refreshAuthToken.setToken(refreshToken);
-        refreshAuthToken.setType(TokenType.REFRESH);
-        refreshAuthToken.setExpireAt(Instant.now().plusSeconds(authProps.getRefresh().getLifetime()));
-        refreshAuthToken.setUser(user);
+        Instant expireAt = Instant.now().plusSeconds(authProps.getRefresh().getLifetime());
+
+        AuthToken refreshAuthToken = new AuthToken(
+                refreshToken,
+                TokenType.REFRESH,
+                expireAt,
+                user
+        );
 
         authTokenRepository.save(refreshAuthToken);
 
@@ -137,6 +143,6 @@ public class AuthTokenService {
      */
     private AuthToken getToken(String token, TokenType type) {
         return authTokenRepository.findByTokenAndType(token, type)
-                .orElseThrow(() -> new NotFoundException("Токен не найден"));
+                .orElseThrow(() -> new EntityNotFoundException("Токен не найден"));
     }
 }

@@ -4,8 +4,8 @@ import naumen.project.entity.Order;
 import naumen.project.entity.OrderItem;
 import naumen.project.entity.User;
 import naumen.project.entity.enums.OrderStatus;
-import naumen.project.exception.ForbiddenException;
-import naumen.project.exception.IllegalDataException;
+import naumen.project.exception.InvalidInputException;
+import naumen.project.exception.PermissionCheckFailedException;
 import naumen.project.service.UserService;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +42,7 @@ public class OrderClientService {
                 .allMatch(item -> item.getMenuItem().getRestaurant().getId().equals(restaurantId));
 
         if (!allItemsBelongToRestaurant) {
-            throw new IllegalDataException("Все позиции заказа должны принадлежать ресторану с id '%d'", restaurantId);
+            throw new InvalidInputException("Все позиции заказа должны принадлежать ресторану с id '%d'", restaurantId);
         }
 
         User restaurant = userService.getById(restaurantId);
@@ -100,7 +100,7 @@ public class OrderClientService {
         assertBelongsToClient(order, client);
         if (order.getStatus() != OrderStatus.CREATED ||
             order.getCourier() != null) {
-            throw new IllegalDataException("Заказ с id '%d' уже принят в работу", orderId);
+            throw new InvalidInputException("Заказ с id '%d' уже принят в работу", orderId);
         }
 
         order.setStatus(OrderStatus.DELETED);
@@ -115,7 +115,7 @@ public class OrderClientService {
      */
     private void assertBelongsToClient(Order order, User client) {
         if (!order.getClient().getId().equals(client.getId())) {
-            throw new ForbiddenException("Заказ c id '%d' не принадлежит вам", order.getId());
+            throw new PermissionCheckFailedException("Заказ c id '%d' не принадлежит вам", order.getId());
         }
     }
 }

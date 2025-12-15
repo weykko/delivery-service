@@ -2,7 +2,7 @@ package naumen.project.service.order;
 
 import naumen.project.entity.Order;
 import naumen.project.entity.User;
-import naumen.project.exception.NotFoundException;
+import naumen.project.exception.EntityNotFoundException;
 import naumen.project.repository.OrderRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -61,7 +61,7 @@ class OrderServiceTest extends OrderTestBase {
 
         Mockito.when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
 
-        NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
+        EntityNotFoundException exception = Assertions.assertThrows(EntityNotFoundException.class,
                 () -> orderService.getById(orderId));
 
         Assertions.assertTrue(exception.getMessage().contains("не найден"));

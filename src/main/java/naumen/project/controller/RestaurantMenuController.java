@@ -47,7 +47,14 @@ public class RestaurantMenuController {
     @Transactional
     public MenuItemResponseDto createMenuItem(@RequestBody @Valid CreateMenuItemRequestDto request,
                                               @AuthenticationPrincipal User user) {
-        MenuItem menuItem = menuService.createMenuItem(menuMapper.toEntity(request), user);
+        MenuItem newItem = new MenuItem(
+                request.title(),
+                request.description(),
+                request.price()
+        );
+
+        MenuItem menuItem = menuService.createMenuItem(newItem, user);
+
         return menuMapper.toResponse(menuItem);
     }
 
@@ -65,7 +72,14 @@ public class RestaurantMenuController {
     public MenuItemResponseDto updateMenuItem(@PathVariable Long id,
                                               @RequestBody @Valid UpdateMenuItemRequestDto request,
                                               @AuthenticationPrincipal User user) {
-        MenuItem menuItem = menuService.updateMenuItem(id, request, user);
+        MenuItem menuItem = menuService.getMenuItemById(id);
+
+        menuItem.setTitle(request.title());
+        menuItem.setDescription(request.description());
+        menuItem.setPrice(request.price());
+
+        menuService.updateMenuItem(menuItem, user);
+
         return menuMapper.toResponse(menuItem);
     }
 

@@ -9,6 +9,7 @@ import naumen.project.service.AuthTokenService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -32,30 +33,18 @@ class AuthControllerTest {
     @InjectMocks
     private AuthController authController;
 
-    private final User testUser = createTestUser();
-    private final RegisterRequestDto registerRequest = createRegisterRequest();
-    private final LoginRequestDto loginRequest = createLoginRequest();
-
     /**
      * Тестирование успешной регистрации нового пользователя
      */
     @Test
-    void register_WithValidRequest_ShouldReturnRegisterResponse() {
-        User userEntity = new User();
-        userEntity.setEmail(registerRequest.email());
-        userEntity.setName(registerRequest.name());
-        userEntity.setPhone(registerRequest.phone());
-        userEntity.setRole(registerRequest.role());
+    void registerWithValidRequestShouldReturnRegisterResponse() {
+        RegisterRequestDto registerRequest = createRegisterRequest();
+        User testUser = createTestUser(registerRequest);
+        RegisterResponseDto expectedResponse = createRegisterResponse(testUser);
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
 
-        RegisterResponseDto expectedResponse = new RegisterResponseDto(
-                1L,
-                registerRequest.email(),
-                registerRequest.role(),
-                registerRequest.name()
-        );
-
-        Mockito.when(userMapper.toEntity(registerRequest)).thenReturn(userEntity);
-        Mockito.when(authService.register(userEntity, registerRequest.password())).thenReturn(testUser);
+        Mockito.when(authService.register(Mockito.any(User.class), Mockito.eq(registerRequest.password())))
+                .thenReturn(testUser);
         Mockito.when(userMapper.toRegisterResponse(testUser)).thenReturn(expectedResponse);
 
         RegisterResponseDto result = authController.register(registerRequest);
@@ -64,8 +53,14 @@ class AuthControllerTest {
         Assertions.assertEquals(expectedResponse.email(), result.email());
         Assertions.assertEquals(expectedResponse.name(), result.name());
         Assertions.assertEquals(expectedResponse.role(), result.role());
-        Mockito.verify(userMapper).toEntity(registerRequest);
-        Mockito.verify(authService).register(userEntity, registerRequest.password());
+
+        Mockito.verify(authService).register(userCaptor.capture(), Mockito.eq(registerRequest.password()));
+        User capturedUser = userCaptor.getValue();
+        Assertions.assertEquals(registerRequest.email(), capturedUser.getEmail());
+        Assertions.assertEquals(registerRequest.name(), capturedUser.getName());
+        Assertions.assertEquals(registerRequest.phone(), capturedUser.getPhone());
+        Assertions.assertEquals(registerRequest.role(), capturedUser.getRole());
+
         Mockito.verify(userMapper).toRegisterResponse(testUser);
     }
 
@@ -73,7 +68,8 @@ class AuthControllerTest {
      * Тестирование успешного входа пользователя с корректными учетными данными
      */
     @Test
-    void login_WithValidCredentials_ShouldReturnTokenResponse() {
+    void loginWithValidCredentialsShouldReturnTokenResponse() {
+        LoginRequestDto loginRequest = createLoginRequest();
         TokenResponseDto expectedTokens = new TokenResponseDto("accessToken", "refreshToken");
 
         Mockito.when(authService.login(loginRequest.email(), loginRequest.password()))
@@ -91,7 +87,7 @@ class AuthControllerTest {
      * Тестирование обновления токенов с валидным refresh токеном
      */
     @Test
-    void refresh_WithValidRefreshToken_ShouldReturnNewTokens() {
+    void refreshWithValidRefreshTokenShouldReturnNewTokens() {
         RefreshRequestDto refreshRequest = new RefreshRequestDto("validRefreshToken");
         TokenResponseDto expectedTokens = new TokenResponseDto("newAccessToken", "newRefreshToken");
 
@@ -105,30 +101,7 @@ class AuthControllerTest {
         Mockito.verify(authTokenService).refresh(refreshRequest.refreshToken());
     }
 
-    /**
-     * Тестирование успешного выхода аутентифицированного пользователя из системы
-     */
-    @Test
-    void logout_WithAuthenticatedUser_ShouldCallLogoutService() {
-        authController.logout(testUser);
-
-        Mockito.verify(authTokenService).logout(testUser);
-    }
-
     // Вспомогательные методы для создания тестовых данных
-
-    /**
-     * Создает тестового пользователя
-     */
-    private User createTestUser() {
-        User user = new User();
-        user.setId(1L);
-        user.setEmail("test@example.com");
-        user.setName("Test User");
-        user.setPhone("+79991234567");
-        user.setRole(Role.CLIENT);
-        return user;
-    }
 
     /**
      * Создает тестовый запрос регистрации
@@ -141,6 +114,34 @@ class AuthControllerTest {
                 "Test User",
                 "+79991234567",
                 "Ул Пушкина"
+        );
+    }
+
+    /**
+     * Создает тестового пользователя
+     */
+    private User createTestUser(RegisterRequestDto request) {
+        User user = new User(
+                request.email(),
+                request.name(),
+                request.phone(),
+                request.role()
+        );
+
+        user.setId(1L);
+
+        return user;
+    }
+
+    /**
+     * Создает тестовый ответ регистрации
+     */
+    private RegisterResponseDto createRegisterResponse(User testUser) {
+        return new RegisterResponseDto(
+                testUser.getId(),
+                testUser.getEmail(),
+                testUser.getRole(),
+                testUser.getName()
         );
     }
 

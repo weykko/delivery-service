@@ -5,11 +5,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import naumen.project.dto.error.ErrorResponseDto;
 import naumen.project.dto.error.ViolationConstraintDto;
-import naumen.project.exception.AppBaseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -27,6 +25,7 @@ import java.util.Objects;
 /**
  * Глобальный обработчик исключений для REST API.
  * Перехватывает и обрабатывает исключения на уровне всего приложения, возвращая структурированные ответы.
+ * Обработчик предназначен для более "технических" ошибок, таких как ошибки валидации, ошибки аутентификации и подобное.
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -43,26 +42,10 @@ public class GlobalExceptionHandler {
         log.error("Internal error", ex);
         return new ErrorResponseDto(
                 Instant.now(),
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Internal Server Error",
                 request.getServletPath(),
                 null
         );
-    }
-
-    /**
-     * Обрабатывает кастомные исключения приложения {@link AppBaseException}
-     */
-    @ExceptionHandler
-    public ResponseEntity<ErrorResponseDto> handleWebException(AppBaseException ex, HttpServletRequest request) {
-        ErrorResponseDto response = new ErrorResponseDto(
-                Instant.now(),
-                ex.getStatus().value(),
-                ex.getMessage(),
-                request.getServletPath(),
-                null
-        );
-        return ResponseEntity.status(ex.getStatus()).body(response);
     }
 
     /**
@@ -74,7 +57,6 @@ public class GlobalExceptionHandler {
     public ErrorResponseDto handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, HttpServletRequest request) {
         return new ErrorResponseDto(
                 Instant.now(),
-                HttpStatus.BAD_REQUEST.value(),
                 "Входные данные не соответствуют заданным ограничениям",
                 request.getServletPath(),
                 ex.getBindingResult().getFieldErrors().stream()
@@ -92,7 +74,6 @@ public class GlobalExceptionHandler {
     public ErrorResponseDto handleConstraintViolationException(ConstraintViolationException ex, HttpServletRequest request) {
         return new ErrorResponseDto(
                 Instant.now(),
-                HttpStatus.BAD_REQUEST.value(),
                 "Входные данные не соответствуют заданным ограничениям",
                 request.getServletPath(),
                 ex.getConstraintViolations().stream()
@@ -110,7 +91,6 @@ public class GlobalExceptionHandler {
     public ErrorResponseDto handleConstraintViolationException(HandlerMethodValidationException ex, HttpServletRequest request) {
         return new ErrorResponseDto(
                 Instant.now(),
-                HttpStatus.BAD_REQUEST.value(),
                 "Входные данные не соответствуют заданным ограничениям",
                 request.getServletPath(),
                 ex.getParameterValidationResults().stream()
@@ -131,7 +111,6 @@ public class GlobalExceptionHandler {
     public ErrorResponseDto handleBadCredentialsException(BadCredentialsException ex, HttpServletRequest request) {
         return new ErrorResponseDto(
                 Instant.now(),
-                HttpStatus.UNAUTHORIZED.value(),
                 "Неверный логин / пароль",
                 request.getServletPath(),
                 null
@@ -147,7 +126,6 @@ public class GlobalExceptionHandler {
     public ErrorResponseDto handleMethodNotSupported(HttpRequestMethodNotSupportedException ex, HttpServletRequest request) {
         return new ErrorResponseDto(
                 Instant.now(),
-                HttpStatus.METHOD_NOT_ALLOWED.value(),
                 "HTTP метод '%s' не поддерживается на этом эндпоинте".formatted(ex.getMethod()),
                 request.getServletPath(),
                 null
@@ -163,7 +141,6 @@ public class GlobalExceptionHandler {
     public ErrorResponseDto handleHttpMessageNotReadableException(HttpMessageNotReadableException ex, HttpServletRequest request) {
         return new ErrorResponseDto(
                 Instant.now(),
-                HttpStatus.BAD_REQUEST.value(),
                 "Неверный запрос JSON",
                 request.getServletPath(),
                 null
@@ -179,7 +156,6 @@ public class GlobalExceptionHandler {
     public ErrorResponseDto handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
         return new ErrorResponseDto(
                 Instant.now(),
-                HttpStatus.BAD_REQUEST.value(),
                 "Неверный тип для параметра '%s': ожидается тип '%s'"
                         .formatted(ex.getName(), Objects.requireNonNull(ex.getRequiredType()).getSimpleName()),
                 request.getServletPath(),
@@ -196,7 +172,6 @@ public class GlobalExceptionHandler {
     public ErrorResponseDto handleNoResourceFoundException(NoResourceFoundException ex, HttpServletRequest request) {
         return new ErrorResponseDto(
                 Instant.now(),
-                HttpStatus.NOT_FOUND.value(),
                 "Запрашиваемый ресурс не найден",
                 request.getServletPath(),
                 null

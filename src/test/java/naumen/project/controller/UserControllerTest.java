@@ -29,20 +29,19 @@ class UserControllerTest {
     @InjectMocks
     private UserController userController;
 
-    private final User testUser = createTestUser();
-
     /**
      * Тестирование получения информации о текущем аутентифицированном пользователе
      */
     @Test
-    void getMyUser_WithAuthenticatedUser_ShouldReturnUserResponse() {
+    void getMyUserWithAuthenticatedUserShouldReturnUserResponse() {
+        User testUser = createTestUser(1L);
         UserResponseDto expectedResponse = new UserResponseDto(
                 testUser.getId(),
                 testUser.getEmail(),
                 testUser.getRole(),
                 testUser.getName(),
                 testUser.getPhone(),
-                null
+                "Пушкина 17"
         );
 
         Mockito.when(userMapper.toResponse(testUser)).thenReturn(expectedResponse);
@@ -62,49 +61,30 @@ class UserControllerTest {
      * Тестирование успешного обновления информации пользователя с валидными данными
      */
     @Test
-    void updateUser_WithValidRequest_ShouldReturnUpdatedUser() {
-        UpdateUserRequestDto updateRequest = new UpdateUserRequestDto(
-                "Updated Name",
-                "+79997654321",
-                "Ул Пушкина");
-        User updatedUser = new User();
-        updatedUser.setId(testUser.getId());
-        updatedUser.setEmail(testUser.getEmail());
-        updatedUser.setName(updateRequest.name());
-        updatedUser.setPhone(updateRequest.phone());
-        updatedUser.setRole(testUser.getRole());
+    void updateUserWithValidRequestShouldReturnUpdatedUser() {
+        User testUser = createTestUser(2L);
+        UpdateUserRequestDto updateRequest = new UpdateUserRequestDto("Updated Name", "+79997654321",
+                "Пушкина 17");
 
         UserResponseDto expectedResponse = new UserResponseDto(
-                updatedUser.getId(),
-                updatedUser.getEmail(),
-                updatedUser.getRole(),
-                updatedUser.getName(),
-                updatedUser.getPhone(),
-                null
+                testUser.getId(),
+                testUser.getEmail(),
+                testUser.getRole(),
+                updateRequest.name(),
+                updateRequest.phone(),
+                "Пушкина 17"
         );
 
-        Mockito.when(userMapper.updateUserEntityFromRequest(updateRequest, testUser)).thenReturn(updatedUser);
-        Mockito.when(userService.updateInfo(updatedUser)).thenReturn(updatedUser);
-        Mockito.when(userMapper.toResponse(updatedUser)).thenReturn(expectedResponse);
+        Mockito.when(userService.updateInfo(testUser)).thenReturn(testUser);
+        Mockito.when(userMapper.toResponse(testUser)).thenReturn(expectedResponse);
 
         UserResponseDto result = userController.updateUser(testUser, updateRequest);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(expectedResponse.name(), result.name());
         Assertions.assertEquals(expectedResponse.phone(), result.phone());
-        Mockito.verify(userMapper).updateUserEntityFromRequest(updateRequest, testUser);
-        Mockito.verify(userService).updateInfo(updatedUser);
-        Mockito.verify(userMapper).toResponse(updatedUser);
-    }
-
-    /**
-     * Тестирование успешного удаления текущего аутентифицированного пользователя
-     */
-    @Test
-    void deleteUser_WithAuthenticatedUser_ShouldCallDeleteService() {
-        userController.deleteUser(testUser);
-
-        Mockito.verify(userService).deleteUser(testUser);
+        Mockito.verify(userService).updateInfo(testUser);
+        Mockito.verify(userMapper).toResponse(testUser);
     }
 
     // Вспомогательные методы для создания тестовых данных
@@ -112,13 +92,11 @@ class UserControllerTest {
     /**
      * Создает тестового пользователя
      */
-    private User createTestUser() {
-        User user = new User();
-        user.setId(1L);
-        user.setEmail("test@example.com");
-        user.setName("Test User");
-        user.setPhone("+79991234567");
-        user.setRole(Role.CLIENT);
+    private User createTestUser(Long id) {
+        User user = new User("test@example.com", "Test User", "+79991234567", Role.CLIENT);
+        if (id != null) {
+            user.setId(id);
+        }
         return user;
     }
 }

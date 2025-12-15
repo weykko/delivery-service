@@ -51,8 +51,17 @@ public class AuthController {
     @ResponseStatus(HttpStatus.CREATED)
     @Transactional
     public RegisterResponseDto register(@RequestBody @Valid RegisterRequestDto request) {
-        User user = userMapper.toEntity(request);
-        return userMapper.toRegisterResponse(authService.register(user, request.password()));
+        User newUser = new User(
+                request.email(),
+                request.name(),
+                request.phone(),
+                request.role(),
+                request.address()
+        );
+
+        User user = authService.register(newUser, request.password());
+
+        return userMapper.toRegisterResponse(user);
     }
 
     /**
@@ -79,7 +88,9 @@ public class AuthController {
     @PostMapping("/refresh")
     @Transactional
     public TokenResponseDto refresh(@RequestBody @Valid RefreshRequestDto request) {
-        return authTokenService.refresh(request.refreshToken());
+        String refreshToken = request.refreshToken();
+
+        return authTokenService.refresh(refreshToken);
     }
 
     /**
