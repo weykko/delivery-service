@@ -39,6 +39,25 @@ public class OrderItem extends IdEntity {
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
+    /**
+     * Конструктор для создания пункта заказа
+     *
+     * @param menuItem  заказанное блюдо
+     * @param itemPrice зафиксированная стоимость выбранного блюда на момент заказа
+     * @param quantity  количество штук блюда
+     */
+    public OrderItem(MenuItem menuItem, BigDecimal itemPrice, Integer quantity) {
+        this.quantity = quantity;
+        this.itemPrice = itemPrice;
+        this.menuItem = menuItem;
+    }
+
+    /**
+     * Пустой конструктор для JPA
+     */
+    public OrderItem() {
+    }
+
     public Integer getQuantity() {
         return quantity;
     }

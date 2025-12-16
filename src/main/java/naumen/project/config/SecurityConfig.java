@@ -1,8 +1,8 @@
 package naumen.project.config;
 
+import naumen.project.auth.JwtFilter;
 import naumen.project.auth.handler.AccessDeniedHandlerImpl;
 import naumen.project.auth.handler.AuthenticationEntryPointImpl;
-import naumen.project.filter.JwtFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

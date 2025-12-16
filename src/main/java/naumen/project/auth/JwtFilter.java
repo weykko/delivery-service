@@ -1,11 +1,9 @@
-package naumen.project.filter;
+package naumen.project.auth;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import naumen.project.auth.JwtAuthenticationService;
-import naumen.project.auth.JwtUtil;
 import naumen.project.entity.enums.TokenType;
 import naumen.project.service.AuthTokenService;
 import org.springframework.security.core.Authentication;

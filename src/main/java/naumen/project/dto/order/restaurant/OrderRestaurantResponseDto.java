@@ -1,6 +1,7 @@
 package naumen.project.dto.order.restaurant;
 
 import naumen.project.dto.order.item.OrderItemResponseDto;
+import naumen.project.entity.enums.OrderStatus;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -18,7 +19,7 @@ import java.util.List;
  */
 public record OrderRestaurantResponseDto(
         Long id,
-        String status,
+        OrderStatus status,
         BigDecimal totalPrice,
         Long courierId,
         Instant createdAt,

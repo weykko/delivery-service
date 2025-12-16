@@ -17,7 +17,7 @@ public class OrderRestaurantService {
 
     private final OrderService orderService;
 
-    public OrderRestaurantService(OrderService orderService) {
+    OrderRestaurantService(OrderService orderService) {
         this.orderService = orderService;
     }
 
@@ -62,8 +62,7 @@ public class OrderRestaurantService {
             case CREATED -> order.setStatus(OrderStatus.ACCEPTED);
             case ACCEPTED -> throw new InvalidInputException("Заказ с id '%d' уже готовиться", orderId);
             case PREPARED -> throw new InvalidInputException("Заказ с id '%d' уже приготовлен", orderId);
-            default -> throw new InvalidInputException("Заказ с id '%d' уже был отдан курьеру", orderId
-            );
+            default -> throw new InvalidInputException("Заказ с id '%d' уже был отдан курьеру", orderId);
         }
 
         orderService.save(order);
@@ -84,8 +83,7 @@ public class OrderRestaurantService {
             case ACCEPTED -> order.setStatus(OrderStatus.PREPARED);
             case CREATED -> throw new InvalidInputException("Заказ с id '%d' еще не начал готовиться", orderId);
             case PREPARED -> throw new InvalidInputException("Заказ с id '%d' уже приготовлен", orderId);
-            default -> throw new InvalidInputException("Заказ с id '%d' уже был отдан курьеру", orderId
-            );
+            default -> throw new InvalidInputException("Заказ с id '%d' уже был отдан курьеру", orderId);
         }
 
         orderService.save(order);

@@ -65,7 +65,7 @@ public interface OrderMapper {
 
     /**
      * Преобразует сущность OrderItem в DTO ответа.
-     * Нужен для метода toResponse(Order order)
+     * Нужен для маппинга Order в response
      *
      * @param orderItem элемент заказа
      * @return DTO элемента заказа

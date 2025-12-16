@@ -67,6 +67,33 @@ public class Order extends IdEntity {
     @CreationTimestamp
     private Instant createdAt;
 
+    /**
+     * Конструктор для создания заказа.
+     *
+     * @param deliveryAddress адрес доставки
+     * @param status          статус заказа
+     * @param items           состав заказа
+     * @param totalPrice      общая стоимость заказа
+     * @param restaurant      ресторан, у которого заказ
+     * @param client          клиент, тот, кто заказал
+     */
+    public Order(String deliveryAddress, OrderStatus status, List<OrderItem> items,
+                 BigDecimal totalPrice, User restaurant, User client) {
+        this.deliveryAddress = deliveryAddress;
+        this.status = status;
+        this.items = items;
+        this.totalPrice = totalPrice;
+        this.restaurant = restaurant;
+        this.client = client;
+    }
+
+    /**
+     * Пустой конструктор для JPA.
+     */
+    public Order() {
+
+    }
+
     public String getDeliveryAddress() {
         return deliveryAddress;
     }
