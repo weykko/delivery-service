@@ -3,7 +3,7 @@ package naumen.project.controller;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import naumen.project.dto.order.client.OrderClientCreateRequestDto;
-import naumen.project.dto.order.client.OrderClientInfoResponseDto;
+import naumen.project.dto.order.client.OrderClientResponseDto;
 import naumen.project.dto.order.client.OrderClientShortResponseDto;
 import naumen.project.entity.Order;
 import naumen.project.entity.OrderItem;
@@ -55,7 +55,7 @@ public class ClientOrderController {
      */
     @PostMapping
     @Transactional
-    public OrderClientInfoResponseDto createOrder(
+    public OrderClientResponseDto createOrder(
             @RequestBody @Valid OrderClientCreateRequestDto request,
             @AuthenticationPrincipal User client
     ) {
@@ -100,7 +100,7 @@ public class ClientOrderController {
      */
     @GetMapping("/{orderId}")
     @Transactional(readOnly = true)
-    public OrderClientInfoResponseDto getOrderInfoById(
+    public OrderClientResponseDto getOrderById(
             @PathVariable Long orderId,
             @AuthenticationPrincipal User client
     ) {

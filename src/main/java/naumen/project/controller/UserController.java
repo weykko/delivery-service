@@ -44,7 +44,7 @@ public class UserController {
      */
     @GetMapping("/me")
     @Transactional(readOnly = true)
-    public UserResponseDto getMyUser(@AuthenticationPrincipal User user) {
+    public UserResponseDto getUser(@AuthenticationPrincipal User user) {
         return userMapper.toResponse(user);
     }
 
