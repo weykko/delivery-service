@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
  * Предоставляет методы для получения, обновления и удаления заказов.
  *
  * @see OrderService
+ * @see UserService
  */
 @Service
 public class OrderAdminService {
