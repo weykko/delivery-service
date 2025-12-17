@@ -33,7 +33,7 @@ class UserControllerTest {
      * Тестирование получения информации о текущем аутентифицированном пользователе
      */
     @Test
-    void getMyUserWithAuthenticatedUserShouldReturnUserResponse() {
+    void getUserWithAuthenticatedUserShouldReturnUserResponse() {
         User testUser = createTestUser(1L);
         UserResponseDto expectedResponse = new UserResponseDto(
                 testUser.getId(),
@@ -46,7 +46,7 @@ class UserControllerTest {
 
         Mockito.when(userMapper.toResponse(testUser)).thenReturn(expectedResponse);
 
-        UserResponseDto result = userController.getMyUser(testUser);
+        UserResponseDto result = userController.getUser(testUser);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(expectedResponse.id(), result.id());
@@ -75,7 +75,7 @@ class UserControllerTest {
                 "Пушкина 17"
         );
 
-        Mockito.when(userService.updateInfo(testUser)).thenReturn(testUser);
+        Mockito.when(userService.updateInfo(testUser, updateRequest.phone(), null)).thenReturn(testUser);
         Mockito.when(userMapper.toResponse(testUser)).thenReturn(expectedResponse);
 
         UserResponseDto result = userController.updateUser(testUser, updateRequest);
@@ -83,7 +83,7 @@ class UserControllerTest {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(expectedResponse.name(), result.name());
         Assertions.assertEquals(expectedResponse.phone(), result.phone());
-        Mockito.verify(userService).updateInfo(testUser);
+        Mockito.verify(userService).updateInfo(testUser, updateRequest.phone(), null);
         Mockito.verify(userMapper).toResponse(testUser);
     }
 

@@ -47,7 +47,7 @@ class RestaurantOrderControllerTest {
      * Тестирование получения активных заказов ресторана
      */
     @Test
-    void getActiveOrders_ShouldReturnPagedOrders() {
+    void getActiveOrdersShouldReturnPagedOrders() {
         Order testOrder = createTestOrder();
         User testRestaurant = createTestRestaurant();
         int page = 0;
@@ -79,7 +79,7 @@ class RestaurantOrderControllerTest {
      * Тестирование получения информации о заказе
      */
     @Test
-    void getOrder_ShouldReturnOrderInfo() {
+    void getOrderShouldReturnOrderInfo() {
         Order testOrder = createTestOrder();
         User testRestaurant = createTestRestaurant();
         Long orderId = 1L;

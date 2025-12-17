@@ -38,7 +38,7 @@ class OrderRestaurantServiceTest extends OrderTestBase {
      * Тестирование получения активных заказов ресторана
      */
     @Test
-    void getActiveOrders_WithValidRestaurant_ShouldReturnPagedOrders() {
+    void getActiveOrdersWithValidRestaurantShouldReturnPagedOrders() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Order> ordersPage = new PageImpl<>(List.of(testOrder));
 
@@ -57,7 +57,7 @@ class OrderRestaurantServiceTest extends OrderTestBase {
      * Тестирование успешного получения заказа ресторана
      */
     @Test
-    void getOrder_WithValidRestaurantAndOrder_ShouldReturnOrder() {
+    void getOrderWithValidRestaurantAndOrderShouldReturnOrder() {
         Long orderId = 1L;
 
         Mockito.when(orderService.getById(orderId)).thenReturn(testOrder);
@@ -73,7 +73,7 @@ class OrderRestaurantServiceTest extends OrderTestBase {
      * Тестирование получения заказа чужим рестораном
      */
     @Test
-    void getOrder_WithDifferentRestaurant_ShouldThrowException() {
+    void getOrderWithDifferentRestaurantShouldThrowException() {
         Long orderId = 1L;
         User differentRestaurant = createDifferentRestaurant();
 
@@ -90,7 +90,7 @@ class OrderRestaurantServiceTest extends OrderTestBase {
      * Тестирование пометки заказа как в приготовлении со статусом CREATED
      */
     @Test
-    void prepareOrder_WithCreatedStatus_ShouldChangeToAccepted() {
+    void prepareOrderWithCreatedStatusShouldChangeToAccepted() {
         Long orderId = 1L;
         Order order = createTestOrder();
         order.setStatus(OrderStatus.CREATED);
@@ -109,7 +109,7 @@ class OrderRestaurantServiceTest extends OrderTestBase {
      * Тестирование пометки заказа как в приготовлении со статусом ACCEPTED
      */
     @Test
-    void prepareOrder_WithAcceptedStatus_ShouldThrowException() {
+    void prepareOrderWithAcceptedStatusShouldThrowException() {
         Long orderId = 1L;
         Order order = createTestOrder();
         order.setStatus(OrderStatus.ACCEPTED);
@@ -128,7 +128,7 @@ class OrderRestaurantServiceTest extends OrderTestBase {
      * Тестирование пометки заказа как в приготовлении со статусом PREPARED
      */
     @Test
-    void prepareOrder_WithPreparedStatus_ShouldThrowException() {
+    void prepareOrderWithPreparedStatusShouldThrowException() {
         Long orderId = 1L;
         Order order = createTestOrder();
         order.setStatus(OrderStatus.PREPARED);
@@ -147,7 +147,7 @@ class OrderRestaurantServiceTest extends OrderTestBase {
      * Тестирование пометки заказа как в приготовлении со статусом DELIVERING
      */
     @Test
-    void prepareOrder_WithDeliveringStatus_ShouldThrowException() {
+    void prepareOrderWithDeliveringStatusShouldThrowException() {
         Long orderId = 1L;
         Order order = createTestOrder();
         order.setStatus(OrderStatus.DELIVERING);
@@ -166,7 +166,7 @@ class OrderRestaurantServiceTest extends OrderTestBase {
      * Тестирование пометки заказа как в приготовлении чужим рестораном
      */
     @Test
-    void prepareOrder_WithDifferentRestaurant_ShouldThrowException() {
+    void prepareOrderWithDifferentRestaurantShouldThrowException() {
         Long orderId = 1L;
         User differentRestaurant = createDifferentRestaurant();
         Order order = createTestOrder();
@@ -186,7 +186,7 @@ class OrderRestaurantServiceTest extends OrderTestBase {
      * Тестирование пометки заказа как готового со статусом ACCEPTED
      */
     @Test
-    void readyOrder_WithAcceptedStatus_ShouldChangeToPrepared() {
+    void readyOrderWithAcceptedStatusShouldChangeToPrepared() {
         Long orderId = 1L;
         Order order = createTestOrder();
         order.setStatus(OrderStatus.ACCEPTED);
@@ -205,7 +205,7 @@ class OrderRestaurantServiceTest extends OrderTestBase {
      * Тестирование пометки заказа как готового со статусом CREATED
      */
     @Test
-    void readyOrder_WithCreatedStatus_ShouldThrowException() {
+    void readyOrderWithCreatedStatusShouldThrowException() {
         Long orderId = 1L;
         Order order = createTestOrder();
         order.setStatus(OrderStatus.CREATED);
@@ -224,7 +224,7 @@ class OrderRestaurantServiceTest extends OrderTestBase {
      * Тестирование пометки заказа как готового со статусом PREPARED
      */
     @Test
-    void readyOrder_WithPreparedStatus_ShouldThrowException() {
+    void readyOrderWithPreparedStatusShouldThrowException() {
         Long orderId = 1L;
         Order order = createTestOrder();
         order.setStatus(OrderStatus.PREPARED);
@@ -243,7 +243,7 @@ class OrderRestaurantServiceTest extends OrderTestBase {
      * Тестирование пометки заказа как готового со статусом DELIVERING
      */
     @Test
-    void readyOrder_WithDeliveringStatus_ShouldThrowException() {
+    void readyOrderWithDeliveringStatusShouldThrowException() {
         Long orderId = 1L;
         Order order = createTestOrder();
         order.setStatus(OrderStatus.DELIVERING);
@@ -262,7 +262,7 @@ class OrderRestaurantServiceTest extends OrderTestBase {
      * Тестирование пометки заказа как готового чужим рестораном
      */
     @Test
-    void readyOrder_WithDifferentRestaurant_ShouldThrowException() {
+    void readyOrderWithDifferentRestaurantShouldThrowException() {
         Long orderId = 1L;
         User differentRestaurant = createDifferentRestaurant();
         Order order = createTestOrder();

@@ -45,7 +45,7 @@ class CourierOrderControllerTest {
      * Тестирование получения доступных заказов для курьера
      */
     @Test
-    void getAvailableOrders_ShouldReturnPagedOrders() {
+    void getAvailableOrdersShouldReturnPagedOrders() {
         Order testOrder = createTestOrder();
         int page = 0;
         int size = 10;
@@ -76,7 +76,7 @@ class CourierOrderControllerTest {
      * Тестирование получения активных заказов курьера
      */
     @Test
-    void getActiveOrders_ShouldReturnListOfOrders() {
+    void getActiveOrdersShouldReturnListOfOrders() {
         User testCourier = createTestCourier();
         Order testOrder = createTestOrder();
 

@@ -1,7 +1,7 @@
 package naumen.project.controller;
 
 import naumen.project.dto.order.client.OrderClientCreateRequestDto;
-import naumen.project.dto.order.client.OrderClientInfoResponseDto;
+import naumen.project.dto.order.client.OrderClientResponseDto;
 import naumen.project.dto.order.client.OrderClientShortResponseDto;
 import naumen.project.dto.order.item.OrderItemCreateRequestDto;
 import naumen.project.entity.Order;
@@ -49,12 +49,12 @@ class ClientOrderControllerTest {
      * Тестирование успешного создания заказа с валидными данными
      */
     @Test
-    void createOrder_WithValidRequest_ShouldReturnOrderInfo() {
+    void createOrderWithValidRequestShouldReturnOrderInfo() {
         OrderClientCreateRequestDto createRequest = createOrderCreateRequest();
         OrderItem orderItem = createOrderItem();
         List<OrderItem> orderItemList = List.of(orderItem);
 
-        OrderClientInfoResponseDto expectedResponse = new OrderClientInfoResponseDto(
+        OrderClientResponseDto expectedResponse = new OrderClientResponseDto(
                 1L,
                 OrderStatus.CREATED,
                 new BigDecimal("500.00"),
@@ -72,9 +72,9 @@ class ClientOrderControllerTest {
                 createRequest.deliveryAddress(),
                 testClient
         )).thenReturn(testOrder);
-        Mockito.when(orderMapper.toClientInfoResponse(testOrder)).thenReturn(expectedResponse);
+        Mockito.when(orderMapper.toClientResponse(testOrder)).thenReturn(expectedResponse);
 
-        OrderClientInfoResponseDto result = clientOrderController.createOrder(createRequest, testClient);
+        OrderClientResponseDto result = clientOrderController.createOrder(createRequest, testClient);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(expectedResponse.id(), result.id());
@@ -88,14 +88,14 @@ class ClientOrderControllerTest {
                 createRequest.deliveryAddress(),
                 testClient
         );
-        Mockito.verify(orderMapper).toClientInfoResponse(testOrder);
+        Mockito.verify(orderMapper).toClientResponse(testOrder);
     }
 
     /**
      * Тестирование получения списка заказов текущего клиента
      */
     @Test
-    void getOrders_WithAuthenticatedClient_ShouldReturnOrdersList() {
+    void getOrdersWithAuthenticatedClientShouldReturnOrdersList() {
         OrderClientShortResponseDto orderResponse = new OrderClientShortResponseDto(
                 1L,
                 OrderStatus.CREATED,
@@ -121,9 +121,9 @@ class ClientOrderControllerTest {
      * Тестирование получения информации о заказе по идентификатору
      */
     @Test
-    void getOrderInfoById_WithValidId_ShouldReturnOrderInfo() {
+    void getOrderByIdWithValidIdShouldReturnOrder() {
         Long orderId = 1L;
-        OrderClientInfoResponseDto expectedResponse = new OrderClientInfoResponseDto(
+        OrderClientResponseDto expectedResponse = new OrderClientResponseDto(
                 orderId,
                 OrderStatus.CREATED,
                 new BigDecimal("500.00"),
@@ -135,28 +135,16 @@ class ClientOrderControllerTest {
         );
 
         Mockito.when(orderClientService.getOrder(orderId, testClient)).thenReturn(testOrder);
-        Mockito.when(orderMapper.toClientInfoResponse(testOrder)).thenReturn(expectedResponse);
+        Mockito.when(orderMapper.toClientResponse(testOrder)).thenReturn(expectedResponse);
 
-        OrderClientInfoResponseDto result = clientOrderController.getOrderInfoById(orderId, testClient);
+        OrderClientResponseDto result = clientOrderController.getOrder(orderId, testClient);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(expectedResponse.id(), result.id());
         Assertions.assertEquals(expectedResponse.status(), result.status());
         Assertions.assertEquals(expectedResponse.deliveryAddress(), result.deliveryAddress());
         Mockito.verify(orderClientService).getOrder(orderId, testClient);
-        Mockito.verify(orderMapper).toClientInfoResponse(testOrder);
-    }
-
-    /**
-     * Тестирование успешного удаления заказа клиентом
-     */
-    @Test
-    void deleteOrderByClient_WithValidOrder_ShouldCallDeleteService() {
-        Long orderId = 1L;
-
-        clientOrderController.deleteOrderByClient(orderId, testClient);
-
-        Mockito.verify(orderClientService).deleteOrder(orderId, testClient);
+        Mockito.verify(orderMapper).toClientResponse(testOrder);
     }
 
     // Вспомогательные методы для создания тестовых данных

@@ -28,7 +28,7 @@ class OrderItemServiceTest {
      * Тестирование создания пункта заказа с расчетом цены
      */
     @Test
-    void buildOrderItem_ShouldCreateOrderItemWithCalculatedPrice() {
+    void buildOrderItemShouldCreateOrderItemWithCalculatedPrice() {
         Long menuItemId = 1L;
         Integer quantity = 2;
         BigDecimal price = new BigDecimal("100.00");

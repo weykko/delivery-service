@@ -38,7 +38,7 @@ class OrderCourierServiceTest extends OrderTestBase {
      * Тестирование получения доступных заказов для курьеров
      */
     @Test
-    void getAvailableOrders_WithValidPageable_ShouldReturnPagedOrders() {
+    void getAvailableOrdersWithValidPageableShouldReturnPagedOrders() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Order> ordersPage = new PageImpl<>(List.of(testOrder));
 
@@ -56,7 +56,7 @@ class OrderCourierServiceTest extends OrderTestBase {
      * Тестирование получения активных заказов курьера
      */
     @Test
-    void getActiveOrders_WithValidCourier_ShouldReturnOrdersList() {
+    void getActiveOrdersWithValidCourierShouldReturnOrdersList() {
         List<Order> orders = List.of(testOrder);
 
         Mockito.when(orderService.getActiveOrdersByCourier(testCourier)).thenReturn(orders);
@@ -73,7 +73,7 @@ class OrderCourierServiceTest extends OrderTestBase {
      * Тестирование успешного приема заказа курьером
      */
     @Test
-    void acceptOrder_WithValidOrder_ShouldAssignCourier() {
+    void acceptOrderWithValidOrderShouldAssignCourier() {
         Long orderId = 1L;
         Order order = createTestOrder();
         order.setCourier(null);
@@ -92,7 +92,7 @@ class OrderCourierServiceTest extends OrderTestBase {
      * Тестирование приема заказа курьером, когда заказ уже принят другим курьером
      */
     @Test
-    void acceptOrder_WithAlreadyAcceptedOrder_ShouldThrowException() {
+    void acceptOrderWithAlreadyAcceptedOrderShouldThrowException() {
         Long orderId = 1L;
         Order order = createTestOrder();
         order.setCourier(testCourier);
@@ -111,7 +111,7 @@ class OrderCourierServiceTest extends OrderTestBase {
      * Тестирование принятия заказа курьером со статусом PREPARED
      */
     @Test
-    void pickUpOrder_WithPreparedStatus_ShouldChangeToDelivering() {
+    void pickUpOrderWithPreparedStatusShouldChangeToDelivering() {
         Long orderId = 1L;
         Order order = createTestOrder();
         order.setCourier(testCourier);
@@ -131,7 +131,7 @@ class OrderCourierServiceTest extends OrderTestBase {
      * Тестирование принятия заказа чужим курьером
      */
     @Test
-    void pickUpOrder_WithDifferentCourier_ShouldThrowException() {
+    void pickUpOrderWithDifferentCourierShouldThrowException() {
         Long orderId = 1L;
         Order order = createTestOrder();
         order.setCourier(testCourier);
@@ -152,7 +152,7 @@ class OrderCourierServiceTest extends OrderTestBase {
      * Тестирование забора заказа со статусом DELIVERING
      */
     @Test
-    void pickUpOrder_WithDeliveringStatus_ShouldThrowException() {
+    void pickUpOrderWithDeliveringStatusShouldThrowException() {
         Long orderId = 1L;
         Order order = createTestOrder();
         order.setCourier(testCourier);
@@ -172,7 +172,7 @@ class OrderCourierServiceTest extends OrderTestBase {
      * Тестирование забора заказа со статусом COMPLETED
      */
     @Test
-    void pickUpOrder_WithCompletedStatus_ShouldThrowException() {
+    void pickUpOrderWithCompletedStatusShouldThrowException() {
         Long orderId = 1L;
         Order order = createTestOrder();
         order.setCourier(testCourier);
@@ -192,7 +192,7 @@ class OrderCourierServiceTest extends OrderTestBase {
      * Тестирование забора заказа со статусом CREATED
      */
     @Test
-    void pickUpOrder_WithCreatedStatus_ShouldThrowException() {
+    void pickUpOrderWithCreatedStatusShouldThrowException() {
         Long orderId = 1L;
         Order order = createTestOrder();
         order.setCourier(testCourier);
@@ -212,7 +212,7 @@ class OrderCourierServiceTest extends OrderTestBase {
      * Тестирование доставки заказа курьером со статусом DELIVERING
      */
     @Test
-    void deliverOrder_WithDeliveringStatus_ShouldChangeToCompleted() {
+    void deliverOrderWithDeliveringStatusShouldChangeToCompleted() {
         Long orderId = 1L;
         Order order = createTestOrder();
         order.setCourier(testCourier);
@@ -232,7 +232,7 @@ class OrderCourierServiceTest extends OrderTestBase {
      * Тестирование доставки заказа чужим курьером
      */
     @Test
-    void deliverOrder_WithDifferentCourier_ShouldThrowException() {
+    void deliverOrderWithDifferentCourierShouldThrowException() {
         Long orderId = 1L;
         Order order = createTestOrder();
         order.setCourier(testCourier);
@@ -253,7 +253,7 @@ class OrderCourierServiceTest extends OrderTestBase {
      * Тестирование доставки заказа со статусом COMPLETED
      */
     @Test
-    void deliverOrder_WithCompletedStatus_ShouldThrowException() {
+    void deliverOrderWithCompletedStatusShouldThrowException() {
         Long orderId = 1L;
         Order order = createTestOrder();
         order.setCourier(testCourier);
