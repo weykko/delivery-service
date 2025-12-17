@@ -1,8 +1,11 @@
 package naumen.project.service.order;
 
 import naumen.project.entity.Order;
+import naumen.project.entity.User;
 import naumen.project.entity.enums.OrderStatus;
+import naumen.project.entity.enums.Role;
 import naumen.project.exception.InvalidInputException;
+import naumen.project.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,9 +20,11 @@ import org.springframework.stereotype.Service;
 public class OrderAdminService {
 
     private final OrderService orderService;
+    private final UserService userService;
 
-    OrderAdminService(OrderService orderService) {
+    OrderAdminService(OrderService orderService, UserService userService) {
         this.orderService = orderService;
+        this.userService = userService;
     }
 
     /**
@@ -47,10 +52,9 @@ public class OrderAdminService {
      * Обновление информации о заказе.
      *
      * @param order заказ с обновленными данными
-     * @return обновленный заказ
      */
-    public Order updateOrder(Order order) {
-        return orderService.save(order);
+    public void saveOrder(Order order) {
+        orderService.save(order);
     }
 
     /**
@@ -58,9 +62,8 @@ public class OrderAdminService {
      * Заказ не может быть удален, если его статус - COMPLETED.
      *
      * @param orderId идентификатор заказа
-     * @return обновленный заказ с пометкой об удалении
      */
-    public Order deleteOrder(Long orderId) {
+    public void deleteOrder(Long orderId) {
         Order order = orderService.getById(orderId);
 
         if (order.getStatus() == OrderStatus.COMPLETED) {
@@ -69,6 +72,21 @@ public class OrderAdminService {
 
         order.setStatus(OrderStatus.DELETED);
 
-        return orderService.save(order);
+        orderService.save(order);
+    }
+
+    /**
+     * Устанавливает курьера для заказа по его идентификатору.
+     *
+     * @param order     заказ
+     * @param courierId идентификатор курьера
+     */
+    public void setCourierById(Order order, Long courierId) {
+        User courier = userService.getUserById(courierId);
+        if (courier.getRole() != Role.COURIER) {
+            throw new InvalidInputException("Пользователь с id '%d' не является курьером", courierId);
+        }
+
+        order.setCourier(courier);
     }
 }

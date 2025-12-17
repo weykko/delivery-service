@@ -1,6 +1,8 @@
 package naumen.project.mapper;
 
-import naumen.project.dto.order.client.OrderClientInfoResponseDto;
+import naumen.project.dto.order.admin.OrderAdminResponseDto;
+import naumen.project.dto.order.admin.OrderAdminShortResponseDto;
+import naumen.project.dto.order.client.OrderClientResponseDto;
 import naumen.project.dto.order.client.OrderClientShortResponseDto;
 import naumen.project.dto.order.courier.OrderCourierResponseDto;
 import naumen.project.dto.order.item.OrderItemResponseDto;
@@ -53,7 +55,7 @@ public interface OrderMapper {
     @Mapping(target = "courierId", source = "courier.id")
     @Mapping(target = "restaurantId", source = "restaurant.id")
     @Mapping(target = "items", source = "items")
-    OrderClientInfoResponseDto toClientInfoResponse(Order order);
+    OrderClientResponseDto toClientResponse(Order order);
 
     /**
      * Преобразует сущность Order в ответ для клиента. Короткий вариант
@@ -62,6 +64,28 @@ public interface OrderMapper {
      * @return DTO ответа клиенту
      */
     OrderClientShortResponseDto toClientShortResponse(Order order);
+
+    /**
+     * Преобразует сущность Order в DTO ответа для админа.
+     *
+     * @param order сущность заказа
+     * @return DTO с данными заказа для админа
+     */
+    @Mapping(target = "clientId", source = "client.id")
+    @Mapping(target = "courierId", source = "courier.id")
+    @Mapping(target = "restaurantId", source = "restaurant.id")
+    OrderAdminResponseDto toAdminResponse(Order order);
+
+    /**
+     * Преобразует сущность Order в короткий DTO ответа для админа.
+     *
+     * @param order сущность заказа
+     * @return DTO с данными заказа для админа
+     */
+    @Mapping(target = "clientId", source = "client.id")
+    @Mapping(target = "courierId", source = "courier.id")
+    @Mapping(target = "restaurantId", source = "restaurant.id")
+    OrderAdminShortResponseDto toAdminShortResponse(Order order);
 
     /**
      * Преобразует сущность OrderItem в DTO ответа.

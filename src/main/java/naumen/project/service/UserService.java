@@ -33,17 +33,27 @@ public class UserService {
      * Обновляет информацию о пользователе.
      *
      * @param updatedUser пользователь с обновленными данными
+     * @param phone       новый телефон пользователя
+     * @param email       новый email пользователя
      * @return обновленные данные пользователя
      */
-    public User updateInfo(User updatedUser) {
-        Optional<User> userWithPhone = userRepository.findByPhone(updatedUser.getPhone());
-        if (userWithPhone.isPresent() && !userWithPhone.get().getId().equals(updatedUser.getId())) {
-            throw new InvalidInputException("Телефон уже занят");
+    public User updateInfo(User updatedUser, String phone, String email) {
+        if (phone != null) {
+            Optional<User> userWithPhone = userRepository.findByPhone(phone);
+            if (userWithPhone.isPresent() && !userWithPhone.get().getId().equals(updatedUser.getId())) {
+                throw new InvalidInputException("Телефон уже занят");
+            }
+
+            updatedUser.setPhone(phone);
         }
 
-        Optional<User> userWithEmail = userRepository.findByEmail(updatedUser.getEmail());
-        if (userWithEmail.isPresent() && !userWithEmail.get().getId().equals(updatedUser.getId())) {
-            throw new InvalidInputException("Email уже занят");
+        if (email != null) {
+            Optional<User> userWithEmail = userRepository.findByEmail(email);
+            if (userWithEmail.isPresent() && !userWithEmail.get().getId().equals(updatedUser.getId())) {
+                throw new InvalidInputException("Email уже занят");
+            }
+
+            updatedUser.setEmail(email);
         }
 
         saveUser(updatedUser);
@@ -92,7 +102,7 @@ public class UserService {
      */
     public User getUserById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден с id=%d", id));
+                .orElseThrow(() -> new EntityNotFoundException("Пользователь с id '%d' не найден", id));
     }
 
     /**
