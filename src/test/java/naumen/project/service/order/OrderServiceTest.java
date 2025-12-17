@@ -40,7 +40,7 @@ class OrderServiceTest extends OrderTestBase {
      * Тестирование успешного получения заказа по идентификатору
      */
     @Test
-    void getById_WithExistingOrder_ShouldReturnOrder() {
+    void getByIdWithExistingOrderShouldReturnOrder() {
         Long orderId = 1L;
 
         Mockito.when(orderRepository.findById(orderId)).thenReturn(Optional.of(testOrder));
@@ -56,7 +56,7 @@ class OrderServiceTest extends OrderTestBase {
      * Тестирование получения несуществующего заказа по идентификатору
      */
     @Test
-    void getById_WithNonExistentOrder_ShouldThrowException() {
+    void getByIdWithNonExistentOrderShouldThrowException() {
         Long orderId = 999L;
 
         Mockito.when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
@@ -72,7 +72,7 @@ class OrderServiceTest extends OrderTestBase {
      * Тестирование успешного сохранения заказа
      */
     @Test
-    void save_WithValidOrder_ShouldReturnSavedOrder() {
+    void saveWithValidOrderShouldReturnSavedOrder() {
         Mockito.when(orderRepository.save(testOrder)).thenReturn(testOrder);
 
         Order result = orderService.save(testOrder);
@@ -86,7 +86,7 @@ class OrderServiceTest extends OrderTestBase {
      * Тестирование получения заказов по клиенту
      */
     @Test
-    void getByClient_WithValidClient_ShouldReturnOrdersList() {
+    void getByClientWithValidClientShouldReturnOrdersList() {
         List<Order> orders = List.of(testOrder);
 
         Mockito.when(orderRepository.findOrdersByClient(testClient)).thenReturn(orders);
@@ -103,7 +103,7 @@ class OrderServiceTest extends OrderTestBase {
      * Тестирование получения доступных заказов для курьеров
      */
     @Test
-    void getAvailableOrdersForCourier_WithValidPageable_ShouldReturnPagedOrders() {
+    void getAvailableOrdersForCourierWithValidPageableShouldReturnPagedOrders() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Order> ordersPage = new PageImpl<>(List.of(testOrder));
 
@@ -121,7 +121,7 @@ class OrderServiceTest extends OrderTestBase {
      * Тестирование получения активных заказов курьера
      */
     @Test
-    void getActiveOrdersByCourier_WithValidCourier_ShouldReturnOrdersList() {
+    void getActiveOrdersByCourierWithValidCourierShouldReturnOrdersList() {
         List<Order> orders = List.of(testOrder);
 
         Mockito.when(orderRepository.findActiveOrdersByCourier(testCourier)).thenReturn(orders);
@@ -138,7 +138,7 @@ class OrderServiceTest extends OrderTestBase {
      * Тестирование получения активных заказов ресторана
      */
     @Test
-    void getActiveOrdersByRestaurant_WithValidRestaurant_ShouldReturnPagedOrders() {
+    void getActiveOrdersByRestaurantWithValidRestaurantShouldReturnPagedOrders() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Order> ordersPage = new PageImpl<>(List.of(testOrder));
 

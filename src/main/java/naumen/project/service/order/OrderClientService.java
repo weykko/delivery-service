@@ -45,7 +45,7 @@ public class OrderClientService {
             throw new InvalidInputException("Все позиции заказа должны принадлежать ресторану с id '%d'", restaurantId);
         }
 
-        User restaurant = userService.getById(restaurantId);
+        User restaurant = userService.getUserById(restaurantId);
 
         BigDecimal totalPrice = orderItems.stream()
                 .map(OrderItem::getItemPrice)

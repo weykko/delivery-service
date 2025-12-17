@@ -12,6 +12,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 /**
  * Контроллер для операций с пользователями.
  * Предоставляет endpoints для получения, обновления и удаления данных текущего пользователя.
@@ -44,7 +46,7 @@ public class UserController {
      */
     @GetMapping("/me")
     @Transactional(readOnly = true)
-    public UserResponseDto getMyUser(@AuthenticationPrincipal User user) {
+    public UserResponseDto getUser(@AuthenticationPrincipal User user) {
         return userMapper.toResponse(user);
     }
 
@@ -61,17 +63,12 @@ public class UserController {
             @AuthenticationPrincipal User user,
             @RequestBody @Valid UpdateUserRequestDto request
     ) {
-        if (request.name() != null) {
-            user.setName(request.name());
-        }
-        if (request.phone() != null) {
-            user.setPhone(request.phone());
-        }
-        if (request.address() != null) {
-            user.setAddress(request.address());
-        }
+        Optional.ofNullable(request.name()).ifPresent(user::setName);
+        Optional.ofNullable(request.address()).ifPresent(user::setAddress);
 
-        User updatedUser = userService.updateInfo(user);
+        String phone = request.phone();
+
+        User updatedUser = userService.updateInfo(user, phone, null);
 
         return userMapper.toResponse(updatedUser);
     }

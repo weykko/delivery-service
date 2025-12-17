@@ -4,6 +4,8 @@ import naumen.project.entity.User;
 import naumen.project.exception.EntityNotFoundException;
 import naumen.project.exception.InvalidInputException;
 import naumen.project.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -31,15 +33,31 @@ public class UserService {
      * Обновляет информацию о пользователе.
      *
      * @param updatedUser пользователь с обновленными данными
+     * @param phone       новый телефон пользователя
+     * @param email       новый email пользователя
      * @return обновленные данные пользователя
      */
-    public User updateInfo(User updatedUser) {
-        Optional<User> userWithPhone = userRepository.findByPhone(updatedUser.getPhone());
-        if (userWithPhone.isPresent() && !userWithPhone.get().getId().equals(updatedUser.getId())) {
-            throw new InvalidInputException("Телефон уже занят");
+    public User updateInfo(User updatedUser, String phone, String email) {
+        if (phone != null) {
+            Optional<User> userWithPhone = userRepository.findByPhone(phone);
+            if (userWithPhone.isPresent() && !userWithPhone.get().getId().equals(updatedUser.getId())) {
+                throw new InvalidInputException("Телефон уже занят");
+            }
+
+            updatedUser.setPhone(phone);
+        }
+
+        if (email != null) {
+            Optional<User> userWithEmail = userRepository.findByEmail(email);
+            if (userWithEmail.isPresent() && !userWithEmail.get().getId().equals(updatedUser.getId())) {
+                throw new InvalidInputException("Email уже занят");
+            }
+
+            updatedUser.setEmail(email);
         }
 
         saveUser(updatedUser);
+
         return updatedUser;
     }
 
@@ -82,8 +100,18 @@ public class UserService {
      * @param id id пользователя
      * @return пользователь
      */
-    public User getById(Long id) {
+    public User getUserById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден с id=%d", id));
+                .orElseThrow(() -> new EntityNotFoundException("Пользователь с id '%d' не найден", id));
+    }
+
+    /**
+     * Получить всех пользователей с пагинацией
+     *
+     * @param pageable параметры пагинации
+     * @return страница пользователей
+     */
+    public Page<User> getAllUsers(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 }

@@ -41,12 +41,12 @@ class OrderClientServiceTest extends OrderTestBase {
      * Тестирование успешного оформления заказа клиентом
      */
     @Test
-    void createOrder_WithValidItems_ShouldCreateOrder() {
+    void createOrderWithValidItemsShouldCreateOrder() {
         Long restaurantId = testRestaurant.getId();
         List<OrderItem> orderItems = List.of(createOrderItem(testRestaurant));
         String deliveryAddress = "Ул Пушкина";
 
-        Mockito.when(userService.getById(restaurantId)).thenReturn(testRestaurant);
+        Mockito.when(userService.getUserById(restaurantId)).thenReturn(testRestaurant);
         Mockito.when(orderService.save(Mockito.any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         Order result = orderClientService.createOrder(restaurantId, orderItems, deliveryAddress, testClient);
@@ -57,7 +57,7 @@ class OrderClientServiceTest extends OrderTestBase {
         Assertions.assertEquals(testClient, result.getClient());
         Assertions.assertEquals(testRestaurant, result.getRestaurant());
         Assertions.assertEquals(new BigDecimal("250.00"), result.getTotalPrice());
-        Mockito.verify(userService).getById(restaurantId);
+        Mockito.verify(userService).getUserById(restaurantId);
         Mockito.verify(orderService).save(Mockito.any(Order.class));
     }
 
@@ -65,7 +65,7 @@ class OrderClientServiceTest extends OrderTestBase {
      * Тестирование оформления заказа с позициями из разных ресторанов
      */
     @Test
-    void createOrder_WithItemsFromDifferentRestaurants_ShouldThrowException() {
+    void createOrderWithItemsFromDifferentRestaurantsShouldThrowException() {
         Long restaurantId = 1L;
         User differentRestaurant = createDifferentRestaurant();
         List<OrderItem> orderItems = List.of(createOrderItem(differentRestaurant));
@@ -75,7 +75,7 @@ class OrderClientServiceTest extends OrderTestBase {
                 () -> orderClientService.createOrder(restaurantId, orderItems, deliveryAddress, testClient));
 
         Assertions.assertTrue(exception.getMessage().contains("Все позиции заказа должны принадлежать ресторану"));
-        Mockito.verify(userService, Mockito.never()).getById(Mockito.any());
+        Mockito.verify(userService, Mockito.never()).getUserById(Mockito.any());
         Mockito.verify(orderService, Mockito.never()).save(Mockito.any());
     }
 
@@ -83,7 +83,7 @@ class OrderClientServiceTest extends OrderTestBase {
      * Тестирование получения заказов клиента
      */
     @Test
-    void getOrders_WithValidClient_ShouldReturnOrdersList() {
+    void getOrdersWithValidClientShouldReturnOrdersList() {
         List<Order> orders = List.of(testOrder);
 
         Mockito.when(orderService.getByClient(testClient)).thenReturn(orders);
@@ -100,7 +100,7 @@ class OrderClientServiceTest extends OrderTestBase {
      * Тестирование успешного получения заказа клиента
      */
     @Test
-    void getOrder_WithValidClientAndOrder_ShouldReturnOrder() {
+    void getOrderWithValidClientAndOrderShouldReturnOrder() {
         Long orderId = 1L;
 
         Mockito.when(orderService.getById(orderId)).thenReturn(testOrder);
@@ -116,7 +116,7 @@ class OrderClientServiceTest extends OrderTestBase {
      * Тестирование получения заказа чужим клиентом
      */
     @Test
-    void getOrder_WithDifferentClient_ShouldThrowException() {
+    void getOrderWithDifferentClientShouldThrowException() {
         Long orderId = 1L;
         User differentClient = createDifferentClient();
 
@@ -133,7 +133,7 @@ class OrderClientServiceTest extends OrderTestBase {
      * Тестирование удаления заказа со статусом ACCEPTED
      */
     @Test
-    void deleteOrder_WithAcceptedStatus_ShouldThrowException() {
+    void deleteOrderWithAcceptedStatusShouldThrowException() {
         Long orderId = 1L;
         Order order = createTestOrder();
         order.setStatus(OrderStatus.ACCEPTED);
@@ -153,7 +153,7 @@ class OrderClientServiceTest extends OrderTestBase {
      * Тестирование удаления заказа чужим клиентом
      */
     @Test
-    void deleteOrder_WithDifferentClient_ShouldThrowException() {
+    void deleteOrderWithDifferentClientShouldThrowException() {
         Long orderId = 1L;
         User differentClient = createDifferentClient();
         Order order = createTestOrder();

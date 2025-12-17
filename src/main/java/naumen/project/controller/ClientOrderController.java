@@ -3,7 +3,7 @@ package naumen.project.controller;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import naumen.project.dto.order.client.OrderClientCreateRequestDto;
-import naumen.project.dto.order.client.OrderClientInfoResponseDto;
+import naumen.project.dto.order.client.OrderClientResponseDto;
 import naumen.project.dto.order.client.OrderClientShortResponseDto;
 import naumen.project.entity.Order;
 import naumen.project.entity.OrderItem;
@@ -55,7 +55,7 @@ public class ClientOrderController {
      */
     @PostMapping
     @Transactional
-    public OrderClientInfoResponseDto createOrder(
+    public OrderClientResponseDto createOrder(
             @RequestBody @Valid OrderClientCreateRequestDto request,
             @AuthenticationPrincipal User client
     ) {
@@ -70,7 +70,7 @@ public class ClientOrderController {
                 client
         );
 
-        return orderMapper.toClientInfoResponse(order);
+        return orderMapper.toClientResponse(order);
     }
 
     /**
@@ -100,12 +100,13 @@ public class ClientOrderController {
      */
     @GetMapping("/{orderId}")
     @Transactional(readOnly = true)
-    public OrderClientInfoResponseDto getOrderInfoById(
+    public OrderClientResponseDto getOrder(
             @PathVariable Long orderId,
             @AuthenticationPrincipal User client
     ) {
         Order order = orderClientService.getOrder(orderId, client);
-        return orderMapper.toClientInfoResponse(order);
+
+        return orderMapper.toClientResponse(order);
     }
 
     /**
@@ -114,8 +115,8 @@ public class ClientOrderController {
      * @param orderId id заказа
      * @param client  текущий клиент
      */
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{orderId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @Transactional
     public void deleteOrderByClient(@PathVariable Long orderId,
                                     @AuthenticationPrincipal User client) {

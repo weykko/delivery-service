@@ -37,7 +37,7 @@ public class UserServiceTest {
         Mockito.when(userRepository.findByPhone("+79991234567")).thenReturn(Optional.of(existingUser));
         Mockito.when(userRepository.save(userToUpdate)).thenReturn(userToUpdate);
 
-        User result = userService.updateInfo(userToUpdate);
+        User result = userService.updateInfo(userToUpdate, userToUpdate.getPhone(), userToUpdate.getEmail());
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals("Updated Name", result.getName());
@@ -56,7 +56,7 @@ public class UserServiceTest {
         Mockito.when(userRepository.findByPhone(newPhone)).thenReturn(Optional.empty());
         Mockito.when(userRepository.save(userToUpdate)).thenReturn(userToUpdate);
 
-        User result = userService.updateInfo(userToUpdate);
+        User result = userService.updateInfo(userToUpdate, userToUpdate.getPhone(), userToUpdate.getEmail());
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(newPhone, result.getPhone());
@@ -76,7 +76,7 @@ public class UserServiceTest {
         Mockito.when(userRepository.findByPhone(existingPhone)).thenReturn(Optional.of(existingUser));
 
         InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
-                () -> userService.updateInfo(userToUpdate));
+                () -> userService.updateInfo(userToUpdate, userToUpdate.getPhone(), userToUpdate.getEmail()));
 
         Assertions.assertEquals("Телефон уже занят", exception.getMessage());
         Mockito.verify(userRepository).findByPhone(existingPhone);
