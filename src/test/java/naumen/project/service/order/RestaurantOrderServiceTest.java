@@ -3,6 +3,7 @@ package naumen.project.service.order;
 import naumen.project.entity.Order;
 import naumen.project.entity.User;
 import naumen.project.entity.enums.OrderStatus;
+import naumen.project.entity.enums.Role;
 import naumen.project.exception.InvalidInputException;
 import naumen.project.exception.PermissionCheckFailedException;
 import org.junit.jupiter.api.Assertions;
@@ -17,19 +18,21 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 /**
- * Модульные тесты для {@link OrderRestaurantService}
+ * Модульные тесты для {@link RestaurantOrderService}
  */
 @ExtendWith(MockitoExtension.class)
-class OrderRestaurantServiceTest extends OrderTestBase {
+class RestaurantOrderServiceTest {
 
     @Mock
     private OrderService orderService;
 
     @InjectMocks
-    private OrderRestaurantService orderRestaurantService;
+    private RestaurantOrderService restaurantOrderService;
 
     private final User testRestaurant = createTestRestaurant();
     private final Order testOrder = createTestOrder();
@@ -45,7 +48,7 @@ class OrderRestaurantServiceTest extends OrderTestBase {
         Mockito.when(orderService.getActiveOrdersByRestaurant(testRestaurant, pageable))
                 .thenReturn(ordersPage);
 
-        Page<Order> result = orderRestaurantService.getActiveOrders(testRestaurant, pageable);
+        Page<Order> result = restaurantOrderService.getActiveOrders(testRestaurant, pageable);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1, result.getTotalElements());
@@ -60,9 +63,9 @@ class OrderRestaurantServiceTest extends OrderTestBase {
     void getOrder_WithValidRestaurantAndOrder_ShouldReturnOrder() {
         Long orderId = 1L;
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(testOrder);
+        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(testOrder));
 
-        Order result = orderRestaurantService.getOrder(orderId, testRestaurant);
+        Order result = restaurantOrderService.getOrder(orderId, testRestaurant);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(testOrder, result);
@@ -77,12 +80,12 @@ class OrderRestaurantServiceTest extends OrderTestBase {
         Long orderId = 1L;
         User differentRestaurant = createDifferentRestaurant();
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(testOrder);
+        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(testOrder));
 
         PermissionCheckFailedException exception = Assertions.assertThrows(PermissionCheckFailedException.class,
-                () -> orderRestaurantService.getOrder(orderId, differentRestaurant));
+                () -> restaurantOrderService.getOrder(orderId, differentRestaurant));
 
-        Assertions.assertTrue(exception.getMessage().contains("не принадлежит вашему ресторану"));
+        Assertions.assertEquals("Заказ с id '1' не принадлежит вашему ресторану", exception.getMessage());
         Mockito.verify(orderService).getById(orderId);
     }
 
@@ -95,10 +98,10 @@ class OrderRestaurantServiceTest extends OrderTestBase {
         Order order = createTestOrder();
         order.setStatus(OrderStatus.CREATED);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(order);
+        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(order));
         Mockito.when(orderService.save(order)).thenReturn(order);
 
-        orderRestaurantService.prepareOrder(orderId, testRestaurant);
+        restaurantOrderService.prepareOrder(orderId, testRestaurant);
 
         Assertions.assertEquals(OrderStatus.ACCEPTED, order.getStatus());
         Mockito.verify(orderService).getById(orderId);
@@ -114,12 +117,12 @@ class OrderRestaurantServiceTest extends OrderTestBase {
         Order order = createTestOrder();
         order.setStatus(OrderStatus.ACCEPTED);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(order);
+        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(order));
 
         InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
-                () -> orderRestaurantService.prepareOrder(orderId, testRestaurant));
+                () -> restaurantOrderService.prepareOrder(orderId, testRestaurant));
 
-        Assertions.assertTrue(exception.getMessage().contains("уже готовиться"));
+        Assertions.assertEquals("Заказ с id '1' уже готовится", exception.getMessage());
         Mockito.verify(orderService).getById(orderId);
         Mockito.verify(orderService, Mockito.never()).save(Mockito.any());
     }
@@ -133,12 +136,12 @@ class OrderRestaurantServiceTest extends OrderTestBase {
         Order order = createTestOrder();
         order.setStatus(OrderStatus.PREPARED);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(order);
+        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(order));
 
         InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
-                () -> orderRestaurantService.prepareOrder(orderId, testRestaurant));
+                () -> restaurantOrderService.prepareOrder(orderId, testRestaurant));
 
-        Assertions.assertTrue(exception.getMessage().contains("уже приготовлен"));
+        Assertions.assertEquals("Заказ с id '1' уже приготовлен", exception.getMessage());
         Mockito.verify(orderService).getById(orderId);
         Mockito.verify(orderService, Mockito.never()).save(Mockito.any());
     }
@@ -152,12 +155,12 @@ class OrderRestaurantServiceTest extends OrderTestBase {
         Order order = createTestOrder();
         order.setStatus(OrderStatus.DELIVERING);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(order);
+        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(order));
 
         InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
-                () -> orderRestaurantService.prepareOrder(orderId, testRestaurant));
+                () -> restaurantOrderService.prepareOrder(orderId, testRestaurant));
 
-        Assertions.assertTrue(exception.getMessage().contains("уже был отдан курьеру"));
+        Assertions.assertEquals("Заказ с id '1' уже был отдан курьеру", exception.getMessage());
         Mockito.verify(orderService).getById(orderId);
         Mockito.verify(orderService, Mockito.never()).save(Mockito.any());
     }
@@ -172,12 +175,12 @@ class OrderRestaurantServiceTest extends OrderTestBase {
         Order order = createTestOrder();
         order.setStatus(OrderStatus.CREATED);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(order);
+        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(order));
 
         PermissionCheckFailedException exception = Assertions.assertThrows(PermissionCheckFailedException.class,
-                () -> orderRestaurantService.prepareOrder(orderId, differentRestaurant));
+                () -> restaurantOrderService.prepareOrder(orderId, differentRestaurant));
 
-        Assertions.assertTrue(exception.getMessage().contains("не принадлежит вашему ресторану"));
+        Assertions.assertEquals("Заказ с id '1' не принадлежит вашему ресторану", exception.getMessage());
         Mockito.verify(orderService).getById(orderId);
         Mockito.verify(orderService, Mockito.never()).save(Mockito.any());
     }
@@ -191,10 +194,10 @@ class OrderRestaurantServiceTest extends OrderTestBase {
         Order order = createTestOrder();
         order.setStatus(OrderStatus.ACCEPTED);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(order);
+        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(order));
         Mockito.when(orderService.save(order)).thenReturn(order);
 
-        orderRestaurantService.readyOrder(orderId, testRestaurant);
+        restaurantOrderService.readyOrder(orderId, testRestaurant);
 
         Assertions.assertEquals(OrderStatus.PREPARED, order.getStatus());
         Mockito.verify(orderService).getById(orderId);
@@ -210,12 +213,12 @@ class OrderRestaurantServiceTest extends OrderTestBase {
         Order order = createTestOrder();
         order.setStatus(OrderStatus.CREATED);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(order);
+        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(order));
 
         InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
-                () -> orderRestaurantService.readyOrder(orderId, testRestaurant));
+                () -> restaurantOrderService.readyOrder(orderId, testRestaurant));
 
-        Assertions.assertTrue(exception.getMessage().contains("еще не начал готовиться"));
+        Assertions.assertEquals("Заказ с id '1' еще не начал готовиться", exception.getMessage());
         Mockito.verify(orderService).getById(orderId);
         Mockito.verify(orderService, Mockito.never()).save(Mockito.any());
     }
@@ -229,12 +232,12 @@ class OrderRestaurantServiceTest extends OrderTestBase {
         Order order = createTestOrder();
         order.setStatus(OrderStatus.PREPARED);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(order);
+        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(order));
 
         InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
-                () -> orderRestaurantService.readyOrder(orderId, testRestaurant));
+                () -> restaurantOrderService.readyOrder(orderId, testRestaurant));
 
-        Assertions.assertTrue(exception.getMessage().contains("уже приготовлен"));
+        Assertions.assertEquals("Заказ с id '1' уже приготовлен", exception.getMessage());
         Mockito.verify(orderService).getById(orderId);
         Mockito.verify(orderService, Mockito.never()).save(Mockito.any());
     }
@@ -248,12 +251,12 @@ class OrderRestaurantServiceTest extends OrderTestBase {
         Order order = createTestOrder();
         order.setStatus(OrderStatus.DELIVERING);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(order);
+        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(order));
 
         InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
-                () -> orderRestaurantService.readyOrder(orderId, testRestaurant));
+                () -> restaurantOrderService.readyOrder(orderId, testRestaurant));
 
-        Assertions.assertTrue(exception.getMessage().contains("уже был отдан курьеру"));
+        Assertions.assertEquals("Заказ с id '1' уже был отдан курьеру", exception.getMessage());
         Mockito.verify(orderService).getById(orderId);
         Mockito.verify(orderService, Mockito.never()).save(Mockito.any());
     }
@@ -268,13 +271,61 @@ class OrderRestaurantServiceTest extends OrderTestBase {
         Order order = createTestOrder();
         order.setStatus(OrderStatus.ACCEPTED);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(order);
+        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(order));
 
         PermissionCheckFailedException exception = Assertions.assertThrows(PermissionCheckFailedException.class,
-                () -> orderRestaurantService.readyOrder(orderId, differentRestaurant));
+                () -> restaurantOrderService.readyOrder(orderId, differentRestaurant));
 
-        Assertions.assertTrue(exception.getMessage().contains("не принадлежит вашему ресторану"));
+        Assertions.assertEquals("Заказ с id '1' не принадлежит вашему ресторану", exception.getMessage());
         Mockito.verify(orderService).getById(orderId);
         Mockito.verify(orderService, Mockito.never()).save(Mockito.any());
+    }
+
+    // Вспомогательные методы для создания тестовых данных
+
+    /**
+     * Создание тестового ресторана
+     */
+    private User createTestRestaurant() {
+        User user = new User(
+                "restaurant@example.com",
+                "Test Restaurant",
+                "+79991234577",
+                Role.RESTAURANT,
+                "Пушкина 17"
+        );
+        user.setId(3L);
+        return user;
+    }
+
+    /**
+     * Создание другого тестового ресторана
+     */
+    private User createDifferentRestaurant() {
+        User user = new User(
+                "other-restaurant@example.com",
+                "Other Restaurant",
+                "+79991234578",
+                Role.RESTAURANT,
+                "Ленина 5"
+        );
+        user.setId(4L);
+        return user;
+    }
+
+    /**
+     * Создает тестовый заказ
+     */
+    private Order createTestOrder() {
+        Order order = new Order(
+                "Ул Пушкина",
+                OrderStatus.CREATED,
+                List.of(),
+                new BigDecimal("500.00"),
+                createTestRestaurant(),
+                null
+        );
+        order.setId(1L);
+        return order;
     }
 }

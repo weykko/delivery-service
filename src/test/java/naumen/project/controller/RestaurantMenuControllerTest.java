@@ -58,7 +58,7 @@ class RestaurantMenuControllerTest {
 
         ArgumentCaptor<MenuItem> menuItemCaptor = ArgumentCaptor.forClass(MenuItem.class);
 
-        Mockito.when(menuService.createMenuItem(Mockito.any(MenuItem.class), Mockito.eq(restaurantUser)))
+        Mockito.when(menuService.save(Mockito.any(MenuItem.class)))
                 .thenReturn(savedMenuItem);
         Mockito.when(menuMapper.toResponse(savedMenuItem)).thenReturn(expectedResponse);
 
@@ -70,7 +70,7 @@ class RestaurantMenuControllerTest {
         Assertions.assertEquals(expectedResponse.description(), result.description());
         Assertions.assertEquals(expectedResponse.price(), result.price());
 
-        Mockito.verify(menuService).createMenuItem(menuItemCaptor.capture(), Mockito.eq(restaurantUser));
+        Mockito.verify(menuService).save(menuItemCaptor.capture());
         MenuItem capturedMenuItem = menuItemCaptor.getValue();
         Assertions.assertEquals(createRequest.title(), capturedMenuItem.getTitle());
         Assertions.assertEquals(createRequest.description(), capturedMenuItem.getDescription());
@@ -124,7 +124,8 @@ class RestaurantMenuControllerTest {
      * Создает тестового пользователя-ресторана
      */
     private User createRestaurantUser(Long id) {
-        User user = new User("restaurant@example.com", "Test Restaurant", "+79991234567", Role.RESTAURANT);
+        User user = new User("restaurant@example.com", "Test Restaurant",
+                "+79991234567", Role.RESTAURANT, "Пушкина 17");
         if (id != null) {
             user.setId(id);
         }
@@ -135,9 +136,8 @@ class RestaurantMenuControllerTest {
      * Создает тестовый пункт меню
      */
     private MenuItem createMenuItem(Long id, String title, String description, BigDecimal price, User restaurant) {
-        MenuItem item = new MenuItem(title, description, price);
+        MenuItem item = new MenuItem(title, description, price, restaurant);
         item.setId(id);
-        item.setRestaurant(restaurant);
         return item;
     }
 }

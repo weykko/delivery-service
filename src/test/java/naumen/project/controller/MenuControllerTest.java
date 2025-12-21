@@ -140,7 +140,8 @@ class MenuControllerTest {
      * Создает тестового пользователя-ресторана
      */
     private User createRestaurantUser(Long id) {
-        User user = new User("restaurant@example.com", "Test Restaurant", "+79991234567", Role.RESTAURANT);
+        User user = new User("restaurant@example.com", "Test Restaurant",
+                "+79991234567", Role.RESTAURANT, "Пушкина 17");
         if (id != null) {
             user.setId(id);
         }
@@ -151,7 +152,7 @@ class MenuControllerTest {
      * Создает тестовый пункт меню
      */
     private MenuItem createMenuItem(User restaurant) {
-        MenuItem item = new MenuItem("Pizza", "description", new BigDecimal(450));
+        MenuItem item = new MenuItem("Pizza", "description", new BigDecimal(450), createRestaurantUser(1L));
         item.setId(1L);
         item.setRestaurant(restaurant);
         return item;

@@ -50,10 +50,11 @@ public class RestaurantMenuController {
         MenuItem newItem = new MenuItem(
                 request.title(),
                 request.description(),
-                request.price()
+                request.price(),
+                user
         );
 
-        MenuItem menuItem = menuService.createMenuItem(newItem, user);
+        MenuItem menuItem = menuService.save(newItem);
 
         return menuMapper.toResponse(menuItem);
     }

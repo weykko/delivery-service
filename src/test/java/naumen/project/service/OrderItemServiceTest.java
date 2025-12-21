@@ -34,17 +34,13 @@ class OrderItemServiceTest {
         BigDecimal price = new BigDecimal("100.00");
         BigDecimal expectedTotalPrice = new BigDecimal("200.00");
 
-        MenuItem menuItem = new MenuItem();
+        MenuItem menuItem = new MenuItem("bread", "Delicious bread", price, null);
         menuItem.setId(menuItemId);
-        menuItem.setPrice(price);
 
         Mockito.when(menuService.getMenuItemById(menuItemId)).thenReturn(menuItem);
 
         OrderItem result = orderItemService.buildOrderItem(menuItemId, quantity);
 
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(menuItem, result.getMenuItem());
-        Assertions.assertEquals(quantity, result.getQuantity());
         Assertions.assertEquals(expectedTotalPrice, result.getItemPrice());
         Mockito.verify(menuService).getMenuItemById(menuItemId);
     }

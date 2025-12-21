@@ -38,14 +38,12 @@ public class MenuService {
     }
 
     /**
-     * Создает новую позицию в меню для указанного пользователя-ресторана.
+     * Сохраняет новую позицию в меню
      *
      * @param menuItem сущность позиции меню
-     * @param user     пользователь-ресторан, для которого создается позиция
      * @return созданная позиция меню
      */
-    public MenuItem createMenuItem(MenuItem menuItem, User user) {
-        menuItem.setRestaurant(user);
+    public MenuItem save(MenuItem menuItem) {
         menuRepository.save(menuItem);
 
         return menuItem;

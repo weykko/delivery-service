@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 
 /**
- * Логика работы с пунктами меню в заказе
+ * Сервис для работы с пунктами заказа
  *
  * @see MenuService
  */
