@@ -18,6 +18,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 /**
  * Модульные тесты для {@link RestaurantMenuController}
@@ -103,7 +104,7 @@ class RestaurantMenuControllerTest {
                 restaurantUser.getId()
         );
 
-        Mockito.when(menuService.getMenuItemById(menuItemId)).thenReturn(existingMenuItem);
+        Mockito.when(menuService.getMenuItemById(menuItemId)).thenReturn(Optional.of(existingMenuItem));
         Mockito.when(menuService.updateMenuItem(existingMenuItem, restaurantUser)).thenReturn(existingMenuItem);
         Mockito.when(menuMapper.toResponse(existingMenuItem)).thenReturn(expectedResponse);
 

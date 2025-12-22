@@ -2,6 +2,7 @@ package naumen.project.service;
 
 import naumen.project.entity.MenuItem;
 import naumen.project.entity.OrderItem;
+import naumen.project.exception.InvalidInputException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -28,7 +29,9 @@ public class OrderItemService {
      * @return объект {@link OrderItem}. Ещё не сохраненный.
      */
     public OrderItem buildOrderItem(Long menuItemId, Integer quantity) {
-        MenuItem menuItem = menuService.getMenuItemById(menuItemId);
+        MenuItem menuItem = menuService.getMenuItemById(menuItemId)
+                .orElseThrow(() -> new InvalidInputException(
+                        "Не удалось собрать заказ, причина: Позиция меню с id '%d' не найдена", menuItemId));
 
         return new OrderItem(
                 menuItem,

@@ -11,6 +11,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 /**
  * Модульные тесты для {@link OrderItemService}
@@ -37,7 +38,7 @@ class OrderItemServiceTest {
         MenuItem menuItem = new MenuItem("bread", "Delicious bread", price, null);
         menuItem.setId(menuItemId);
 
-        Mockito.when(menuService.getMenuItemById(menuItemId)).thenReturn(menuItem);
+        Mockito.when(menuService.getMenuItemById(menuItemId)).thenReturn(Optional.of(menuItem));
 
         OrderItem result = orderItemService.buildOrderItem(menuItemId, quantity);
 

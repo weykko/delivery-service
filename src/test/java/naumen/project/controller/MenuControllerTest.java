@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Модульные тесты для {@link MenuController}
@@ -121,7 +122,7 @@ class MenuControllerTest {
         MenuItemResponseDto menuItemResponse = createMenuItemResponse(menuItem);
         Long menuId = 1L;
 
-        Mockito.when(menuService.getMenuItemById(menuId)).thenReturn(menuItem);
+        Mockito.when(menuService.getMenuItemById(menuId)).thenReturn(Optional.of(menuItem));
         Mockito.when(menuMapper.toResponse(menuItem)).thenReturn(menuItemResponse);
 
         MenuItemResponseDto result = menuController.getMenuItem(menuId);

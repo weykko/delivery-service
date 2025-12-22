@@ -3,7 +3,7 @@ package naumen.project.service;
 import naumen.project.entity.MenuItem;
 import naumen.project.entity.User;
 import naumen.project.entity.enums.Role;
-import naumen.project.exception.EntityNotFoundException;
+import naumen.project.exception.InvalidInputException;
 import naumen.project.exception.PermissionCheckFailedException;
 import naumen.project.repository.MenuRepository;
 import org.junit.jupiter.api.Assertions;
@@ -155,10 +155,11 @@ class MenuServiceTest {
 
         Mockito.when(menuRepository.findById(menuItemId)).thenReturn(Optional.empty());
 
-        EntityNotFoundException exception = Assertions.assertThrows(EntityNotFoundException.class,
+        InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
                 () -> menuService.deleteMenuItem(menuItemId, restaurantUser));
 
-        Assertions.assertEquals("Позиция меню с id '999' не найдена", exception.getMessage());
+        Assertions.assertEquals("Не удалось удалить, причина: Позиция меню с id '999' не найдена",
+                exception.getMessage());
         Mockito.verify(menuRepository).findById(menuItemId);
         Mockito.verify(menuRepository, Mockito.never()).delete(Mockito.any());
     }
@@ -195,26 +196,11 @@ class MenuServiceTest {
 
         Mockito.when(menuRepository.findById(menuItemId)).thenReturn(Optional.of(menuItem));
 
-        MenuItem result = menuService.getMenuItemById(menuItemId);
+        MenuItem result = menuService.getMenuItemById(menuItemId)
+                .orElseThrow(() -> new IllegalArgumentException("Не должно быть равно null"));
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(menuItem, result);
-        Mockito.verify(menuRepository).findById(menuItemId);
-    }
-
-    /**
-     * Тестирование получения позиции меню по несуществующему ID
-     */
-    @Test
-    void getMenuItemByIdWithNonExistingIdShouldThrowException() {
-        Long menuItemId = 999L;
-
-        Mockito.when(menuRepository.findById(menuItemId)).thenReturn(Optional.empty());
-
-        EntityNotFoundException exception = Assertions.assertThrows(EntityNotFoundException.class,
-                () -> menuService.getMenuItemById(menuItemId));
-
-        Assertions.assertEquals("Позиция меню с id '999' не найдена", exception.getMessage());
         Mockito.verify(menuRepository).findById(menuItemId);
     }
 
