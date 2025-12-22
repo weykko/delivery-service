@@ -93,7 +93,8 @@ class UserControllerTest {
      * Создает тестового пользователя
      */
     private User createTestUser(Long id) {
-        User user = new User("test@example.com", "Test User", "+79991234567", Role.CLIENT);
+        User user = new User("test@example.com", "Test User",
+                "+79991234567", Role.CLIENT, "Пушкина 17");
         if (id != null) {
             user.setId(id);
         }

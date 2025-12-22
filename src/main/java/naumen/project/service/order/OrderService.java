@@ -2,22 +2,22 @@ package naumen.project.service.order;
 
 import naumen.project.entity.Order;
 import naumen.project.entity.User;
-import naumen.project.exception.EntityNotFoundException;
 import naumen.project.repository.OrderRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Общие методы по работе с заказами.
  * Это внутренний сервис, который далее используют более "высокоуровневые" сервисы.
  * Доступ к классу и его методам только в пакете Order
  *
- * @see OrderClientService
- * @see OrderCourierService
- * @see OrderRestaurantService
+ * @see ClientOrderService
+ * @see CourierOrderService
+ * @see RestaurantOrderService
  */
 @Service
 class OrderService {
@@ -34,10 +34,8 @@ class OrderService {
      * @param id идентификатор заказа
      * @return заказ
      */
-    Order getById(Long id) {
-        return orderRepository
-                .findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Заказ с id '%d' не найден", id));
+    Optional<Order> getById(Long id) {
+        return orderRepository.findById(id);
     }
 
     /**

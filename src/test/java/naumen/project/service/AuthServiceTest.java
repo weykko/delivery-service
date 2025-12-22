@@ -144,7 +144,8 @@ public class AuthServiceTest {
      * Создает тестового пользователя
      */
     private User createTestUser(Long id) {
-        User user = new User("test@notexists.ru", "Alexey", "73454562345", Role.CLIENT);
+        User user = new User("test@notexists.ru", "Alexey", "73454562345",
+                Role.CLIENT, "Пушкина 17");
         if (id != null) {
             user.setId(id);
         }

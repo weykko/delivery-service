@@ -13,11 +13,11 @@ import org.springframework.stereotype.Service;
  * Сервис для работы с заказами со стороны ресторанов
  */
 @Service
-public class OrderRestaurantService {
+public class RestaurantOrderService {
 
     private final OrderService orderService;
 
-    OrderRestaurantService(OrderService orderService) {
+    RestaurantOrderService(OrderService orderService) {
         this.orderService = orderService;
     }
 
@@ -40,7 +40,8 @@ public class OrderRestaurantService {
      * @return заказ
      */
     public Order getOrder(Long orderId, User restaurant) {
-        Order order = orderService.getById(orderId);
+        Order order = orderService.getById(orderId)
+                .orElseThrow(() -> new InvalidInputException("Заказ с id '%d' не найден", orderId));
 
         assertBelongsToRestaurant(order, restaurant);
 
@@ -54,13 +55,16 @@ public class OrderRestaurantService {
      * @param restaurant ресторан
      */
     public void prepareOrder(Long orderId, User restaurant) {
-        Order order = orderService.getById(orderId);
+        Order order = orderService.getById(orderId)
+                .orElseThrow(() ->
+                        new InvalidInputException("Нельзя приготовить заказ, причина: Заказ с id '%d' не найден",
+                                orderId));
 
         assertBelongsToRestaurant(order, restaurant);
 
         switch (order.getStatus()) {
             case CREATED -> order.setStatus(OrderStatus.ACCEPTED);
-            case ACCEPTED -> throw new InvalidInputException("Заказ с id '%d' уже готовиться", orderId);
+            case ACCEPTED -> throw new InvalidInputException("Заказ с id '%d' уже готовится", orderId);
             case PREPARED -> throw new InvalidInputException("Заказ с id '%d' уже приготовлен", orderId);
             default -> throw new InvalidInputException("Заказ с id '%d' уже был отдан курьеру", orderId);
         }
@@ -75,7 +79,10 @@ public class OrderRestaurantService {
      * @param restaurant ресторан
      */
     public void readyOrder(Long orderId, User restaurant) {
-        Order order = orderService.getById(orderId);
+        Order order = orderService.getById(orderId)
+                .orElseThrow(() ->
+                        new InvalidInputException("Нельзя пометить заказ готовым, причина: Заказ с id '%d' не найден",
+                                orderId));
 
         assertBelongsToRestaurant(order, restaurant);
 
@@ -96,8 +103,8 @@ public class OrderRestaurantService {
      * @param restaurant ресторан
      */
     private void assertBelongsToRestaurant(Order order, User restaurant) {
-        if (order.getRestaurant() == null ||
-            !order.getRestaurant().getId().equals(restaurant.getId())) {
+        if (order.getRestaurant() == null
+            || !order.getRestaurant().getId().equals(restaurant.getId())) {
             throw new PermissionCheckFailedException("Заказ с id '%d' не принадлежит вашему ресторану", order.getId());
         }
     }

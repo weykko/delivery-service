@@ -7,6 +7,7 @@ import naumen.project.dto.menu.MenuItemResponseDto;
 import naumen.project.dto.menu.UpdateMenuItemRequestDto;
 import naumen.project.entity.MenuItem;
 import naumen.project.entity.User;
+import naumen.project.exception.InvalidInputException;
 import naumen.project.mapper.MenuMapper;
 import naumen.project.service.MenuService;
 import org.springframework.http.HttpStatus;
@@ -50,10 +51,11 @@ public class RestaurantMenuController {
         MenuItem newItem = new MenuItem(
                 request.title(),
                 request.description(),
-                request.price()
+                request.price(),
+                user
         );
 
-        MenuItem menuItem = menuService.createMenuItem(newItem, user);
+        MenuItem menuItem = menuService.save(newItem);
 
         return menuMapper.toResponse(menuItem);
     }
@@ -72,7 +74,9 @@ public class RestaurantMenuController {
     public MenuItemResponseDto updateMenuItem(@PathVariable Long id,
                                               @RequestBody @Valid UpdateMenuItemRequestDto request,
                                               @AuthenticationPrincipal User user) {
-        MenuItem menuItem = menuService.getMenuItemById(id);
+        MenuItem menuItem = menuService.getMenuItemById(id)
+                .orElseThrow(() -> new InvalidInputException(
+                        "Не получилось обновить меню, причина: Позиция меню с id '%d' не найдена", id));
 
         if (request.title() != null) {
             menuItem.setTitle(request.title());

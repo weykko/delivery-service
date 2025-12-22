@@ -3,7 +3,7 @@ package naumen.project.service;
 import naumen.project.entity.MenuItem;
 import naumen.project.entity.User;
 import naumen.project.entity.enums.Role;
-import naumen.project.exception.EntityNotFoundException;
+import naumen.project.exception.InvalidInputException;
 import naumen.project.exception.PermissionCheckFailedException;
 import naumen.project.repository.MenuRepository;
 import org.junit.jupiter.api.Assertions;
@@ -40,7 +40,7 @@ class MenuServiceTest {
     @Test
     void getMenuItemsWithAllParametersShouldReturnPagedResults() {
         User restaurantUser = createRestaurantUser(1L);
-        MenuItem menuItem = createMenuItem(restaurantUser);
+        MenuItem menuItem = save(restaurantUser);
         Long restaurantId = 1L;
         String title = "Пицца";
         Pageable pageable = PageRequest.of(0, 10);
@@ -63,7 +63,7 @@ class MenuServiceTest {
     @Test
     void getMenuItemsWithNullParametersShouldReturnAllResults() {
         User restaurantUser = createRestaurantUser(1L);
-        MenuItem menuItem = createMenuItem(restaurantUser);
+        MenuItem menuItem = save(restaurantUser);
         Pageable pageable = PageRequest.of(0, 10);
         Page<MenuItem> menuPage = new PageImpl<>(List.of(menuItem));
 
@@ -81,13 +81,13 @@ class MenuServiceTest {
      * Тестирование метода создания нового пункта меню
      */
     @Test
-    void createMenuItemWithValidRequestShouldCreateAndReturnMenuItem() {
+    void createMenuItemWithValidRequestShouldSave() {
         User restaurantUser = createRestaurantUser(1L);
-        MenuItem newMenuItem = createMenuItem();
+        MenuItem newMenuItem = save(restaurantUser);
 
         Mockito.when(menuRepository.save(newMenuItem)).thenReturn(newMenuItem);
 
-        MenuItem result = menuService.createMenuItem(newMenuItem, restaurantUser);
+        MenuItem result = menuService.save(newMenuItem);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(restaurantUser, result.getRestaurant());
@@ -100,7 +100,7 @@ class MenuServiceTest {
     @Test
     void updateMenuItemWithValidOwnerShouldUpdateAndReturnMenuItem() {
         User restaurantUser = createRestaurantUser(1L);
-        MenuItem menuItem = createMenuItem(restaurantUser);
+        MenuItem menuItem = save(restaurantUser);
 
         Mockito.when(menuRepository.save(menuItem)).thenReturn(menuItem);
 
@@ -118,7 +118,7 @@ class MenuServiceTest {
     void updateMenuItemWithDifferentOwnerShouldThrowForbiddenException() {
         User restaurantUser = createRestaurantUser(1L);
         User differentUser = createRestaurantUser(2L);
-        MenuItem menuItem = createMenuItem(restaurantUser);
+        MenuItem menuItem = save(restaurantUser);
 
         PermissionCheckFailedException exception = Assertions.assertThrows(PermissionCheckFailedException.class,
                 () -> menuService.updateMenuItem(menuItem, differentUser));
@@ -134,7 +134,7 @@ class MenuServiceTest {
     @Test
     void deleteMenuItemWithValidOwnerShouldDeleteMenuItem() {
         User restaurantUser = createRestaurantUser(1L);
-        MenuItem menuItem = createMenuItem(restaurantUser);
+        MenuItem menuItem = save(restaurantUser);
         Long menuItemId = 1L;
 
         Mockito.when(menuRepository.findById(menuItemId)).thenReturn(Optional.of(menuItem));
@@ -155,10 +155,11 @@ class MenuServiceTest {
 
         Mockito.when(menuRepository.findById(menuItemId)).thenReturn(Optional.empty());
 
-        EntityNotFoundException exception = Assertions.assertThrows(EntityNotFoundException.class,
+        InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
                 () -> menuService.deleteMenuItem(menuItemId, restaurantUser));
 
-        Assertions.assertEquals("Позиция меню с id '999' не найдена", exception.getMessage());
+        Assertions.assertEquals("Не удалось удалить, причина: Позиция меню с id '999' не найдена",
+                exception.getMessage());
         Mockito.verify(menuRepository).findById(menuItemId);
         Mockito.verify(menuRepository, Mockito.never()).delete(Mockito.any());
     }
@@ -170,7 +171,7 @@ class MenuServiceTest {
     void deleteMenuItemWithDifferentOwnerShouldThrowForbiddenException() {
         User restaurantUser = createRestaurantUser(1L);
         User differentUser = createRestaurantUser(2L);
-        MenuItem menuItem = createMenuItem(restaurantUser);
+        MenuItem menuItem = save(restaurantUser);
         Long menuItemId = 1L;
 
         Mockito.when(menuRepository.findById(menuItemId)).thenReturn(Optional.of(menuItem));
@@ -190,31 +191,16 @@ class MenuServiceTest {
     @Test
     void getMenuItemByIdWithExistingIdShouldReturnMenuItem() {
         User restaurantUser = createRestaurantUser(1L);
-        MenuItem menuItem = createMenuItem(restaurantUser);
+        MenuItem menuItem = save(restaurantUser);
         Long menuItemId = 1L;
 
         Mockito.when(menuRepository.findById(menuItemId)).thenReturn(Optional.of(menuItem));
 
-        MenuItem result = menuService.getMenuItemById(menuItemId);
+        MenuItem result = menuService.getMenuItemById(menuItemId)
+                .orElseThrow(() -> new IllegalArgumentException("Не должно быть равно null"));
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(menuItem, result);
-        Mockito.verify(menuRepository).findById(menuItemId);
-    }
-
-    /**
-     * Тестирование получения позиции меню по несуществующему ID
-     */
-    @Test
-    void getMenuItemByIdWithNonExistingIdShouldThrowException() {
-        Long menuItemId = 999L;
-
-        Mockito.when(menuRepository.findById(menuItemId)).thenReturn(Optional.empty());
-
-        EntityNotFoundException exception = Assertions.assertThrows(EntityNotFoundException.class,
-                () -> menuService.getMenuItemById(menuItemId));
-
-        Assertions.assertEquals("Позиция меню с id '999' не найдена", exception.getMessage());
         Mockito.verify(menuRepository).findById(menuItemId);
     }
 
@@ -224,7 +210,8 @@ class MenuServiceTest {
      * Создание тестового пользователя-ресторана
      */
     private User createRestaurantUser(Long id) {
-        User user = new User("restaurant@example.com", "Test Restaurant", "+79991234567", Role.RESTAURANT);
+        User user = new User("restaurant@example.com", "Test Restaurant",
+                "+79991234567", Role.RESTAURANT, "Пушкина 17");
         user.setId(id);
         return user;
     }
@@ -232,18 +219,8 @@ class MenuServiceTest {
     /**
      * Создание тестового пункта меню
      */
-    private MenuItem createMenuItem(User restaurant) {
-        MenuItem item = new MenuItem("Pizza", "description", new BigDecimal(450));
-        item.setId(1L);
-        item.setRestaurant(restaurant);
-        return item;
-    }
-
-    /**
-     * Создание новго тестового пункта меню
-     */
-    private MenuItem createMenuItem() {
-        MenuItem item = new MenuItem("Pizza", "description", new BigDecimal(450));
+    private MenuItem save(User restaurant) {
+        MenuItem item = new MenuItem("Pizza", "description", new BigDecimal(450), restaurant);
         item.setId(1L);
         return item;
     }
