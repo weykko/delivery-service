@@ -8,7 +8,7 @@ import naumen.project.entity.Order;
 import naumen.project.entity.User;
 import naumen.project.mapper.OrderMapper;
 import naumen.project.mapper.PageMapper;
-import naumen.project.service.order.OrderRestaurantService;
+import naumen.project.service.order.RestaurantOrderService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
  * Предоставляет endpoints для операций с заказами ресторана.
  * Требует аутентификации с JWT токеном и права доступа RESTAURANT.
  *
- * @see OrderRestaurantService
+ * @see RestaurantOrderService
  * @see OrderMapper
  * @see PageMapper
  */
@@ -30,16 +30,16 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/restaurant/orders")
 public class RestaurantOrderController {
 
-    private final OrderRestaurantService orderRestaurantService;
+    private final RestaurantOrderService restaurantOrderService;
     private final OrderMapper orderMapper;
     private final PageMapper pageMapper;
 
     public RestaurantOrderController(
-            OrderRestaurantService orderRestaurantService,
+            RestaurantOrderService restaurantOrderService,
             OrderMapper orderMapper,
             PageMapper pageMapper
     ) {
-        this.orderRestaurantService = orderRestaurantService;
+        this.restaurantOrderService = restaurantOrderService;
         this.orderMapper = orderMapper;
         this.pageMapper = pageMapper;
     }
@@ -59,7 +59,7 @@ public class RestaurantOrderController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @AuthenticationPrincipal User restaurant) {
-        Page<OrderRestaurantShortResponseDto> orderPages = orderRestaurantService
+        Page<OrderRestaurantShortResponseDto> orderPages = restaurantOrderService
                 .getActiveOrders(restaurant, PageRequest.of(page, size))
                 .map(orderMapper::toRestaurantShortResponse);
 
@@ -79,7 +79,7 @@ public class RestaurantOrderController {
     public OrderRestaurantResponseDto getOrder(
             @PathVariable Long orderId,
             @AuthenticationPrincipal User restaurant) {
-        Order order = orderRestaurantService.getOrder(orderId, restaurant);
+        Order order = restaurantOrderService.getOrder(orderId, restaurant);
 
         return orderMapper.toRestaurantResponse(order);
     }
@@ -95,7 +95,7 @@ public class RestaurantOrderController {
     @Transactional
     public void prepareOrder(@PathVariable Long orderId,
                              @AuthenticationPrincipal User restaurant) {
-        orderRestaurantService.prepareOrder(orderId, restaurant);
+        restaurantOrderService.prepareOrder(orderId, restaurant);
     }
 
     /**
@@ -109,6 +109,6 @@ public class RestaurantOrderController {
     @Transactional
     public void readyOrder(@PathVariable Long orderId,
                            @AuthenticationPrincipal User restaurant) {
-        orderRestaurantService.readyOrder(orderId, restaurant);
+        restaurantOrderService.readyOrder(orderId, restaurant);
     }
 }

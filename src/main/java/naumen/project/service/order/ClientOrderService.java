@@ -16,12 +16,12 @@ import java.util.List;
  * Сервис для работы с заказами со стороны клиентов
  */
 @Service
-public class OrderClientService {
+public class ClientOrderService {
 
     private final OrderService orderService;
     private final UserService userService;
 
-    OrderClientService(OrderService orderService, UserService userService) {
+    ClientOrderService(OrderService orderService, UserService userService) {
         this.orderService = orderService;
         this.userService = userService;
     }
@@ -45,7 +45,9 @@ public class OrderClientService {
             throw new InvalidInputException("Все позиции заказа должны принадлежать ресторану с id '%d'", restaurantId);
         }
 
-        User restaurant = userService.getUserById(restaurantId);
+        User restaurant = userService.getUserById(restaurantId)
+                .orElseThrow(() -> new InvalidInputException("Ошибка создания заказа, ресторан с id '%d' не найден",
+                        restaurantId));
 
         BigDecimal totalPrice = orderItems.stream()
                 .map(OrderItem::getItemPrice)
@@ -84,7 +86,8 @@ public class OrderClientService {
      * @return заказ
      */
     public Order getOrder(Long orderId, User client) {
-        Order order = orderService.getById(orderId);
+        Order order = orderService.getById(orderId)
+                .orElseThrow(() -> new InvalidInputException("Заказ с id '%d' не найден", orderId));
         assertBelongsToClient(order, client);
         return order;
     }
@@ -96,11 +99,14 @@ public class OrderClientService {
      * @param client  текущий клиент
      */
     public void deleteOrder(Long orderId, User client) {
-        Order order = orderService.getById(orderId);
+        Order order = orderService.getById(orderId)
+                .orElseThrow(() -> new InvalidInputException(
+                        "Не удалось удалить заказ. Причина: Заказ с id '%d' не найден",
+                        orderId));
 
         assertBelongsToClient(order, client);
-        if (order.getStatus() != OrderStatus.CREATED ||
-                order.getCourier() != null) {
+        if (order.getStatus() != OrderStatus.CREATED
+            || order.getCourier() != null) {
             throw new InvalidInputException("Заказ с id '%d' уже принят в работу", orderId);
         }
 

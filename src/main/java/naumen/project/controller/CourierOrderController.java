@@ -6,7 +6,7 @@ import naumen.project.dto.paged.PagedResponseDto;
 import naumen.project.entity.User;
 import naumen.project.mapper.OrderMapper;
 import naumen.project.mapper.PageMapper;
-import naumen.project.service.order.OrderCourierService;
+import naumen.project.service.order.CourierOrderService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -21,7 +21,7 @@ import java.util.List;
  * Предоставляет endpoints для операций с курьерами.
  * Требует аутентификации с JWT токеном и права доступа DELIVERY.
  *
- * @see OrderCourierService
+ * @see CourierOrderService
  * @see OrderMapper
  * @see PageMapper
  */
@@ -30,16 +30,16 @@ import java.util.List;
 @RequestMapping("/api/v1/courier/orders")
 public class CourierOrderController {
 
-    private final OrderCourierService orderCourierService;
+    private final CourierOrderService courierOrderService;
     private final OrderMapper orderMapper;
     private final PageMapper pageMapper;
 
     public CourierOrderController(
-            OrderCourierService orderCourierService,
+            CourierOrderService courierOrderService,
             OrderMapper orderMapper,
             PageMapper pageMapper
     ) {
-        this.orderCourierService = orderCourierService;
+        this.courierOrderService = courierOrderService;
         this.orderMapper = orderMapper;
         this.pageMapper = pageMapper;
     }
@@ -57,7 +57,7 @@ public class CourierOrderController {
     public PagedResponseDto<OrderCourierResponseDto> getAvailableOrders(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        Page<OrderCourierResponseDto> orderPages = orderCourierService
+        Page<OrderCourierResponseDto> orderPages = courierOrderService
                 .getAvailableOrders(PageRequest.of(page, size))
                 .map(orderMapper::toCourierResponse);
 
@@ -74,7 +74,7 @@ public class CourierOrderController {
     @ResponseStatus(HttpStatus.OK)
     @Transactional(readOnly = true)
     public List<OrderCourierResponseDto> getActiveOrders(@AuthenticationPrincipal User courier) {
-        return orderCourierService.getActiveOrders(courier).stream()
+        return courierOrderService.getActiveOrders(courier).stream()
                 .map(orderMapper::toCourierResponse)
                 .toList();
     }
@@ -90,7 +90,7 @@ public class CourierOrderController {
     @Transactional
     public void acceptOrder(@PathVariable Long orderId,
                             @AuthenticationPrincipal User courier) {
-        orderCourierService.acceptOrder(orderId, courier);
+        courierOrderService.acceptOrder(orderId, courier);
     }
 
     /**
@@ -104,7 +104,7 @@ public class CourierOrderController {
     @Transactional
     public void pickUpOrder(@PathVariable Long orderId,
                             @AuthenticationPrincipal User courier) {
-        orderCourierService.pickUpOrder(orderId, courier);
+        courierOrderService.pickUpOrder(orderId, courier);
     }
 
     /**
@@ -118,6 +118,6 @@ public class CourierOrderController {
     @Transactional
     public void deliverOrder(@PathVariable Long orderId,
                              @AuthenticationPrincipal User courier) {
-        orderCourierService.deliverOrder(orderId, courier);
+        courierOrderService.deliverOrder(orderId, courier);
     }
 }

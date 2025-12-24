@@ -7,6 +7,8 @@ import naumen.project.dto.order.admin.OrderAdminShortResponseDto;
 import naumen.project.dto.order.admin.OrderAdminUpdateRequestDto;
 import naumen.project.dto.paged.PagedResponseDto;
 import naumen.project.entity.Order;
+import naumen.project.exception.EntityNotFoundException;
+import naumen.project.exception.InvalidInputException;
 import naumen.project.mapper.OrderMapper;
 import naumen.project.mapper.PageMapper;
 import naumen.project.service.order.OrderAdminService;
@@ -75,7 +77,8 @@ public class AdminOrderController {
     @ResponseStatus(HttpStatus.OK)
     @Transactional(readOnly = true)
     public OrderAdminResponseDto getOrder(@PathVariable Long orderId) {
-        Order order = orderAdminService.getOrderById(orderId);
+        Order order = orderAdminService.getOrderById(orderId)
+                .orElseThrow(() -> new EntityNotFoundException("Заказ с id '%d' не найден", orderId));
 
         return orderMapper.toAdminResponse(order);
     }
@@ -92,7 +95,10 @@ public class AdminOrderController {
     @Transactional
     public OrderAdminResponseDto updateOrder(@PathVariable Long orderId,
                                              @RequestBody @Valid OrderAdminUpdateRequestDto request) {
-        Order order = orderAdminService.getOrderById(orderId);
+        Order order = orderAdminService.getOrderById(orderId)
+                .orElseThrow(() ->
+                        new InvalidInputException("Не удалось обновить заказ, причина: Заказ с id '%d' не найден",
+                                orderId));
 
         Optional.ofNullable(request.status()).ifPresent(order::setStatus);
         Optional.ofNullable(request.totalPrice()).ifPresent(order::setTotalPrice);

@@ -125,7 +125,8 @@ class AuthControllerTest {
                 request.email(),
                 request.name(),
                 request.phone(),
-                request.role()
+                request.role(),
+                "Пушкина 17"
         );
 
         user.setId(1L);

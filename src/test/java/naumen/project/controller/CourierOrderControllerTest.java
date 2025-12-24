@@ -8,7 +8,7 @@ import naumen.project.entity.enums.OrderStatus;
 import naumen.project.entity.enums.Role;
 import naumen.project.mapper.OrderMapper;
 import naumen.project.mapper.PageMapper;
-import naumen.project.service.order.OrderCourierService;
+import naumen.project.service.order.CourierOrderService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,7 +30,7 @@ import java.util.List;
 class CourierOrderControllerTest {
 
     @Mock
-    private OrderCourierService orderCourierService;
+    private CourierOrderService courierOrderService;
 
     @Mock
     private OrderMapper orderMapper;
@@ -41,12 +41,14 @@ class CourierOrderControllerTest {
     @InjectMocks
     private CourierOrderController courierOrderController;
 
+    private final Order testOrder = createTestOrder();
+    private final User testCourier = createTestCourier();
+
     /**
      * Тестирование получения доступных заказов для курьера
      */
     @Test
     void getAvailableOrdersShouldReturnPagedOrders() {
-        Order testOrder = createTestOrder();
         int page = 0;
         int size = 10;
 
@@ -58,7 +60,7 @@ class CourierOrderControllerTest {
                 List.of(responseDto), page, size, 1, 1
         );
 
-        Mockito.when(orderCourierService.getAvailableOrders(pageRequest)).thenReturn(orderPage);
+        Mockito.when(courierOrderService.getAvailableOrders(pageRequest)).thenReturn(orderPage);
         Mockito.when(orderMapper.toCourierResponse(testOrder)).thenReturn(responseDto);
         Mockito.when(pageMapper.toOrderCourierResponse(responsePage)).thenReturn(pagedResponse);
 
@@ -67,7 +69,7 @@ class CourierOrderControllerTest {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1, result.content().size());
         Assertions.assertEquals(responseDto, result.content().getFirst());
-        Mockito.verify(orderCourierService).getAvailableOrders(pageRequest);
+        Mockito.verify(courierOrderService).getAvailableOrders(pageRequest);
         Mockito.verify(orderMapper).toCourierResponse(testOrder);
         Mockito.verify(pageMapper).toOrderCourierResponse(responsePage);
     }
@@ -77,12 +79,9 @@ class CourierOrderControllerTest {
      */
     @Test
     void getActiveOrdersShouldReturnListOfOrders() {
-        User testCourier = createTestCourier();
-        Order testOrder = createTestOrder();
-
         OrderCourierResponseDto responseDto = createOrderCourierResponseDto(testOrder);
 
-        Mockito.when(orderCourierService.getActiveOrders(testCourier)).thenReturn(List.of(testOrder));
+        Mockito.when(courierOrderService.getActiveOrders(testCourier)).thenReturn(List.of(testOrder));
         Mockito.when(orderMapper.toCourierResponse(testOrder)).thenReturn(responseDto);
 
         List<OrderCourierResponseDto> result = courierOrderController.getActiveOrders(testCourier);
@@ -90,24 +89,31 @@ class CourierOrderControllerTest {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1, result.size());
         Assertions.assertEquals(responseDto, result.getFirst());
-        Mockito.verify(orderCourierService).getActiveOrders(testCourier);
+        Mockito.verify(courierOrderService).getActiveOrders(testCourier);
         Mockito.verify(orderMapper).toCourierResponse(testOrder);
     }
 
     // Вспомогательные методы
 
+    /**
+     * Создает тестового курьера
+     */
     private User createTestCourier() {
         User user = new User(
                 "courier@example.com",
                 "Test Courier",
                 "+1234567890",
-                Role.COURIER
+                Role.COURIER,
+                "Пушкина 17"
         );
         user.setId(5L);
 
         return user;
     }
 
+    /**
+     * Создает тестовый заказ
+     */
     private Order createTestOrder() {
         Order order = new Order(
                 "Ул Пушкина",
@@ -122,6 +128,9 @@ class CourierOrderControllerTest {
         return order;
     }
 
+    /**
+     * Создает DTO ответа для курьера на основе заказа
+     */
     private OrderCourierResponseDto createOrderCourierResponseDto(Order order) {
         return new OrderCourierResponseDto(
                 order.getId(),

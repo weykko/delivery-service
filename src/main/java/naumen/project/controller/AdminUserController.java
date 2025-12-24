@@ -6,6 +6,8 @@ import naumen.project.dto.paged.PagedResponseDto;
 import naumen.project.dto.user.AdminUpdateUserRequestDto;
 import naumen.project.dto.user.UserResponseDto;
 import naumen.project.entity.User;
+import naumen.project.exception.EntityNotFoundException;
+import naumen.project.exception.InvalidInputException;
 import naumen.project.mapper.PageMapper;
 import naumen.project.mapper.UserMapper;
 import naumen.project.service.UserService;
@@ -72,7 +74,8 @@ public class AdminUserController {
     @ResponseStatus(HttpStatus.OK)
     @Transactional(readOnly = true)
     public UserResponseDto getUser(@PathVariable Long id) {
-        User user = userService.getUserById(id);
+        User user = userService.getUserById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Пользователь с id '%d' не найден", id));
 
         return userMapper.toResponse(user);
     }
@@ -89,7 +92,9 @@ public class AdminUserController {
     @Transactional
     public UserResponseDto updateUser(@PathVariable Long id,
                                       @RequestBody @Valid AdminUpdateUserRequestDto request) {
-        User user = userService.getUserById(id);
+        User user = userService.getUserById(id)
+                .orElseThrow(() -> new InvalidInputException(
+                        "Не удалось обновить пользователя, причина: Пользователь с id '%d' не найден", id));
 
         Optional.ofNullable(request.name()).ifPresent(user::setName);
         Optional.ofNullable(request.role()).ifPresent(user::setRole);

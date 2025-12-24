@@ -3,8 +3,6 @@ package naumen.project.service;
 import naumen.project.auth.JwtUserDetails;
 import naumen.project.dto.auth.TokenResponseDto;
 import naumen.project.entity.User;
-import naumen.project.entity.enums.Role;
-import naumen.project.exception.InvalidInputException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -46,7 +44,6 @@ public class AuthService {
      */
     public User register(User user, String password) {
         userService.checkUniqueFieldsRegistration(user);
-        doChecksForRestaurant(user);
         String encodePassword = passwordEncoder.encode(password);
         user.setPassword(encodePassword);
 
@@ -69,15 +66,5 @@ public class AuthService {
         JwtUserDetails userDetails = (JwtUserDetails) authentication.getPrincipal();
 
         return authTokenService.generateAndSave(userDetails.getUser());
-    }
-
-    private void doChecksForRestaurant(User user) {
-        if (!user.getRole().equals(Role.RESTAURANT)) {
-            return;
-        }
-
-        if (user.getAddress() == null) {
-            throw new InvalidInputException("У ресторана должен быть адрес");
-        }
     }
 }
