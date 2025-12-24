@@ -52,7 +52,6 @@ class MenuControllerTest {
     void getMenuItemsWithFiltersShouldReturnPagedResults() {
         MenuItemResponseDto menuItemResponse = createMenuItemResponse(testMenuItem);
 
-        Long restaurantId = 1L;
         String title = "Пицца";
         int page = 0;
         int size = 10;
@@ -67,16 +66,16 @@ class MenuControllerTest {
                 1
         );
 
-        Mockito.when(menuService.getMenuItems(restaurantId, title, pageable)).thenReturn(menuItemPage);
+        Mockito.when(menuService.getMenuItems(testMenuItem.getId(), title, pageable)).thenReturn(menuItemPage);
         Mockito.when(menuMapper.toResponse(testMenuItem)).thenReturn(menuItemResponse);
         Mockito.when(pageMapper.toMenuResponse(Mockito.any())).thenReturn(expectedPagedResponse);
 
-        PagedResponseDto<MenuItemResponseDto> result = menuController.getMenuItems(restaurantId, title, page, size);
+        PagedResponseDto<MenuItemResponseDto> result = menuController.getMenuItems(testMenuItem.getId(), title, page, size);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1, result.totalElements());
         Assertions.assertEquals(1, result.content().size());
-        Mockito.verify(menuService).getMenuItems(restaurantId, title, pageable);
+        Mockito.verify(menuService).getMenuItems(testRestaurant.getId(), title, pageable);
         Mockito.verify(pageMapper).toMenuResponse(Mockito.any());
     }
 
@@ -117,18 +116,17 @@ class MenuControllerTest {
     @Test
     void getMenuItemWithValidIdShouldReturnMenuItem() {
         MenuItemResponseDto menuItemResponse = createMenuItemResponse(testMenuItem);
-        Long menuId = 1L;
 
-        Mockito.when(menuService.getMenuItemById(menuId)).thenReturn(Optional.of(testMenuItem));
+        Mockito.when(menuService.getMenuItemById(testMenuItem.getId())).thenReturn(Optional.of(testMenuItem));
         Mockito.when(menuMapper.toResponse(testMenuItem)).thenReturn(menuItemResponse);
 
-        MenuItemResponseDto result = menuController.getMenuItem(menuId);
+        MenuItemResponseDto result = menuController.getMenuItem(testMenuItem.getId());
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(menuItemResponse.id(), result.id());
         Assertions.assertEquals(menuItemResponse.title(), result.title());
         Assertions.assertEquals(menuItemResponse.price(), result.price());
-        Mockito.verify(menuService).getMenuItemById(menuId);
+        Mockito.verify(menuService).getMenuItemById(testMenuItem.getId());
         Mockito.verify(menuMapper).toResponse(testMenuItem);
     }
 

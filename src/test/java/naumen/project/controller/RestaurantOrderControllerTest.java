@@ -81,17 +81,16 @@ class RestaurantOrderControllerTest {
      */
     @Test
     void getOrderShouldReturnOrderInfo() {
-        Long orderId = 1L;
         OrderRestaurantResponseDto responseDto = createOrderRestaurantResponseDto(testOrder);
 
-        Mockito.when(restaurantOrderService.getOrder(orderId, testRestaurant)).thenReturn(testOrder);
+        Mockito.when(restaurantOrderService.getOrder(testOrder.getId(), testRestaurant)).thenReturn(testOrder);
         Mockito.when(orderMapper.toRestaurantResponse(testOrder)).thenReturn(responseDto);
 
-        OrderRestaurantResponseDto result = restaurantOrderController.getOrder(orderId, testRestaurant);
+        OrderRestaurantResponseDto result = restaurantOrderController.getOrder(testOrder.getId(), testRestaurant);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(responseDto, result);
-        Mockito.verify(restaurantOrderService).getOrder(orderId, testRestaurant);
+        Mockito.verify(restaurantOrderService).getOrder(testOrder.getId(), testRestaurant);
         Mockito.verify(orderMapper).toRestaurantResponse(testOrder);
     }
 

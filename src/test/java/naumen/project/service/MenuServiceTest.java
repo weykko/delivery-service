@@ -43,20 +43,19 @@ class MenuServiceTest {
      */
     @Test
     void getMenuItemsWithAllParametersShouldReturnPagedResults() {
-        Long restaurantId = 1L;
         String title = "Пицца";
         Pageable pageable = PageRequest.of(0, 10);
         Page<MenuItem> menuPage = new PageImpl<>(List.of(testMenuItem));
 
-        Mockito.when(menuRepository.findByRestaurantIdAndTitle(restaurantId, title, pageable))
+        Mockito.when(menuRepository.findByRestaurantIdAndTitle(testRestaurant.getId(), title, pageable))
                 .thenReturn(menuPage);
 
-        Page<MenuItem> result = menuService.getMenuItems(restaurantId, title, pageable);
+        Page<MenuItem> result = menuService.getMenuItems(testRestaurant.getId(), title, pageable);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1, result.getTotalElements());
         Assertions.assertEquals(testMenuItem, result.getContent().getFirst());
-        Mockito.verify(menuRepository).findByRestaurantIdAndTitle(restaurantId, title, pageable);
+        Mockito.verify(menuRepository).findByRestaurantIdAndTitle(testRestaurant.getId(), title, pageable);
     }
 
     /**
@@ -136,16 +135,14 @@ class MenuServiceTest {
      */
     @Test
     void deleteMenuItemWithNotFoundMenuItemShouldThrowException() {
-        Long menuItemId = 999L;
-
-        Mockito.when(menuRepository.findById(menuItemId)).thenReturn(Optional.empty());
+        Mockito.when(menuRepository.findById(testMenuItem.getId())).thenReturn(Optional.empty());
 
         InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
-                () -> menuService.deleteMenuItem(menuItemId, testRestaurant));
+                () -> menuService.deleteMenuItem(testMenuItem.getId(), testRestaurant));
 
-        Assertions.assertEquals("Не удалось удалить, причина: Позиция меню с id '999' не найдена",
+        Assertions.assertEquals("Не удалось удалить, причина: Позиция меню с id '1' не найдена",
                 exception.getMessage());
-        Mockito.verify(menuRepository).findById(menuItemId);
+        Mockito.verify(menuRepository).findById(testMenuItem.getId());
         Mockito.verify(menuRepository, Mockito.never()).delete(Mockito.any());
     }
 

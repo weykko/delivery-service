@@ -78,16 +78,15 @@ class CourierOrderServiceTest {
      */
     @Test
     void acceptOrderWithValidOrderShouldAssignCourier() {
-        Long orderId = 1L;
         testOrder.setCourier(null);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(testOrder));
+        Mockito.when(orderService.getById(testOrder.getId())).thenReturn(Optional.of(testOrder));
         Mockito.when(orderService.save(testOrder)).thenReturn(testOrder);
 
-        courierOrderService.acceptOrder(orderId, testCourier);
+        courierOrderService.acceptOrder(testOrder.getId(), testCourier);
 
         Assertions.assertEquals(testCourier, testOrder.getCourier());
-        Mockito.verify(orderService).getById(orderId);
+        Mockito.verify(orderService).getById(testOrder.getId());
         Mockito.verify(orderService).save(testOrder);
     }
 
@@ -96,16 +95,15 @@ class CourierOrderServiceTest {
      */
     @Test
     void acceptOrderWithAlreadyAcceptedOrderShouldThrowException() {
-        Long orderId = 1L;
         testOrder.setCourier(testCourier);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(testOrder));
+        Mockito.when(orderService.getById(testOrder.getId())).thenReturn(Optional.of(testOrder));
 
         InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
-                () -> courierOrderService.acceptOrder(orderId, testCourier));
+                () -> courierOrderService.acceptOrder(testOrder.getId(), testCourier));
 
         Assertions.assertEquals("Заказ с id '1' уже принят курьером", exception.getMessage());
-        Mockito.verify(orderService).getById(orderId);
+        Mockito.verify(orderService).getById(testOrder.getId());
         Mockito.verify(orderService, Mockito.never()).save(Mockito.any());
     }
 
@@ -114,17 +112,16 @@ class CourierOrderServiceTest {
      */
     @Test
     void pickUpOrderWithPreparedStatusShouldChangeToDelivering() {
-        Long orderId = 1L;
         testOrder.setCourier(testCourier);
         testOrder.setStatus(OrderStatus.PREPARED);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(testOrder));
+        Mockito.when(orderService.getById(testOrder.getId())).thenReturn(Optional.of(testOrder));
         Mockito.when(orderService.save(testOrder)).thenReturn(testOrder);
 
-        courierOrderService.pickUpOrder(orderId, testCourier);
+        courierOrderService.pickUpOrder(testOrder.getId(), testCourier);
 
         Assertions.assertEquals(OrderStatus.DELIVERING, testOrder.getStatus());
-        Mockito.verify(orderService).getById(orderId);
+        Mockito.verify(orderService).getById(testOrder.getId());
         Mockito.verify(orderService).save(testOrder);
     }
 
@@ -133,17 +130,16 @@ class CourierOrderServiceTest {
      */
     @Test
     void pickUpOrderWithDifferentCourierShouldThrowException() {
-        Long orderId = 1L;
         testOrder.setCourier(testCourier);
         testOrder.setStatus(OrderStatus.PREPARED);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(testOrder));
+        Mockito.when(orderService.getById(testOrder.getId())).thenReturn(Optional.of(testOrder));
 
         PermissionCheckFailedException exception = Assertions.assertThrows(PermissionCheckFailedException.class,
-                () -> courierOrderService.pickUpOrder(orderId, differentTestCourier));
+                () -> courierOrderService.pickUpOrder(testOrder.getId(), differentTestCourier));
 
         Assertions.assertEquals("Заказ с id '1' не принадлежит вам", exception.getMessage());
-        Mockito.verify(orderService).getById(orderId);
+        Mockito.verify(orderService).getById(testOrder.getId());
         Mockito.verify(orderService, Mockito.never()).save(Mockito.any());
     }
 
@@ -152,17 +148,16 @@ class CourierOrderServiceTest {
      */
     @Test
     void pickUpOrderWithDeliveringStatusShouldThrowException() {
-        Long orderId = 1L;
         testOrder.setCourier(testCourier);
         testOrder.setStatus(OrderStatus.DELIVERING);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(testOrder));
+        Mockito.when(orderService.getById(testOrder.getId())).thenReturn(Optional.of(testOrder));
 
         InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
-                () -> courierOrderService.pickUpOrder(orderId, testCourier));
+                () -> courierOrderService.pickUpOrder(testOrder.getId(), testCourier));
 
         Assertions.assertEquals("Заказ с id '1' уже доставляется", exception.getMessage());
-        Mockito.verify(orderService).getById(orderId);
+        Mockito.verify(orderService).getById(testOrder.getId());
         Mockito.verify(orderService, Mockito.never()).save(Mockito.any());
     }
 
@@ -171,17 +166,16 @@ class CourierOrderServiceTest {
      */
     @Test
     void pickUpOrderWithCompletedStatusShouldThrowException() {
-        Long orderId = 1L;
         testOrder.setCourier(testCourier);
         testOrder.setStatus(OrderStatus.COMPLETED);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(testOrder));
+        Mockito.when(orderService.getById(testOrder.getId())).thenReturn(Optional.of(testOrder));
 
         InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
-                () -> courierOrderService.pickUpOrder(orderId, testCourier));
+                () -> courierOrderService.pickUpOrder(testOrder.getId(), testCourier));
 
         Assertions.assertEquals("Заказ с id '1' уже доставлен", exception.getMessage());
-        Mockito.verify(orderService).getById(orderId);
+        Mockito.verify(orderService).getById(testOrder.getId());
         Mockito.verify(orderService, Mockito.never()).save(Mockito.any());
     }
 
@@ -190,17 +184,16 @@ class CourierOrderServiceTest {
      */
     @Test
     void pickUpOrderWithCreatedStatusShouldThrowException() {
-        Long orderId = 1L;
         testOrder.setCourier(testCourier);
         testOrder.setStatus(OrderStatus.CREATED);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(testOrder));
+        Mockito.when(orderService.getById(testOrder.getId())).thenReturn(Optional.of(testOrder));
 
         InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
-                () -> courierOrderService.pickUpOrder(orderId, testCourier));
+                () -> courierOrderService.pickUpOrder(testOrder.getId(), testCourier));
 
         Assertions.assertEquals("Заказ с id '1' ещё не готов", exception.getMessage());
-        Mockito.verify(orderService).getById(orderId);
+        Mockito.verify(orderService).getById(testOrder.getId());
         Mockito.verify(orderService, Mockito.never()).save(Mockito.any());
     }
 
@@ -209,17 +202,16 @@ class CourierOrderServiceTest {
      */
     @Test
     void deliverOrderWithDeliveringStatusShouldChangeToCompleted() {
-        Long orderId = 1L;
         testOrder.setCourier(testCourier);
         testOrder.setStatus(OrderStatus.DELIVERING);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(testOrder));
+        Mockito.when(orderService.getById(testOrder.getId())).thenReturn(Optional.of(testOrder));
         Mockito.when(orderService.save(testOrder)).thenReturn(testOrder);
 
-        courierOrderService.deliverOrder(orderId, testCourier);
+        courierOrderService.deliverOrder(testOrder.getId(), testCourier);
 
         Assertions.assertEquals(OrderStatus.COMPLETED, testOrder.getStatus());
-        Mockito.verify(orderService).getById(orderId);
+        Mockito.verify(orderService).getById(testOrder.getId());
         Mockito.verify(orderService).save(testOrder);
     }
 
@@ -228,17 +220,16 @@ class CourierOrderServiceTest {
      */
     @Test
     void deliverOrderWithDifferentCourierShouldThrowException() {
-        Long orderId = 1L;
         testOrder.setCourier(testCourier);
         testOrder.setStatus(OrderStatus.DELIVERING);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(testOrder));
+        Mockito.when(orderService.getById(testOrder.getId())).thenReturn(Optional.of(testOrder));
 
         PermissionCheckFailedException exception = Assertions.assertThrows(PermissionCheckFailedException.class,
-                () -> courierOrderService.deliverOrder(orderId, differentTestCourier));
+                () -> courierOrderService.deliverOrder(testOrder.getId(), differentTestCourier));
 
         Assertions.assertEquals("Заказ с id '1' не принадлежит вам", exception.getMessage());
-        Mockito.verify(orderService).getById(orderId);
+        Mockito.verify(orderService).getById(testOrder.getId());
         Mockito.verify(orderService, Mockito.never()).save(Mockito.any());
     }
 
@@ -247,17 +238,16 @@ class CourierOrderServiceTest {
      */
     @Test
     void deliverOrderWithCompletedStatusShouldThrowException() {
-        Long orderId = 1L;
         testOrder.setCourier(testCourier);
         testOrder.setStatus(OrderStatus.COMPLETED);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(testOrder));
+        Mockito.when(orderService.getById(testOrder.getId())).thenReturn(Optional.of(testOrder));
 
         InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
-                () -> courierOrderService.deliverOrder(orderId, testCourier));
+                () -> courierOrderService.deliverOrder(testOrder.getId(), testCourier));
 
         Assertions.assertEquals("Заказ с id '1' уже доставлен", exception.getMessage());
-        Mockito.verify(orderService).getById(orderId);
+        Mockito.verify(orderService).getById(testOrder.getId());
         Mockito.verify(orderService, Mockito.never()).save(Mockito.any());
     }
 

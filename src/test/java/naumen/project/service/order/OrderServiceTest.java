@@ -43,16 +43,14 @@ class OrderServiceTest {
      */
     @Test
     void getByIdWithExistingOrderShouldReturnOrder() {
-        Long orderId = 1L;
+        Mockito.when(orderRepository.findById(testOrder.getId())).thenReturn(Optional.of(testOrder));
 
-        Mockito.when(orderRepository.findById(orderId)).thenReturn(Optional.of(testOrder));
-
-        Order result = orderService.getById(orderId)
+        Order result = orderService.getById(testOrder.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Ожидали получить заказ, но он не был найден"));
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(testOrder, result);
-        Mockito.verify(orderRepository).findById(orderId);
+        Mockito.verify(orderRepository).findById(testOrder.getId());
     }
 
     /**

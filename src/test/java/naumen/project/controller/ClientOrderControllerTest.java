@@ -122,9 +122,8 @@ class ClientOrderControllerTest {
      */
     @Test
     void getOrderByIdWithValidIdShouldReturnOrder() {
-        Long orderId = 1L;
         OrderClientResponseDto expectedResponse = new OrderClientResponseDto(
-                orderId,
+                testOrder.getId(),
                 OrderStatus.CREATED,
                 new BigDecimal("500.00"),
                 "Ул Пушкина",
@@ -134,16 +133,16 @@ class ClientOrderControllerTest {
                 List.of()
         );
 
-        Mockito.when(clientOrderService.getOrder(orderId, testClient)).thenReturn(testOrder);
+        Mockito.when(clientOrderService.getOrder(testOrder.getId(), testClient)).thenReturn(testOrder);
         Mockito.when(orderMapper.toClientResponse(testOrder)).thenReturn(expectedResponse);
 
-        OrderClientResponseDto result = clientOrderController.getOrder(orderId, testClient);
+        OrderClientResponseDto result = clientOrderController.getOrder(testOrder.getId(), testClient);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(expectedResponse.id(), result.id());
         Assertions.assertEquals(expectedResponse.status(), result.status());
         Assertions.assertEquals(expectedResponse.deliveryAddress(), result.deliveryAddress());
-        Mockito.verify(clientOrderService).getOrder(orderId, testClient);
+        Mockito.verify(clientOrderService).getOrder(testOrder.getId(), testClient);
         Mockito.verify(orderMapper).toClientResponse(testOrder);
     }
 
