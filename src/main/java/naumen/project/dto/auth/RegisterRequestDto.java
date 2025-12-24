@@ -35,7 +35,6 @@ public record RegisterRequestDto(
         String phone,
 
         @Size(max = 255)
-        @NotNull
         String address
 ) {
 }

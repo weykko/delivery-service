@@ -39,8 +39,8 @@ class MenuServiceTest {
      */
     @Test
     void getMenuItemsWithAllParametersShouldReturnPagedResults() {
-        User restaurantUser = createRestaurantUser(1L);
-        MenuItem menuItem = save(restaurantUser);
+        User restaurantUser = createTestRestaurantUser(1L);
+        MenuItem menuItem = createTestMenuItem(restaurantUser);
         Long restaurantId = 1L;
         String title = "Пицца";
         Pageable pageable = PageRequest.of(0, 10);
@@ -62,8 +62,8 @@ class MenuServiceTest {
      */
     @Test
     void getMenuItemsWithNullParametersShouldReturnAllResults() {
-        User restaurantUser = createRestaurantUser(1L);
-        MenuItem menuItem = save(restaurantUser);
+        User restaurantUser = createTestRestaurantUser(1L);
+        MenuItem menuItem = createTestMenuItem(restaurantUser);
         Pageable pageable = PageRequest.of(0, 10);
         Page<MenuItem> menuPage = new PageImpl<>(List.of(menuItem));
 
@@ -82,8 +82,8 @@ class MenuServiceTest {
      */
     @Test
     void createMenuItemWithValidRequestShouldSave() {
-        User restaurantUser = createRestaurantUser(1L);
-        MenuItem newMenuItem = save(restaurantUser);
+        User restaurantUser = createTestRestaurantUser(1L);
+        MenuItem newMenuItem = createTestMenuItem(restaurantUser);
 
         Mockito.when(menuRepository.save(newMenuItem)).thenReturn(newMenuItem);
 
@@ -99,8 +99,8 @@ class MenuServiceTest {
      */
     @Test
     void updateMenuItemWithValidOwnerShouldUpdateAndReturnMenuItem() {
-        User restaurantUser = createRestaurantUser(1L);
-        MenuItem menuItem = save(restaurantUser);
+        User restaurantUser = createTestRestaurantUser(1L);
+        MenuItem menuItem = createTestMenuItem(restaurantUser);
 
         Mockito.when(menuRepository.save(menuItem)).thenReturn(menuItem);
 
@@ -116,9 +116,9 @@ class MenuServiceTest {
      */
     @Test
     void updateMenuItemWithDifferentOwnerShouldThrowForbiddenException() {
-        User restaurantUser = createRestaurantUser(1L);
-        User differentUser = createRestaurantUser(2L);
-        MenuItem menuItem = save(restaurantUser);
+        User restaurantUser = createTestRestaurantUser(1L);
+        User differentUser = createTestRestaurantUser(2L);
+        MenuItem menuItem = createTestMenuItem(restaurantUser);
 
         PermissionCheckFailedException exception = Assertions.assertThrows(PermissionCheckFailedException.class,
                 () -> menuService.updateMenuItem(menuItem, differentUser));
@@ -133,8 +133,8 @@ class MenuServiceTest {
      */
     @Test
     void deleteMenuItemWithValidOwnerShouldDeleteMenuItem() {
-        User restaurantUser = createRestaurantUser(1L);
-        MenuItem menuItem = save(restaurantUser);
+        User restaurantUser = createTestRestaurantUser(1L);
+        MenuItem menuItem = createTestMenuItem(restaurantUser);
         Long menuItemId = 1L;
 
         Mockito.when(menuRepository.findById(menuItemId)).thenReturn(Optional.of(menuItem));
@@ -150,7 +150,7 @@ class MenuServiceTest {
      */
     @Test
     void deleteMenuItemWithNotFoundMenuItemShouldThrowException() {
-        User restaurantUser = createRestaurantUser(1L);
+        User restaurantUser = createTestRestaurantUser(1L);
         Long menuItemId = 999L;
 
         Mockito.when(menuRepository.findById(menuItemId)).thenReturn(Optional.empty());
@@ -169,9 +169,9 @@ class MenuServiceTest {
      */
     @Test
     void deleteMenuItemWithDifferentOwnerShouldThrowForbiddenException() {
-        User restaurantUser = createRestaurantUser(1L);
-        User differentUser = createRestaurantUser(2L);
-        MenuItem menuItem = save(restaurantUser);
+        User restaurantUser = createTestRestaurantUser(1L);
+        User differentUser = createTestRestaurantUser(2L);
+        MenuItem menuItem = createTestMenuItem(restaurantUser);
         Long menuItemId = 1L;
 
         Mockito.when(menuRepository.findById(menuItemId)).thenReturn(Optional.of(menuItem));
@@ -190,8 +190,8 @@ class MenuServiceTest {
      */
     @Test
     void getMenuItemByIdWithExistingIdShouldReturnMenuItem() {
-        User restaurantUser = createRestaurantUser(1L);
-        MenuItem menuItem = save(restaurantUser);
+        User restaurantUser = createTestRestaurantUser(1L);
+        MenuItem menuItem = createTestMenuItem(restaurantUser);
         Long menuItemId = 1L;
 
         Mockito.when(menuRepository.findById(menuItemId)).thenReturn(Optional.of(menuItem));
@@ -209,7 +209,7 @@ class MenuServiceTest {
     /**
      * Создание тестового пользователя-ресторана
      */
-    private User createRestaurantUser(Long id) {
+    private User createTestRestaurantUser(Long id) {
         User user = new User("restaurant@example.com", "Test Restaurant",
                 "+79991234567", Role.RESTAURANT, "Пушкина 17");
         user.setId(id);
@@ -219,7 +219,7 @@ class MenuServiceTest {
     /**
      * Создание тестового пункта меню
      */
-    private MenuItem save(User restaurant) {
+    private MenuItem createTestMenuItem(User restaurant) {
         MenuItem item = new MenuItem("Pizza", "description", new BigDecimal(450), restaurant);
         item.setId(1L);
         return item;

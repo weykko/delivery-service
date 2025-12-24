@@ -33,7 +33,9 @@ public class User extends IdEntity {
     private String phone;
 
     /**
-     * Адрес пользователя
+     * Адрес пользователя.
+     * Для пользователя с ролью RESTAURANT поле обязательное,
+     * для других ролей может быть null.
      */
     @Column(name = "address")
     private String address;
@@ -64,7 +66,8 @@ public class User extends IdEntity {
     private List<MenuItem> menuItems;
 
     /**
-     * Конструктор пользователя
+     * Конструктор пользователя.
+     * При создании пользователя с ролью RESTAURANT обязательно наличие адреса.
      *
      * @param email   электронная почта пользователя
      * @param name    имя пользователя
@@ -73,6 +76,12 @@ public class User extends IdEntity {
      * @param address адрес пользователя
      */
     public User(String email, String name, String phone, Role role, String address) {
+        if (role == Role.RESTAURANT && address == null) {
+            throw new IllegalArgumentException(
+                    "Ошибка при создании пользователя: для роли RESTAURANT адрес обязателен"
+            );
+        }
+
         this.email = email;
         this.name = name;
         this.phone = phone;
