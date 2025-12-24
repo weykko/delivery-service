@@ -41,12 +41,14 @@ class CourierOrderControllerTest {
     @InjectMocks
     private CourierOrderController courierOrderController;
 
+    private final Order testOrder = createTestOrder();
+    private final User testCourier = createTestCourier();
+
     /**
      * Тестирование получения доступных заказов для курьера
      */
     @Test
     void getAvailableOrders_ShouldReturnPagedOrders() {
-        Order testOrder = createTestOrder();
         int page = 0;
         int size = 10;
 
@@ -77,9 +79,6 @@ class CourierOrderControllerTest {
      */
     @Test
     void getActiveOrders_ShouldReturnListOfOrders() {
-        User testCourier = createTestCourier();
-        Order testOrder = createTestOrder();
-
         OrderCourierResponseDto responseDto = createOrderCourierResponseDto(testOrder);
 
         Mockito.when(courierOrderService.getActiveOrders(testCourier)).thenReturn(List.of(testOrder));

@@ -35,6 +35,7 @@ class CourierOrderServiceTest {
     private CourierOrderService courierOrderService;
 
     private final User testCourier = createTestCourier();
+    private final User differentTestCourier = createDifferentCourier();
     private final Order testOrder = createTestOrder();
 
     /**
@@ -78,17 +79,16 @@ class CourierOrderServiceTest {
     @Test
     void acceptOrder_WithValidOrder_ShouldAssignCourier() {
         Long orderId = 1L;
-        Order order = createTestOrder();
-        order.setCourier(null);
+        testOrder.setCourier(null);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(order));
-        Mockito.when(orderService.save(order)).thenReturn(order);
+        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(testOrder));
+        Mockito.when(orderService.save(testOrder)).thenReturn(testOrder);
 
         courierOrderService.acceptOrder(orderId, testCourier);
 
-        Assertions.assertEquals(testCourier, order.getCourier());
+        Assertions.assertEquals(testCourier, testOrder.getCourier());
         Mockito.verify(orderService).getById(orderId);
-        Mockito.verify(orderService).save(order);
+        Mockito.verify(orderService).save(testOrder);
     }
 
     /**
@@ -97,10 +97,9 @@ class CourierOrderServiceTest {
     @Test
     void acceptOrder_WithAlreadyAcceptedOrder_ShouldThrowException() {
         Long orderId = 1L;
-        Order order = createTestOrder();
-        order.setCourier(testCourier);
+        testOrder.setCourier(testCourier);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(order));
+        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(testOrder));
 
         InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
                 () -> courierOrderService.acceptOrder(orderId, testCourier));
@@ -116,18 +115,17 @@ class CourierOrderServiceTest {
     @Test
     void pickUpOrder_WithPreparedStatus_ShouldChangeToDelivering() {
         Long orderId = 1L;
-        Order order = createTestOrder();
-        order.setCourier(testCourier);
-        order.setStatus(OrderStatus.PREPARED);
+        testOrder.setCourier(testCourier);
+        testOrder.setStatus(OrderStatus.PREPARED);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(order));
-        Mockito.when(orderService.save(order)).thenReturn(order);
+        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(testOrder));
+        Mockito.when(orderService.save(testOrder)).thenReturn(testOrder);
 
         courierOrderService.pickUpOrder(orderId, testCourier);
 
-        Assertions.assertEquals(OrderStatus.DELIVERING, order.getStatus());
+        Assertions.assertEquals(OrderStatus.DELIVERING, testOrder.getStatus());
         Mockito.verify(orderService).getById(orderId);
-        Mockito.verify(orderService).save(order);
+        Mockito.verify(orderService).save(testOrder);
     }
 
     /**
@@ -136,15 +134,13 @@ class CourierOrderServiceTest {
     @Test
     void pickUpOrder_WithDifferentCourier_ShouldThrowException() {
         Long orderId = 1L;
-        Order order = createTestOrder();
-        order.setCourier(testCourier);
-        order.setStatus(OrderStatus.PREPARED);
-        User differentCourier = createDifferentCourier();
+        testOrder.setCourier(testCourier);
+        testOrder.setStatus(OrderStatus.PREPARED);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(order));
+        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(testOrder));
 
         PermissionCheckFailedException exception = Assertions.assertThrows(PermissionCheckFailedException.class,
-                () -> courierOrderService.pickUpOrder(orderId, differentCourier));
+                () -> courierOrderService.pickUpOrder(orderId, differentTestCourier));
 
         Assertions.assertEquals("Заказ с id '1' не принадлежит вам", exception.getMessage());
         Mockito.verify(orderService).getById(orderId);
@@ -157,11 +153,10 @@ class CourierOrderServiceTest {
     @Test
     void pickUpOrder_WithDeliveringStatus_ShouldThrowException() {
         Long orderId = 1L;
-        Order order = createTestOrder();
-        order.setCourier(testCourier);
-        order.setStatus(OrderStatus.DELIVERING);
+        testOrder.setCourier(testCourier);
+        testOrder.setStatus(OrderStatus.DELIVERING);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(order));
+        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(testOrder));
 
         InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
                 () -> courierOrderService.pickUpOrder(orderId, testCourier));
@@ -177,11 +172,10 @@ class CourierOrderServiceTest {
     @Test
     void pickUpOrder_WithCompletedStatus_ShouldThrowException() {
         Long orderId = 1L;
-        Order order = createTestOrder();
-        order.setCourier(testCourier);
-        order.setStatus(OrderStatus.COMPLETED);
+        testOrder.setCourier(testCourier);
+        testOrder.setStatus(OrderStatus.COMPLETED);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(order));
+        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(testOrder));
 
         InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
                 () -> courierOrderService.pickUpOrder(orderId, testCourier));
@@ -197,11 +191,10 @@ class CourierOrderServiceTest {
     @Test
     void pickUpOrder_WithCreatedStatus_ShouldThrowException() {
         Long orderId = 1L;
-        Order order = createTestOrder();
-        order.setCourier(testCourier);
-        order.setStatus(OrderStatus.CREATED);
+        testOrder.setCourier(testCourier);
+        testOrder.setStatus(OrderStatus.CREATED);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(order));
+        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(testOrder));
 
         InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
                 () -> courierOrderService.pickUpOrder(orderId, testCourier));
@@ -217,18 +210,17 @@ class CourierOrderServiceTest {
     @Test
     void deliverOrder_WithDeliveringStatus_ShouldChangeToCompleted() {
         Long orderId = 1L;
-        Order order = createTestOrder();
-        order.setCourier(testCourier);
-        order.setStatus(OrderStatus.DELIVERING);
+        testOrder.setCourier(testCourier);
+        testOrder.setStatus(OrderStatus.DELIVERING);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(order));
-        Mockito.when(orderService.save(order)).thenReturn(order);
+        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(testOrder));
+        Mockito.when(orderService.save(testOrder)).thenReturn(testOrder);
 
         courierOrderService.deliverOrder(orderId, testCourier);
 
-        Assertions.assertEquals(OrderStatus.COMPLETED, order.getStatus());
+        Assertions.assertEquals(OrderStatus.COMPLETED, testOrder.getStatus());
         Mockito.verify(orderService).getById(orderId);
-        Mockito.verify(orderService).save(order);
+        Mockito.verify(orderService).save(testOrder);
     }
 
     /**
@@ -237,15 +229,13 @@ class CourierOrderServiceTest {
     @Test
     void deliverOrder_WithDifferentCourier_ShouldThrowException() {
         Long orderId = 1L;
-        Order order = createTestOrder();
-        order.setCourier(testCourier);
-        order.setStatus(OrderStatus.DELIVERING);
-        User differentCourier = createDifferentCourier();
+        testOrder.setCourier(testCourier);
+        testOrder.setStatus(OrderStatus.DELIVERING);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(order));
+        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(testOrder));
 
         PermissionCheckFailedException exception = Assertions.assertThrows(PermissionCheckFailedException.class,
-                () -> courierOrderService.deliverOrder(orderId, differentCourier));
+                () -> courierOrderService.deliverOrder(orderId, differentTestCourier));
 
         Assertions.assertEquals("Заказ с id '1' не принадлежит вам", exception.getMessage());
         Mockito.verify(orderService).getById(orderId);
@@ -258,11 +248,10 @@ class CourierOrderServiceTest {
     @Test
     void deliverOrder_WithCompletedStatus_ShouldThrowException() {
         Long orderId = 1L;
-        Order order = createTestOrder();
-        order.setCourier(testCourier);
-        order.setStatus(OrderStatus.COMPLETED);
+        testOrder.setCourier(testCourier);
+        testOrder.setStatus(OrderStatus.COMPLETED);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(order));
+        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(testOrder));
 
         InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
                 () -> courierOrderService.deliverOrder(orderId, testCourier));

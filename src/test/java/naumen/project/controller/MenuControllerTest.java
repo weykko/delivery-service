@@ -42,14 +42,15 @@ class MenuControllerTest {
     @InjectMocks
     private MenuController menuController;
 
+    private final User testRestaurant = createRestaurantUser(1L);
+    private final MenuItem testMenuItem = createMenuItem(testRestaurant);
+
     /**
      * Тестирование получения списка позиций меню с фильтрацией по ресторану и названию
      */
     @Test
     void getMenuItemsWithFiltersShouldReturnPagedResults() {
-        User restaurantUser = createRestaurantUser(1L);
-        MenuItem menuItem = createMenuItem(restaurantUser);
-        MenuItemResponseDto menuItemResponse = createMenuItemResponse(menuItem);
+        MenuItemResponseDto menuItemResponse = createMenuItemResponse(testMenuItem);
 
         Long restaurantId = 1L;
         String title = "Пицца";
@@ -57,7 +58,7 @@ class MenuControllerTest {
         int size = 10;
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<MenuItem> menuItemPage = new PageImpl<>(List.of(menuItem), pageable, 1);
+        Page<MenuItem> menuItemPage = new PageImpl<>(List.of(testMenuItem), pageable, 1);
         PagedResponseDto<MenuItemResponseDto> expectedPagedResponse = new PagedResponseDto<>(
                 List.of(menuItemResponse),
                 page,
@@ -67,7 +68,7 @@ class MenuControllerTest {
         );
 
         Mockito.when(menuService.getMenuItems(restaurantId, title, pageable)).thenReturn(menuItemPage);
-        Mockito.when(menuMapper.toResponse(menuItem)).thenReturn(menuItemResponse);
+        Mockito.when(menuMapper.toResponse(testMenuItem)).thenReturn(menuItemResponse);
         Mockito.when(pageMapper.toMenuResponse(Mockito.any())).thenReturn(expectedPagedResponse);
 
         PagedResponseDto<MenuItemResponseDto> result = menuController.getMenuItems(restaurantId, title, page, size);
@@ -84,15 +85,13 @@ class MenuControllerTest {
      */
     @Test
     void getMenuItemsWithoutFiltersShouldReturnAllResults() {
-        User restaurantUser = createRestaurantUser(2L);
-        MenuItem menuItem = createMenuItem(restaurantUser);
-        MenuItemResponseDto menuItemResponse = createMenuItemResponse(menuItem);
+        MenuItemResponseDto menuItemResponse = createMenuItemResponse(testMenuItem);
 
         int page = 0;
         int size = 10;
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<MenuItem> menuItemPage = new PageImpl<>(List.of(menuItem), pageable, 1);
+        Page<MenuItem> menuItemPage = new PageImpl<>(List.of(testMenuItem), pageable, 1);
         PagedResponseDto<MenuItemResponseDto> expectedPagedResponse = new PagedResponseDto<>(
                 List.of(menuItemResponse),
                 page,
@@ -102,7 +101,7 @@ class MenuControllerTest {
         );
 
         Mockito.when(menuService.getMenuItems(null, null, pageable)).thenReturn(menuItemPage);
-        Mockito.when(menuMapper.toResponse(menuItem)).thenReturn(menuItemResponse);
+        Mockito.when(menuMapper.toResponse(testMenuItem)).thenReturn(menuItemResponse);
         Mockito.when(pageMapper.toMenuResponse(Mockito.any())).thenReturn(expectedPagedResponse);
 
         PagedResponseDto<MenuItemResponseDto> result = menuController.getMenuItems(null, null, page, size);
@@ -117,13 +116,11 @@ class MenuControllerTest {
      */
     @Test
     void getMenuItemWithValidIdShouldReturnMenuItem() {
-        User restaurantUser = createRestaurantUser(3L);
-        MenuItem menuItem = createMenuItem(restaurantUser);
-        MenuItemResponseDto menuItemResponse = createMenuItemResponse(menuItem);
+        MenuItemResponseDto menuItemResponse = createMenuItemResponse(testMenuItem);
         Long menuId = 1L;
 
-        Mockito.when(menuService.getMenuItemById(menuId)).thenReturn(Optional.of(menuItem));
-        Mockito.when(menuMapper.toResponse(menuItem)).thenReturn(menuItemResponse);
+        Mockito.when(menuService.getMenuItemById(menuId)).thenReturn(Optional.of(testMenuItem));
+        Mockito.when(menuMapper.toResponse(testMenuItem)).thenReturn(menuItemResponse);
 
         MenuItemResponseDto result = menuController.getMenuItem(menuId);
 
@@ -132,7 +129,7 @@ class MenuControllerTest {
         Assertions.assertEquals(menuItemResponse.title(), result.title());
         Assertions.assertEquals(menuItemResponse.price(), result.price());
         Mockito.verify(menuService).getMenuItemById(menuId);
-        Mockito.verify(menuMapper).toResponse(menuItem);
+        Mockito.verify(menuMapper).toResponse(testMenuItem);
     }
 
     // Вспомогательные методы для создания тестовых данных
@@ -153,9 +150,8 @@ class MenuControllerTest {
      * Создает тестовый пункт меню
      */
     private MenuItem createMenuItem(User restaurant) {
-        MenuItem item = new MenuItem("Pizza", "description", new BigDecimal(450), createRestaurantUser(1L));
+        MenuItem item = new MenuItem("Pizza", "description", new BigDecimal(450), restaurant);
         item.setId(1L);
-        item.setRestaurant(restaurant);
         return item;
     }
 
