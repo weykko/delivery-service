@@ -38,12 +38,13 @@ public class AuthServiceTest {
     @InjectMocks
     private AuthService authService;
 
+    private final User testUser = createTestUser(1L);
+
     /**
      * Тестирование успешной регистрации пользователя с валидными данными
      */
     @Test
     public void registerWithValidDataShouldReturnSuccessResponse() {
-        User testUser = createTestUser(null);
         String password = "strongPassword";
         String encodedPassword = "encodedPassword";
 
@@ -67,7 +68,6 @@ public class AuthServiceTest {
      */
     @Test
     public void registerWithExistingEmailShouldThrowWebException() {
-        User testUser = createTestUser(null);
         String password = "strongPassword";
 
         Mockito.doThrow(new InvalidInputException("Email уже занят"))
@@ -83,7 +83,6 @@ public class AuthServiceTest {
      */
     @Test
     public void registerWithExistingPhoneShouldThrowWebException() {
-        User testUser = createTestUser(null);
         String password = "strongPassword";
 
         Mockito.doThrow(new InvalidInputException("Телефон уже занят"))
@@ -100,7 +99,6 @@ public class AuthServiceTest {
      */
     @Test
     public void loginWithValidCredentialsShouldReturnTokens() {
-        User testUser = createTestUser(1L);
         String password = "strongPassword";
         String aToken = "access-token";
         String rToken = "refresh-token";
@@ -128,7 +126,6 @@ public class AuthServiceTest {
      */
     @Test
     public void loginWithInvalidCredentialsShouldThrowBadCredentialsException() {
-        User testUser = createTestUser(1L);
         String password = "wrongPassword";
 
         Mockito.when(authenticationManager

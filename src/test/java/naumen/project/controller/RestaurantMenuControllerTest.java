@@ -35,26 +35,28 @@ class RestaurantMenuControllerTest {
     @InjectMocks
     private RestaurantMenuController restaurantMenuController;
 
+    private final User testRestaurant = createRestaurantUser(1L);
+
     /**
      * Тестирование успешного создания новой позиции меню с валидными данными
      */
     @Test
     void createMenuItemWithValidRequestShouldReturnCreatedMenuItem() {
-        User restaurantUser = createRestaurantUser(1L);
         CreateMenuItemRequestDto createRequest = new CreateMenuItemRequestDto(
                 "Новая пицца",
                 "Описание новой пиццы",
                 new BigDecimal("500.00")
         );
 
-        MenuItem savedMenuItem = createMenuItem(1L, createRequest.title(), createRequest.description(), createRequest.price(), restaurantUser);
+        MenuItem savedMenuItem = createMenuItem(1L, createRequest.title(), createRequest.description(),
+                createRequest.price(), testRestaurant);
 
         MenuItemResponseDto expectedResponse = new MenuItemResponseDto(
                 1L,
                 createRequest.title(),
                 createRequest.description(),
                 createRequest.price(),
-                restaurantUser.getId()
+                testRestaurant.getId()
         );
 
         ArgumentCaptor<MenuItem> menuItemCaptor = ArgumentCaptor.forClass(MenuItem.class);
@@ -63,7 +65,7 @@ class RestaurantMenuControllerTest {
                 .thenReturn(savedMenuItem);
         Mockito.when(menuMapper.toResponse(savedMenuItem)).thenReturn(expectedResponse);
 
-        MenuItemResponseDto result = restaurantMenuController.createMenuItem(createRequest, restaurantUser);
+        MenuItemResponseDto result = restaurantMenuController.createMenuItem(createRequest, testRestaurant);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(expectedResponse.id(), result.id());
@@ -85,7 +87,6 @@ class RestaurantMenuControllerTest {
      */
     @Test
     void updateMenuItemWithValidRequestShouldReturnUpdatedMenuItem() {
-        User restaurantUser = createRestaurantUser(2L);
         Long menuItemId = 1L;
         UpdateMenuItemRequestDto updateRequest = new UpdateMenuItemRequestDto(
                 "Обновленная пицца",
@@ -94,28 +95,28 @@ class RestaurantMenuControllerTest {
         );
 
         MenuItem existingMenuItem = createMenuItem(menuItemId, "Старая пицца", "Старое описание",
-                new BigDecimal("450.00"), restaurantUser);
+                new BigDecimal("450.00"), testRestaurant);
 
         MenuItemResponseDto expectedResponse = new MenuItemResponseDto(
                 menuItemId,
                 updateRequest.title(),
                 updateRequest.description(),
                 updateRequest.price(),
-                restaurantUser.getId()
+                testRestaurant.getId()
         );
 
         Mockito.when(menuService.getMenuItemById(menuItemId)).thenReturn(Optional.of(existingMenuItem));
-        Mockito.when(menuService.updateMenuItem(existingMenuItem, restaurantUser)).thenReturn(existingMenuItem);
+        Mockito.when(menuService.updateMenuItem(existingMenuItem, testRestaurant)).thenReturn(existingMenuItem);
         Mockito.when(menuMapper.toResponse(existingMenuItem)).thenReturn(expectedResponse);
 
-        MenuItemResponseDto result = restaurantMenuController.updateMenuItem(menuItemId, updateRequest, restaurantUser);
+        MenuItemResponseDto result = restaurantMenuController.updateMenuItem(menuItemId, updateRequest, testRestaurant);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(expectedResponse.id(), result.id());
         Assertions.assertEquals(expectedResponse.title(), result.title());
         Assertions.assertEquals(expectedResponse.description(), result.description());
         Assertions.assertEquals(expectedResponse.price(), result.price());
-        Mockito.verify(menuService).updateMenuItem(existingMenuItem, restaurantUser);
+        Mockito.verify(menuService).updateMenuItem(existingMenuItem, testRestaurant);
         Mockito.verify(menuMapper).toResponse(existingMenuItem);
     }
 

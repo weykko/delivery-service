@@ -29,12 +29,13 @@ class UserControllerTest {
     @InjectMocks
     private UserController userController;
 
+    private final User testUser = createTestUser(1L);
+
     /**
      * Тестирование получения информации о текущем аутентифицированном пользователе
      */
     @Test
     void getMyUserWithAuthenticatedUserShouldReturnUserResponse() {
-        User testUser = createTestUser(1L);
         UserResponseDto expectedResponse = new UserResponseDto(
                 testUser.getId(),
                 testUser.getEmail(),
@@ -62,7 +63,6 @@ class UserControllerTest {
      */
     @Test
     void updateUserWithValidRequestShouldReturnUpdatedUser() {
-        User testUser = createTestUser(2L);
         UpdateUserRequestDto updateRequest = new UpdateUserRequestDto("Updated Name", "+79997654321",
                 "Пушкина 17");
 

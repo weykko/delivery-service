@@ -36,7 +36,7 @@ class OrderServiceTest {
     private final User testClient = createTestClient();
     private final User testRestaurant = createTestRestaurant();
     private final User testCourier = createTestCourier();
-    private final Order testOrder = createTestOrder();
+    private final Order testOrder = createTestOrder(testClient);
 
     /**
      * Тестирование успешного получения заказа по идентификатору
@@ -190,14 +190,14 @@ class OrderServiceTest {
     /**
      * Создает тестовый заказ
      */
-    private Order createTestOrder() {
+    private Order createTestOrder(User client) {
         Order order = new Order(
                 "Ул Пушкина",
                 OrderStatus.CREATED,
                 List.of(),
                 new BigDecimal("500.00"),
                 null,
-                createTestClient()
+                client
         );
         order.setId(1L);
         return order;

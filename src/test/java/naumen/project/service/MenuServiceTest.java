@@ -35,6 +35,7 @@ class MenuServiceTest {
     private MenuService menuService;
 
     private final User testRestaurant = createTestRestaurantUser(1L);
+    private final User differentTestUser = createTestRestaurantUser(2L);
     private final MenuItem testMenuItem = createTestMenuItem(testRestaurant);
 
     /**
@@ -109,10 +110,8 @@ class MenuServiceTest {
      */
     @Test
     void updateMenuItemWithDifferentOwnerShouldThrowForbiddenException() {
-        User differentUser = createTestRestaurantUser(2L);
-
         PermissionCheckFailedException exception = Assertions.assertThrows(PermissionCheckFailedException.class,
-                () -> menuService.updateMenuItem(testMenuItem, differentUser));
+                () -> menuService.updateMenuItem(testMenuItem, differentTestUser));
 
         Assertions.assertEquals("Позиция меню с id '1' не принадлежит вашему ресторану",
                 exception.getMessage());
@@ -155,13 +154,10 @@ class MenuServiceTest {
      */
     @Test
     void deleteMenuItemWithDifferentOwnerShouldThrowForbiddenException() {
-        User differentUser = createTestRestaurantUser(2L);
-        MenuItem menuItem = createTestMenuItem(testRestaurant);
-
-        Mockito.when(menuRepository.findById(testMenuItem.getId())).thenReturn(Optional.of(menuItem));
+        Mockito.when(menuRepository.findById(testMenuItem.getId())).thenReturn(Optional.of(testMenuItem));
 
         PermissionCheckFailedException exception = Assertions.assertThrows(PermissionCheckFailedException.class,
-                () -> menuService.deleteMenuItem(testMenuItem.getId(), differentUser));
+                () -> menuService.deleteMenuItem(testMenuItem.getId(), differentTestUser));
 
         Assertions.assertEquals("Позиция меню с id '1' не принадлежит вашему ресторану",
                 exception.getMessage());

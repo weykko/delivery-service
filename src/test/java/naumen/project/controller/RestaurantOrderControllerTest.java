@@ -43,13 +43,14 @@ class RestaurantOrderControllerTest {
     @InjectMocks
     private RestaurantOrderController restaurantOrderController;
 
+    private final User testRestaurant = createTestRestaurant();
+    private final Order testOrder = createTestOrder();
+
     /**
      * Тестирование получения активных заказов ресторана
      */
     @Test
     void getActiveOrders_ShouldReturnPagedOrders() {
-        Order testOrder = createTestOrder();
-        User testRestaurant = createTestRestaurant();
         int page = 0;
         int size = 10;
 
@@ -80,8 +81,6 @@ class RestaurantOrderControllerTest {
      */
     @Test
     void getOrder_ShouldReturnOrderInfo() {
-        Order testOrder = createTestOrder();
-        User testRestaurant = createTestRestaurant();
         Long orderId = 1L;
         OrderRestaurantResponseDto responseDto = createOrderRestaurantResponseDto(testOrder);
 

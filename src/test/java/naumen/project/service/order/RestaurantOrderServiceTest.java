@@ -35,7 +35,7 @@ class RestaurantOrderServiceTest {
     private RestaurantOrderService restaurantOrderService;
 
     private final User testRestaurant = createTestRestaurant();
-    private final Order testOrder = createTestOrder();
+    private final Order testOrder = createTestOrder(testRestaurant);
     private final Long orderId = 1L;
 
     /**
@@ -294,13 +294,13 @@ class RestaurantOrderServiceTest {
     /**
      * Создает тестовый заказ
      */
-    private Order createTestOrder() {
+    private Order createTestOrder(User restaurant) {
         Order order = new Order(
                 "Ул Пушкина",
                 OrderStatus.CREATED,
                 List.of(),
                 new BigDecimal("500.00"),
-                createTestRestaurant(),
+                restaurant,
                 null
         );
         order.setId(1L);

@@ -38,7 +38,8 @@ class ClientOrderServiceTest {
 
     private final User testClient = createTestClient();
     private final User testRestaurant = createTestRestaurant();
-    private final Order testOrder = createTestOrder();
+    private final Order testOrder = createTestOrder(testRestaurant, testClient);
+    private final OrderItem testOrderItem = createOrderItem(testRestaurant);
 
     /**
      * Тестирование успешного оформления заказа клиентом
@@ -46,7 +47,7 @@ class ClientOrderServiceTest {
     @Test
     void createOrder_WithValidItems_ShouldCreateOrder() {
         Long restaurantId = testRestaurant.getId();
-        List<OrderItem> orderItems = List.of(createOrderItem());
+        List<OrderItem> orderItems = List.of(testOrderItem);
         String deliveryAddress = "Ул Пушкина";
 
         Mockito.when(userService.getById(restaurantId)).thenReturn(Optional.of(testRestaurant));
@@ -71,7 +72,7 @@ class ClientOrderServiceTest {
     void createOrder_WithItemsFromDifferentRestaurants_ShouldThrowException() {
         Long restaurantId = 1L;
 
-        List<OrderItem> orderItems = List.of(createOrderItem());
+        List<OrderItem> orderItems = List.of(testOrderItem);
         String deliveryAddress = "Ул Пушкина";
 
         InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
@@ -138,11 +139,10 @@ class ClientOrderServiceTest {
     @Test
     void deleteOrder_WithAcceptedStatus_ShouldThrowException() {
         Long orderId = 1L;
-        Order order = createTestOrder();
-        order.setStatus(OrderStatus.ACCEPTED);
-        order.setCourier(null);
+        testOrder.setStatus(OrderStatus.ACCEPTED);
+        testOrder.setCourier(null);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(order));
+        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(testOrder));
 
         InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
                 () -> clientOrderService.deleteOrder(orderId, testClient));
@@ -159,9 +159,8 @@ class ClientOrderServiceTest {
     void deleteOrder_WithDifferentClient_ShouldThrowException() {
         Long orderId = 1L;
         User differentClient = createDifferentClient();
-        Order order = createTestOrder();
-        order.setStatus(OrderStatus.CREATED);
-        order.setCourier(null);
+        testOrder.setStatus(OrderStatus.CREATED);
+        testOrder.setCourier(null);
 
         Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(testOrder));
 
@@ -223,26 +222,25 @@ class ClientOrderServiceTest {
     /**
      * Создание позиции заказа
      */
-    private OrderItem createOrderItem() {
+    private OrderItem createOrderItem(User restaurant) {
         return new OrderItem(
-                new MenuItem("Пицца", null, new BigDecimal("250.00"), createTestRestaurant()),
+                new MenuItem("Пицца", null, new BigDecimal("250.00"), restaurant),
                 new BigDecimal("250.00"),
                 1
         );
     }
 
-
     /**
      * Создает тестовый заказ
      */
-    private Order createTestOrder() {
+    private Order createTestOrder(User restaurant, User client) {
         Order order = new Order(
                 "Ул Пушкина",
                 OrderStatus.CREATED,
                 List.of(),
                 new BigDecimal("500.00"),
-                createTestRestaurant(),
-                createTestClient()
+                restaurant,
+                client
         );
         order.setId(1L);
         return order;
