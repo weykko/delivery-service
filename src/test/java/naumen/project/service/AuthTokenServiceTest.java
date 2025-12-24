@@ -45,6 +45,9 @@ class AuthTokenServiceTest {
     @InjectMocks
     private AuthTokenService authTokenService;
 
+    private final User testUser = createTestUser(1L);
+    private final AuthToken testRefreshToken = createRefreshToken("valid-refresh-token", testUser);
+
     /**
      * Тестирование проверки допустимости токена
      */
@@ -82,7 +85,6 @@ class AuthTokenServiceTest {
      */
     @Test
     void generateAndSaveWithValidUserShouldGenerateAndSaveTokens() {
-        User testUser = createTestUser(1L);
         String accessToken = "access-token";
         String refreshToken = "refresh-token";
 
@@ -113,27 +115,24 @@ class AuthTokenServiceTest {
      */
     @Test
     void refreshWithValidRefreshTokenShouldReturnNewTokens() {
-        User testUser = createTestUser(2L);
-        String refreshToken = "valid-refresh-token";
-        AuthToken authRefreshToken = createRefreshToken(refreshToken, testUser);
         TokenResponseDto newTokens = new TokenResponseDto("new-access", "new-refresh");
 
-        Mockito.when(jwtUtil.validateRefreshToken(refreshToken)).thenReturn(true);
-        Mockito.when(authTokenRepository.existsByTokenAndType(refreshToken, TokenType.REFRESH))
+        Mockito.when(jwtUtil.validateRefreshToken(testRefreshToken.getToken())).thenReturn(true);
+        Mockito.when(authTokenRepository.existsByTokenAndType(testRefreshToken.getToken(), TokenType.REFRESH))
                 .thenReturn(true);
-        Mockito.when(authTokenRepository.findByTokenAndType(refreshToken, TokenType.REFRESH))
-                .thenReturn(Optional.of(authRefreshToken));
+        Mockito.when(authTokenRepository.findByTokenAndType(testRefreshToken.getToken(), TokenType.REFRESH))
+                .thenReturn(Optional.of(testRefreshToken));
 
         AuthTokenService spyService = Mockito.spy(authTokenService);
         Mockito.doReturn(newTokens).when(spyService).generateAndSave(testUser);
 
-        TokenResponseDto result = spyService.refresh(refreshToken);
+        TokenResponseDto result = spyService.refresh(testRefreshToken.getToken());
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(newTokens, result);
-        Mockito.verify(jwtUtil).validateRefreshToken(refreshToken);
-        Mockito.verify(authTokenRepository).existsByTokenAndType(refreshToken, TokenType.REFRESH);
-        Mockito.verify(authTokenRepository).findByTokenAndType(refreshToken, TokenType.REFRESH);
+        Mockito.verify(jwtUtil).validateRefreshToken(testRefreshToken.getToken());
+        Mockito.verify(authTokenRepository).existsByTokenAndType(testRefreshToken.getToken(), TokenType.REFRESH);
+        Mockito.verify(authTokenRepository).findByTokenAndType(testRefreshToken.getToken(), TokenType.REFRESH);
         Mockito.verify(spyService).generateAndSave(testUser);
     }
 
@@ -199,7 +198,8 @@ class AuthTokenServiceTest {
      * Создание тестового пользователя
      */
     private User createTestUser(Long id) {
-        User user = new User("test@example.com", "Test User", "+79991234567", Role.USER);
+        User user = new User("test@example.com", "Test User",
+                "+79991234567", Role.CLIENT, "Пушкина 17");
         if (id != null) {
             user.setId(id);
         }

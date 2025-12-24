@@ -110,9 +110,10 @@ class AuthControllerTest {
         return new RegisterRequestDto(
                 "test@example.com",
                 "password123",
-                Role.USER,
+                Role.CLIENT,
                 "Test User",
-                "+79991234567"
+                "+79991234567",
+                "Ул Пушкина"
         );
     }
 
@@ -124,7 +125,8 @@ class AuthControllerTest {
                 request.email(),
                 request.name(),
                 request.phone(),
-                request.role()
+                request.role(),
+                "Пушкина 17"
         );
 
         user.setId(1L);
@@ -139,8 +141,8 @@ class AuthControllerTest {
         return new RegisterResponseDto(
                 testUser.getId(),
                 testUser.getEmail(),
-                testUser.getName(),
-                testUser.getRole()
+                testUser.getRole(),
+                testUser.getName()
         );
     }
 

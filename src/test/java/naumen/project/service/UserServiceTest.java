@@ -26,15 +26,16 @@ public class UserServiceTest {
     @InjectMocks
     private UserService userService;
 
+    private final User testUser = createTestUser(1L, "test@example.com", "Test User", "+79991234567");
+
     /**
      * Тестирование успешного обновления информации пользователя с тем же номером телефона
      */
     @Test
     void updateInfoWithSamePhoneShouldUpdateUser() {
-        User existingUser = createTestUser(1L, "test@example.com", "Test User", "+79991234567");
-        User userToUpdate = createTestUser(1L, "test@example.com", "Updated Name", "+79991234567");
+        User userToUpdate = createTestUser(1L, "test@example.com", "Updated Name", testUser.getPhone());
 
-        Mockito.when(userRepository.findByPhone("+79991234567")).thenReturn(Optional.of(existingUser));
+        Mockito.when(userRepository.findByPhone(testUser.getPhone())).thenReturn(Optional.of(testUser));
         Mockito.when(userRepository.save(userToUpdate)).thenReturn(userToUpdate);
 
         User result = userService.updateInfo(userToUpdate);
@@ -51,17 +52,17 @@ public class UserServiceTest {
     @Test
     void updateInfoWithNewUniquePhoneShouldUpdateUser() {
         String newPhone = "+79997654321";
-        User userToUpdate = createTestUser(1L, "test@example.com", "Updated Name", newPhone);
+        testUser.setPhone(newPhone);
 
         Mockito.when(userRepository.findByPhone(newPhone)).thenReturn(Optional.empty());
-        Mockito.when(userRepository.save(userToUpdate)).thenReturn(userToUpdate);
+        Mockito.when(userRepository.save(testUser)).thenReturn(testUser);
 
-        User result = userService.updateInfo(userToUpdate);
+        User result = userService.updateInfo(testUser);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(newPhone, result.getPhone());
         Mockito.verify(userRepository).findByPhone(newPhone);
-        Mockito.verify(userRepository).save(userToUpdate);
+        Mockito.verify(userRepository).save(testUser);
     }
 
     /**
@@ -69,11 +70,10 @@ public class UserServiceTest {
      */
     @Test
     void updateInfoWithExistingPhoneShouldThrowException() {
-        String existingPhone = "+79998887766";
+        String existingPhone = testUser.getPhone();
         User userToUpdate = createTestUser(2L, "another@example.com", "Updated Name", existingPhone);
-        User existingUser = createTestUser(3L, "existing@example.com", "Existing User", existingPhone);
 
-        Mockito.when(userRepository.findByPhone(existingPhone)).thenReturn(Optional.of(existingUser));
+        Mockito.when(userRepository.findByPhone(existingPhone)).thenReturn(Optional.of(testUser));
 
         InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
                 () -> userService.updateInfo(userToUpdate));
@@ -89,7 +89,7 @@ public class UserServiceTest {
      * Создает тестового пользователя
      */
     private User createTestUser(Long id, String email, String name, String phone) {
-        User user = new User(email, name, phone, Role.USER);
+        User user = new User(email, name, phone, Role.CLIENT, "Пушкина 17");
         if (id != null) {
             user.setId(id);
         }

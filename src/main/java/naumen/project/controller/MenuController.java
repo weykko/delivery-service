@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Size;
 import naumen.project.dto.menu.MenuItemResponseDto;
 import naumen.project.dto.paged.PagedResponseDto;
 import naumen.project.entity.MenuItem;
+import naumen.project.exception.InvalidInputException;
 import naumen.project.mapper.MenuMapper;
 import naumen.project.mapper.PageMapper;
 import naumen.project.service.MenuService;
@@ -62,7 +63,7 @@ public class MenuController {
                 .getMenuItems(restaurantId, title, PageRequest.of(page, size))
                 .map(menuMapper::toResponse);
 
-        return pageMapper.toResponse(menuPages);
+        return pageMapper.toMenuResponse(menuPages);
     }
 
     /**
@@ -75,7 +76,8 @@ public class MenuController {
     @ResponseStatus(HttpStatus.OK)
     @Transactional(readOnly = true)
     public MenuItemResponseDto getMenuItem(@PathVariable Long menuId) {
-        MenuItem menuItem = menuService.getMenuItemById(menuId);
+        MenuItem menuItem = menuService.getMenuItemById(menuId)
+                .orElseThrow(() -> new InvalidInputException("Позиция меню с id '%d' не найдена", menuId));
 
         return menuMapper.toResponse(menuItem);
     }

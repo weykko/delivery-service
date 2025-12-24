@@ -7,6 +7,7 @@ import naumen.project.dto.menu.MenuItemResponseDto;
 import naumen.project.dto.menu.UpdateMenuItemRequestDto;
 import naumen.project.entity.MenuItem;
 import naumen.project.entity.User;
+import naumen.project.exception.InvalidInputException;
 import naumen.project.mapper.MenuMapper;
 import naumen.project.service.MenuService;
 import org.springframework.http.HttpStatus;
@@ -24,13 +25,13 @@ import org.springframework.web.bind.annotation.*;
  */
 @SecurityRequirement(name = "JWT")
 @RestController
-@RequestMapping("/api/v1/restaurant")
-public class RestaurantController {
+@RequestMapping("/api/v1/restaurant/menu")
+public class RestaurantMenuController {
 
     private final MenuService menuService;
     private final MenuMapper menuMapper;
 
-    public RestaurantController(MenuService menuService, MenuMapper menuMapper) {
+    public RestaurantMenuController(MenuService menuService, MenuMapper menuMapper) {
         this.menuService = menuService;
         this.menuMapper = menuMapper;
     }
@@ -39,10 +40,10 @@ public class RestaurantController {
      * Создает новое блюдо в меню ресторана текущего пользователя.
      *
      * @param request данные для создания позиции меню
-     * @param user аутентифицированный пользователь с ролью RESTAURANT
+     * @param user    аутентифицированный ресторан
      * @return созданное блюдо с присвоенным идентификатором
      */
-    @PostMapping("/menu")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Transactional
     public MenuItemResponseDto createMenuItem(@RequestBody @Valid CreateMenuItemRequestDto request,
@@ -50,10 +51,11 @@ public class RestaurantController {
         MenuItem newItem = new MenuItem(
                 request.title(),
                 request.description(),
-                request.price()
+                request.price(),
+                user
         );
 
-        MenuItem menuItem = menuService.createMenuItem(newItem, user);
+        MenuItem menuItem = menuService.save(newItem);
 
         return menuMapper.toResponse(menuItem);
     }
@@ -61,22 +63,30 @@ public class RestaurantController {
     /**
      * Обновляет существующее блюдо в меню ресторана.
      *
-     * @param id идентификатор обновляемой позиции меню
+     * @param id      идентификатор обновляемой позиции меню
      * @param request данные для обновления позиции меню
-     * @param user аутентифицированный пользователь с ролью RESTAURANT
+     * @param user    аутентифицированный ресторан
      * @return обновленное блюдо
      */
-    @PutMapping("/menu/{id}")
+    @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @Transactional
     public MenuItemResponseDto updateMenuItem(@PathVariable Long id,
                                               @RequestBody @Valid UpdateMenuItemRequestDto request,
                                               @AuthenticationPrincipal User user) {
-        MenuItem menuItem = menuService.getMenuItemById(id);
+        MenuItem menuItem = menuService.getMenuItemById(id)
+                .orElseThrow(() -> new InvalidInputException(
+                        "Не получилось обновить меню, причина: Позиция меню с id '%d' не найдена", id));
 
-        menuItem.setTitle(request.title());
-        menuItem.setDescription(request.description());
-        menuItem.setPrice(request.price());
+        if (request.title() != null) {
+            menuItem.setTitle(request.title());
+        }
+        if (request.description() != null) {
+            menuItem.setDescription(request.description());
+        }
+        if (request.price() != null) {
+            menuItem.setPrice(request.price());
+        }
 
         menuService.updateMenuItem(menuItem, user);
 
@@ -86,10 +96,10 @@ public class RestaurantController {
     /**
      * Удаляет блюдо из меню ресторана.
      *
-     * @param id идентификатор удаляемой позиции меню
-     * @param user аутентифицированный пользователь с ролью RESTAURANT
+     * @param id   идентификатор удаляемой позиции меню
+     * @param user аутентифицированный ресторан
      */
-    @DeleteMapping("/menu/{id}")
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Transactional
     public void deleteMenuItem(@PathVariable Long id,

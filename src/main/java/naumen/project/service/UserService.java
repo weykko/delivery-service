@@ -74,4 +74,14 @@ public class UserService {
             throw new InvalidInputException("Телефон уже занят");
         }
     }
+
+    /**
+     * Получить пользователя по id
+     *
+     * @param id id пользователя
+     * @return пользователь
+     */
+    public Optional<User> getById(Long id) {
+        return userRepository.findById(id);
+    }
 }

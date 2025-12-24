@@ -51,7 +51,7 @@ public class UserController {
     /**
      * Обновляет информацию текущего пользователя.
      *
-     * @param user аутентифицированный пользователь
+     * @param user    аутентифицированный пользователь
      * @param request новые данные пользователя
      * @return обновленные данные пользователя
      */
@@ -61,8 +61,15 @@ public class UserController {
             @AuthenticationPrincipal User user,
             @RequestBody @Valid UpdateUserRequestDto request
     ) {
-        user.setName(request.name());
-        user.setPhone(request.phone());
+        if (request.name() != null) {
+            user.setName(request.name());
+        }
+        if (request.phone() != null) {
+            user.setPhone(request.phone());
+        }
+        if (request.address() != null) {
+            user.setAddress(request.address());
+        }
 
         User updatedUser = userService.updateInfo(user);
 

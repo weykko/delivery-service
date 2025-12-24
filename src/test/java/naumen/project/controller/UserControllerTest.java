@@ -29,18 +29,20 @@ class UserControllerTest {
     @InjectMocks
     private UserController userController;
 
+    private final User testUser = createTestUser(1L);
+
     /**
      * Тестирование получения информации о текущем аутентифицированном пользователе
      */
     @Test
     void getMyUserWithAuthenticatedUserShouldReturnUserResponse() {
-        User testUser = createTestUser(1L);
         UserResponseDto expectedResponse = new UserResponseDto(
                 testUser.getId(),
                 testUser.getEmail(),
+                testUser.getRole(),
                 testUser.getName(),
                 testUser.getPhone(),
-                testUser.getRole()
+                "Пушкина 17"
         );
 
         Mockito.when(userMapper.toResponse(testUser)).thenReturn(expectedResponse);
@@ -61,15 +63,16 @@ class UserControllerTest {
      */
     @Test
     void updateUserWithValidRequestShouldReturnUpdatedUser() {
-        User testUser = createTestUser(2L);
-        UpdateUserRequestDto updateRequest = new UpdateUserRequestDto("Updated Name", "+79997654321");
+        UpdateUserRequestDto updateRequest = new UpdateUserRequestDto("Updated Name", "+79997654321",
+                "Пушкина 17");
 
         UserResponseDto expectedResponse = new UserResponseDto(
                 testUser.getId(),
                 testUser.getEmail(),
+                testUser.getRole(),
                 updateRequest.name(),
                 updateRequest.phone(),
-                testUser.getRole()
+                "Пушкина 17"
         );
 
         Mockito.when(userService.updateInfo(testUser)).thenReturn(testUser);
@@ -90,7 +93,8 @@ class UserControllerTest {
      * Создает тестового пользователя
      */
     private User createTestUser(Long id) {
-        User user = new User("test@example.com", "Test User", "+79991234567", Role.USER);
+        User user = new User("test@example.com", "Test User",
+                "+79991234567", Role.CLIENT, "Пушкина 17");
         if (id != null) {
             user.setId(id);
         }
