@@ -45,10 +45,11 @@ public class MenuItem extends IdEntity {
      * @param description описание блюда
      * @param price       цена блюда
      */
-    public MenuItem(String title, String description, BigDecimal price) {
+    public MenuItem(String title, String description, BigDecimal price, User restaurant) {
         this.title = title;
         this.description = description;
         this.price = price;
+        this.restaurant = restaurant;
     }
 
     /**

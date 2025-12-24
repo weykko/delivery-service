@@ -1,9 +1,11 @@
 package naumen.project.service.order;
 
+import naumen.project.entity.MenuItem;
 import naumen.project.entity.Order;
 import naumen.project.entity.OrderItem;
 import naumen.project.entity.User;
 import naumen.project.entity.enums.OrderStatus;
+import naumen.project.entity.enums.Role;
 import naumen.project.exception.InvalidInputException;
 import naumen.project.exception.PermissionCheckFailedException;
 import naumen.project.service.UserService;
@@ -17,12 +19,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 /**
- * Модульные тесты для {@link OrderClientService}
+ * Модульные тесты для {@link ClientOrderService}
  */
 @ExtendWith(MockitoExtension.class)
-class OrderClientServiceTest extends OrderTestBase {
+class ClientOrderServiceTest {
 
     @Mock
     private OrderService orderService;
@@ -31,11 +34,12 @@ class OrderClientServiceTest extends OrderTestBase {
     private UserService userService;
 
     @InjectMocks
-    private OrderClientService orderClientService;
+    private ClientOrderService clientOrderService;
 
     private final User testClient = createTestClient();
     private final User testRestaurant = createTestRestaurant();
-    private final Order testOrder = createTestOrder();
+    private final Order testOrder = createTestOrder(testRestaurant, testClient);
+    private final OrderItem testOrderItem = createOrderItem(testRestaurant);
 
     /**
      * Тестирование успешного оформления заказа клиентом
@@ -43,13 +47,13 @@ class OrderClientServiceTest extends OrderTestBase {
     @Test
     void createOrderWithValidItemsShouldCreateOrder() {
         Long restaurantId = testRestaurant.getId();
-        List<OrderItem> orderItems = List.of(createOrderItem(testRestaurant));
+        List<OrderItem> orderItems = List.of(testOrderItem);
         String deliveryAddress = "Ул Пушкина";
 
-        Mockito.when(userService.getUserById(restaurantId)).thenReturn(testRestaurant);
+        Mockito.when(userService.getUserById(restaurantId)).thenReturn(Optional.of(testRestaurant));
         Mockito.when(orderService.save(Mockito.any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Order result = orderClientService.createOrder(restaurantId, orderItems, deliveryAddress, testClient);
+        Order result = clientOrderService.createOrder(restaurantId, orderItems, deliveryAddress, testClient);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(OrderStatus.CREATED, result.getStatus());
@@ -67,14 +71,14 @@ class OrderClientServiceTest extends OrderTestBase {
     @Test
     void createOrderWithItemsFromDifferentRestaurantsShouldThrowException() {
         Long restaurantId = 1L;
-        User differentRestaurant = createDifferentRestaurant();
-        List<OrderItem> orderItems = List.of(createOrderItem(differentRestaurant));
+
+        List<OrderItem> orderItems = List.of(testOrderItem);
         String deliveryAddress = "Ул Пушкина";
 
         InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
-                () -> orderClientService.createOrder(restaurantId, orderItems, deliveryAddress, testClient));
+                () -> clientOrderService.createOrder(restaurantId, orderItems, deliveryAddress, testClient));
 
-        Assertions.assertTrue(exception.getMessage().contains("Все позиции заказа должны принадлежать ресторану"));
+        Assertions.assertEquals("Все позиции заказа должны принадлежать ресторану с id '1'", exception.getMessage());
         Mockito.verify(userService, Mockito.never()).getUserById(Mockito.any());
         Mockito.verify(orderService, Mockito.never()).save(Mockito.any());
     }
@@ -88,7 +92,7 @@ class OrderClientServiceTest extends OrderTestBase {
 
         Mockito.when(orderService.getByClient(testClient)).thenReturn(orders);
 
-        List<Order> result = orderClientService.getOrders(testClient);
+        List<Order> result = clientOrderService.getOrders(testClient);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1, result.size());
@@ -103,9 +107,9 @@ class OrderClientServiceTest extends OrderTestBase {
     void getOrderWithValidClientAndOrderShouldReturnOrder() {
         Long orderId = 1L;
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(testOrder);
+        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(testOrder));
 
-        Order result = orderClientService.getOrder(orderId, testClient);
+        Order result = clientOrderService.getOrder(orderId, testClient);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(testOrder, result);
@@ -120,12 +124,12 @@ class OrderClientServiceTest extends OrderTestBase {
         Long orderId = 1L;
         User differentClient = createDifferentClient();
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(testOrder);
+        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(testOrder));
 
         PermissionCheckFailedException exception = Assertions.assertThrows(PermissionCheckFailedException.class,
-                () -> orderClientService.getOrder(orderId, differentClient));
+                () -> clientOrderService.getOrder(orderId, differentClient));
 
-        Assertions.assertTrue(exception.getMessage().contains("не принадлежит вам"));
+        Assertions.assertEquals("Заказ c id '1' не принадлежит вам", exception.getMessage());
         Mockito.verify(orderService).getById(orderId);
     }
 
@@ -134,18 +138,16 @@ class OrderClientServiceTest extends OrderTestBase {
      */
     @Test
     void deleteOrderWithAcceptedStatusShouldThrowException() {
-        Long orderId = 1L;
-        Order order = createTestOrder();
-        order.setStatus(OrderStatus.ACCEPTED);
-        order.setCourier(null);
+        testOrder.setStatus(OrderStatus.ACCEPTED);
+        testOrder.setCourier(null);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(order);
+        Mockito.when(orderService.getById(testOrder.getId())).thenReturn(Optional.of(testOrder));
 
         InvalidInputException exception = Assertions.assertThrows(InvalidInputException.class,
-                () -> orderClientService.deleteOrder(orderId, testClient));
+                () -> clientOrderService.deleteOrder(testOrder.getId(), testClient));
 
-        Assertions.assertTrue(exception.getMessage().contains("уже принят в работу"));
-        Mockito.verify(orderService).getById(orderId);
+        Assertions.assertEquals("Заказ с id '1' уже принят в работу", exception.getMessage());
+        Mockito.verify(orderService).getById(testOrder.getId());
         Mockito.verify(orderService, Mockito.never()).save(Mockito.any());
     }
 
@@ -156,17 +158,91 @@ class OrderClientServiceTest extends OrderTestBase {
     void deleteOrderWithDifferentClientShouldThrowException() {
         Long orderId = 1L;
         User differentClient = createDifferentClient();
-        Order order = createTestOrder();
-        order.setStatus(OrderStatus.CREATED);
-        order.setCourier(null);
+        testOrder.setStatus(OrderStatus.CREATED);
+        testOrder.setCourier(null);
 
-        Mockito.when(orderService.getById(orderId)).thenReturn(order);
+        Mockito.when(orderService.getById(orderId)).thenReturn(Optional.of(testOrder));
 
         PermissionCheckFailedException exception = Assertions.assertThrows(PermissionCheckFailedException.class,
-                () -> orderClientService.deleteOrder(orderId, differentClient));
+                () -> clientOrderService.deleteOrder(orderId, differentClient));
 
-        Assertions.assertTrue(exception.getMessage().contains("не принадлежит вам"));
+        Assertions.assertEquals("Заказ c id '1' не принадлежит вам", exception.getMessage());
         Mockito.verify(orderService).getById(orderId);
         Mockito.verify(orderService, Mockito.never()).save(Mockito.any());
     }
+
+    // Вспомогательные методы для создания тестовых данных
+
+    /**
+     * Создание тестового клиента
+     */
+    private User createTestClient() {
+        User user = new User(
+                "client@example.com",
+                "Test Client",
+                "+79991234567",
+                Role.CLIENT,
+                "Пушкина 17"
+        );
+        user.setId(1L);
+        return user;
+    }
+
+    /**
+     * Создание другого тестового клиента
+     */
+    private User createDifferentClient() {
+        User user = new User(
+                "other-client@example.com",
+                "Other Client",
+                "+79991234568",
+                Role.CLIENT,
+                "Ленина 10"
+        );
+        user.setId(2L);
+        return user;
+    }
+
+    /**
+     * Создание тестового ресторана
+     */
+    private User createTestRestaurant() {
+        User user = new User(
+                "restaurant@example.com",
+                "Test Restaurant",
+                "+79991234577",
+                Role.RESTAURANT,
+                "Пушкина 17"
+        );
+        user.setId(3L);
+        return user;
+    }
+
+    /**
+     * Создание позиции заказа
+     */
+    private OrderItem createOrderItem(User restaurant) {
+        return new OrderItem(
+                new MenuItem("Пицца", null, new BigDecimal("250.00"), restaurant),
+                new BigDecimal("250.00"),
+                1
+        );
+    }
+
+    /**
+     * Создает тестовый заказ
+     */
+    private Order createTestOrder(User restaurant, User client) {
+        Order order = new Order(
+                "Ул Пушкина",
+                OrderStatus.CREATED,
+                List.of(),
+                new BigDecimal("500.00"),
+                restaurant,
+                client
+        );
+        order.setId(1L);
+        return order;
+    }
+
 }

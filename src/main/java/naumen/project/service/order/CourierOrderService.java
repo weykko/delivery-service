@@ -15,11 +15,11 @@ import java.util.List;
  * Сервис для работы с заказами со стороны курьеров
  */
 @Service
-public class OrderCourierService {
+public class CourierOrderService {
 
     private final OrderService orderService;
 
-    OrderCourierService(OrderService orderService) {
+    CourierOrderService(OrderService orderService) {
         this.orderService = orderService;
     }
 
@@ -50,7 +50,10 @@ public class OrderCourierService {
      * @param courier курьер
      */
     public void acceptOrder(Long orderId, User courier) {
-        Order order = orderService.getById(orderId);
+        Order order = orderService.getById(orderId)
+                .orElseThrow(() ->
+                        new InvalidInputException("Нельзя принять заказ, причина: Заказ с id '%d' не найден",
+                                orderId));
 
         if (order.getCourier() != null) {
             throw new InvalidInputException("Заказ с id '%d' уже принят курьером", orderId);
@@ -67,7 +70,10 @@ public class OrderCourierService {
      * @param courier курьер
      */
     public void pickUpOrder(Long orderId, User courier) {
-        Order order = orderService.getById(orderId);
+        Order order = orderService.getById(orderId)
+                .orElseThrow(() ->
+                        new InvalidInputException("Нельзя забрать заказ, причина: Заказ с id '%d' не найден",
+                                orderId));
 
         assertBelongsToCourier(order, courier);
 
@@ -88,7 +94,10 @@ public class OrderCourierService {
      * @param courier курьер
      */
     public void deliverOrder(Long orderId, User courier) {
-        Order order = orderService.getById(orderId);
+        Order order = orderService.getById(orderId)
+                .orElseThrow(() ->
+                        new InvalidInputException("Нельзя доставить заказ, причина: Заказ с id '%d' не найден",
+                                orderId));
 
         assertBelongsToCourier(order, courier);
 
@@ -108,8 +117,8 @@ public class OrderCourierService {
      * @param courier курьер
      */
     private void assertBelongsToCourier(Order order, User courier) {
-        if (order.getCourier() == null ||
-            !order.getCourier().getId().equals(courier.getId())) {
+        if (order.getCourier() == null
+            || !order.getCourier().getId().equals(courier.getId())) {
             throw new PermissionCheckFailedException("Заказ с id '%d' не принадлежит вам", order.getId());
         }
     }

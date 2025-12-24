@@ -2,12 +2,14 @@ package naumen.project.service;
 
 import naumen.project.entity.MenuItem;
 import naumen.project.entity.User;
-import naumen.project.exception.EntityNotFoundException;
+import naumen.project.exception.InvalidInputException;
 import naumen.project.exception.PermissionCheckFailedException;
 import naumen.project.repository.MenuRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 /**
  * Сервис для управления меню ресторанов.
@@ -38,14 +40,12 @@ public class MenuService {
     }
 
     /**
-     * Создает новую позицию в меню для указанного пользователя-ресторана.
+     * Сохраняет новую позицию в меню
      *
      * @param menuItem сущность позиции меню
-     * @param user     пользователь-ресторан, для которого создается позиция
      * @return созданная позиция меню
      */
-    public MenuItem createMenuItem(MenuItem menuItem, User user) {
-        menuItem.setRestaurant(user);
+    public MenuItem save(MenuItem menuItem) {
         menuRepository.save(menuItem);
 
         return menuItem;
@@ -73,7 +73,9 @@ public class MenuService {
      * @param user пользователь, выполняющий удаление
      */
     public void deleteMenuItem(Long id, User user) {
-        MenuItem menuItem = getMenuItemById(id);
+        MenuItem menuItem = getMenuItemById(id)
+                .orElseThrow(() -> new InvalidInputException(
+                        "Не удалось удалить, причина: Позиция меню с id '%d' не найдена", id));
 
         assertBelongsToRestaurant(menuItem, user);
 
@@ -86,10 +88,8 @@ public class MenuService {
      * @param id идентификатор позиции меню
      * @return найденная позиция меню
      */
-    public MenuItem getMenuItemById(Long id) {
-        return menuRepository
-                .findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Позиция меню с id '%d' не найдена", id));
+    public Optional<MenuItem> getMenuItemById(Long id) {
+        return menuRepository.findById(id);
     }
 
     /**

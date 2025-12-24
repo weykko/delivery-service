@@ -11,7 +11,7 @@ import naumen.project.entity.enums.OrderStatus;
 import naumen.project.entity.enums.Role;
 import naumen.project.mapper.OrderMapper;
 import naumen.project.service.OrderItemService;
-import naumen.project.service.order.OrderClientService;
+import naumen.project.service.order.ClientOrderService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,7 +31,7 @@ import java.util.List;
 class ClientOrderControllerTest {
 
     @Mock
-    private OrderClientService orderClientService;
+    private ClientOrderService clientOrderService;
 
     @Mock
     private OrderItemService orderItemService;
@@ -66,7 +66,7 @@ class ClientOrderControllerTest {
         );
 
         Mockito.when(orderItemService.buildOrderItem(1L, 2)).thenReturn(orderItem);
-        Mockito.when(orderClientService.createOrder(
+        Mockito.when(clientOrderService.createOrder(
                 createRequest.restaurantId(),
                 orderItemList,
                 createRequest.deliveryAddress(),
@@ -82,7 +82,7 @@ class ClientOrderControllerTest {
         Assertions.assertEquals(expectedResponse.totalPrice(), result.totalPrice());
         Assertions.assertEquals(expectedResponse.deliveryAddress(), result.deliveryAddress());
         Mockito.verify(orderItemService).buildOrderItem(1L, 2);
-        Mockito.verify(orderClientService).createOrder(
+        Mockito.verify(clientOrderService).createOrder(
                 createRequest.restaurantId(),
                 orderItemList,
                 createRequest.deliveryAddress(),
@@ -103,7 +103,7 @@ class ClientOrderControllerTest {
                 "Test Restaurant"
         );
 
-        Mockito.when(orderClientService.getOrders(testClient)).thenReturn(List.of(testOrder));
+        Mockito.when(clientOrderService.getOrders(testClient)).thenReturn(List.of(testOrder));
         Mockito.when(orderMapper.toClientShortResponse(testOrder)).thenReturn(orderResponse);
 
         List<OrderClientShortResponseDto> result = clientOrderController.getOrders(testClient);
@@ -113,7 +113,7 @@ class ClientOrderControllerTest {
         Assertions.assertEquals(orderResponse.id(), result.getFirst().id());
         Assertions.assertEquals(orderResponse.status(), result.getFirst().status());
         Assertions.assertEquals(orderResponse.totalPrice(), result.getFirst().totalPrice());
-        Mockito.verify(orderClientService).getOrders(testClient);
+        Mockito.verify(clientOrderService).getOrders(testClient);
         Mockito.verify(orderMapper).toClientShortResponse(testOrder);
     }
 
@@ -134,7 +134,7 @@ class ClientOrderControllerTest {
                 List.of()
         );
 
-        Mockito.when(orderClientService.getOrder(orderId, testClient)).thenReturn(testOrder);
+        Mockito.when(clientOrderService.getOrder(orderId, testClient)).thenReturn(testOrder);
         Mockito.when(orderMapper.toClientResponse(testOrder)).thenReturn(expectedResponse);
 
         OrderClientResponseDto result = clientOrderController.getOrder(orderId, testClient);
@@ -143,8 +143,20 @@ class ClientOrderControllerTest {
         Assertions.assertEquals(expectedResponse.id(), result.id());
         Assertions.assertEquals(expectedResponse.status(), result.status());
         Assertions.assertEquals(expectedResponse.deliveryAddress(), result.deliveryAddress());
-        Mockito.verify(orderClientService).getOrder(orderId, testClient);
+        Mockito.verify(clientOrderService).getOrder(orderId, testClient);
         Mockito.verify(orderMapper).toClientResponse(testOrder);
+    }
+
+    /**
+     * Тестирование успешного удаления заказа клиентом
+     */
+    @Test
+    void deleteOrderByClient_WithValidOrder_ShouldCallDeleteService() {
+        Long orderId = 1L;
+
+        clientOrderController.deleteOrderByClient(orderId, testClient);
+
+        Mockito.verify(clientOrderService).deleteOrder(orderId, testClient);
     }
 
     // Вспомогательные методы для создания тестовых данных
@@ -153,26 +165,27 @@ class ClientOrderControllerTest {
      * Создает тестового клиента
      */
     private User createTestClient() {
-        User user = new User();
-        user.setId(1L);
-        user.setEmail("client@example.com");
-        user.setName("Test Client");
-        user.setPhone("+79991234567");
-        user.setRole(Role.CLIENT);
-        return user;
+        return new User(
+                "client@example.com",
+                "Test Client",
+                "+79991234567",
+                Role.CLIENT,
+                "Пушкина 17"
+        );
     }
 
     /**
      * Создает тестовый заказ
      */
     private Order createTestOrder() {
-        Order order = new Order();
-        order.setId(1L);
-        order.setStatus(OrderStatus.CREATED);
-        order.setTotalPrice(new BigDecimal("500.00"));
-        order.setDeliveryAddress("Ул Пушкина");
-        order.setClient(testClient);
-        return order;
+        return new Order(
+                "Ул Пушкина",
+                OrderStatus.CREATED,
+                List.of(),
+                new BigDecimal("500.00"),
+                null,
+                testClient
+        );
     }
 
     /**

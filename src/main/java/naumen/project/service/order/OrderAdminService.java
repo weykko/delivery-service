@@ -10,6 +10,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 /**
  * Сервис для административных операций с заказами.
  * Предоставляет методы для получения, обновления и удаления заказов.
@@ -45,7 +47,7 @@ public class OrderAdminService {
      * @param orderId идентификатор заказа
      * @return заказ
      */
-    public Order getOrderById(Long orderId) {
+    public Optional<Order> getOrderById(Long orderId) {
         return orderService.getById(orderId);
     }
 
@@ -65,7 +67,9 @@ public class OrderAdminService {
      * @param orderId идентификатор заказа
      */
     public void deleteOrder(Long orderId) {
-        Order order = orderService.getById(orderId);
+        Order order = orderService.getById(orderId)
+                .orElseThrow(() -> new InvalidInputException("Не удалось удалить заказ. Заказ с id '%d' не найден",
+                        orderId));
 
         if (order.getStatus() == OrderStatus.COMPLETED) {
             throw new InvalidInputException("Невозможно удалить завершенный заказ c id '%d'", orderId);
@@ -83,7 +87,11 @@ public class OrderAdminService {
      * @param courierId идентификатор курьера
      */
     public void setCourierById(Order order, Long courierId) {
-        User courier = userService.getUserById(courierId);
+        User courier = userService.getUserById(courierId)
+                .orElseThrow(() ->
+                        new InvalidInputException("Не удалось назначить курьера: Пользователь с id '%d' не найден",
+                                courierId));
+
         if (courier.getRole() != Role.COURIER) {
             throw new InvalidInputException("Пользователь с id '%d' не является курьером", courierId);
         }

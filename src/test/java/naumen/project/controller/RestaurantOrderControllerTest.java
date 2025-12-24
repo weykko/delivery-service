@@ -9,7 +9,7 @@ import naumen.project.entity.enums.OrderStatus;
 import naumen.project.entity.enums.Role;
 import naumen.project.mapper.OrderMapper;
 import naumen.project.mapper.PageMapper;
-import naumen.project.service.order.OrderRestaurantService;
+import naumen.project.service.order.RestaurantOrderService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,7 +32,7 @@ import java.util.List;
 class RestaurantOrderControllerTest {
 
     @Mock
-    private OrderRestaurantService orderRestaurantService;
+    private RestaurantOrderService restaurantOrderService;
 
     @Mock
     private OrderMapper orderMapper;
@@ -43,13 +43,14 @@ class RestaurantOrderControllerTest {
     @InjectMocks
     private RestaurantOrderController restaurantOrderController;
 
+    private final User testRestaurant = createTestRestaurant();
+    private final Order testOrder = createTestOrder();
+
     /**
      * Тестирование получения активных заказов ресторана
      */
     @Test
     void getActiveOrdersShouldReturnPagedOrders() {
-        Order testOrder = createTestOrder();
-        User testRestaurant = createTestRestaurant();
         int page = 0;
         int size = 10;
 
@@ -61,7 +62,7 @@ class RestaurantOrderControllerTest {
                 List.of(responseDto), page, size, 1, 1
         );
 
-        Mockito.when(orderRestaurantService.getActiveOrders(testRestaurant, pageRequest)).thenReturn(orderPage);
+        Mockito.when(restaurantOrderService.getActiveOrders(testRestaurant, pageRequest)).thenReturn(orderPage);
         Mockito.when(orderMapper.toRestaurantShortResponse(testOrder)).thenReturn(responseDto);
         Mockito.when(pageMapper.toOrderRestaurantResponse(responsePage)).thenReturn(pagedResponse);
 
@@ -70,7 +71,7 @@ class RestaurantOrderControllerTest {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1, result.content().size());
         Assertions.assertEquals(responseDto, result.content().getFirst());
-        Mockito.verify(orderRestaurantService).getActiveOrders(testRestaurant, pageRequest);
+        Mockito.verify(restaurantOrderService).getActiveOrders(testRestaurant, pageRequest);
         Mockito.verify(orderMapper).toRestaurantShortResponse(testOrder);
         Mockito.verify(pageMapper).toOrderRestaurantResponse(responsePage);
     }
@@ -80,36 +81,41 @@ class RestaurantOrderControllerTest {
      */
     @Test
     void getOrderShouldReturnOrderInfo() {
-        Order testOrder = createTestOrder();
-        User testRestaurant = createTestRestaurant();
         Long orderId = 1L;
         OrderRestaurantResponseDto responseDto = createOrderRestaurantResponseDto(testOrder);
 
-        Mockito.when(orderRestaurantService.getOrder(orderId, testRestaurant)).thenReturn(testOrder);
+        Mockito.when(restaurantOrderService.getOrder(orderId, testRestaurant)).thenReturn(testOrder);
         Mockito.when(orderMapper.toRestaurantResponse(testOrder)).thenReturn(responseDto);
 
         OrderRestaurantResponseDto result = restaurantOrderController.getOrder(orderId, testRestaurant);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(responseDto, result);
-        Mockito.verify(orderRestaurantService).getOrder(orderId, testRestaurant);
+        Mockito.verify(restaurantOrderService).getOrder(orderId, testRestaurant);
         Mockito.verify(orderMapper).toRestaurantResponse(testOrder);
     }
 
     // Вспомогательные методы
 
+    /**
+     * Создает тестового ресторана
+     */
     private User createTestRestaurant() {
         User user = new User(
                 "restaurant@example.com",
                 "Test Restaurant",
                 "+79991234567",
-                Role.RESTAURANT
+                Role.RESTAURANT,
+                "Пушкина 17"
         );
         user.setId(3L);
 
         return user;
     }
 
+    /**
+     * Создает тестовый заказ
+     */
     private Order createTestOrder() {
         Order order = new Order(
                 "Ул Пушкина",
@@ -124,6 +130,9 @@ class RestaurantOrderControllerTest {
         return order;
     }
 
+    /**
+     * Создает краткий ответ с информацией о заказе для ресторана
+     */
     private OrderRestaurantShortResponseDto createOrderRestaurantShortResponseDto(Order order) {
         return new OrderRestaurantShortResponseDto(
                 order.getId(),
@@ -132,6 +141,9 @@ class RestaurantOrderControllerTest {
         );
     }
 
+    /**
+     * Создает полный ответ с информацией о заказе для ресторана
+     */
     private OrderRestaurantResponseDto createOrderRestaurantResponseDto(Order order) {
         return new OrderRestaurantResponseDto(
                 order.getId(),
