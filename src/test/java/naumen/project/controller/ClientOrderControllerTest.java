@@ -43,7 +43,7 @@ class ClientOrderControllerTest {
     private ClientOrderController clientOrderController;
 
     private final User testClient = createTestClient();
-    private final Order testOrder = createTestOrder();
+    private final Order testOrder = createTestOrder(testClient);
 
     /**
      * Тестирование успешного создания заказа с валидными данными
@@ -176,14 +176,14 @@ class ClientOrderControllerTest {
     /**
      * Создает тестовый заказ
      */
-    private Order createTestOrder() {
+    private Order createTestOrder(User client) {
         return new Order(
                 "Ул Пушкина",
                 OrderStatus.CREATED,
                 List.of(),
                 new BigDecimal("500.00"),
                 null,
-                testClient
+                client
         );
     }
 

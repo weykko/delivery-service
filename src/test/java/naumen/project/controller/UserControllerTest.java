@@ -29,7 +29,7 @@ class UserControllerTest {
     @InjectMocks
     private UserController userController;
 
-    private final User testUser = createTestUser(1L);
+    private final User testUser = createTestUser();
 
     /**
      * Тестирование получения информации о текущем аутентифицированном пользователе
@@ -92,12 +92,16 @@ class UserControllerTest {
     /**
      * Создает тестового пользователя
      */
-    private User createTestUser(Long id) {
-        User user = new User("test@example.com", "Test User",
-                "+79991234567", Role.CLIENT, "Пушкина 17");
-        if (id != null) {
-            user.setId(id);
-        }
+    private User createTestUser() {
+        User user = new User(
+                "test@example.com",
+                "Test User",
+                "+79991234567",
+                Role.CLIENT,
+                "Пушкина 17"
+        );
+        user.setId(1L);
+
         return user;
     }
 }

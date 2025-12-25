@@ -38,7 +38,7 @@ public class AuthServiceTest {
     @InjectMocks
     private AuthService authService;
 
-    private final User testUser = createTestUser(1L);
+    private final User testUser = createTestUser();
 
     /**
      * Тестирование успешной регистрации пользователя с валидными данными
@@ -140,12 +140,16 @@ public class AuthServiceTest {
     /**
      * Создает тестового пользователя
      */
-    private User createTestUser(Long id) {
-        User user = new User("test@notexists.ru", "Alexey", "73454562345",
-                Role.CLIENT, "Пушкина 17");
-        if (id != null) {
-            user.setId(id);
-        }
+    private User createTestUser() {
+        User user = new User(
+                "test@notexists.ru",
+                "Alexey",
+                "73454562345",
+                Role.CLIENT,
+                "Пушкина 17"
+        );
+        user.setId(1L);
+
         return user;
     }
 }

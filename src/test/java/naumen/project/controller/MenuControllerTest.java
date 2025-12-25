@@ -42,7 +42,7 @@ class MenuControllerTest {
     @InjectMocks
     private MenuController menuController;
 
-    private final User testRestaurant = createRestaurantUser(1L);
+    private final User testRestaurant = createRestaurantUser();
     private final MenuItem testMenuItem = createMenuItem(testRestaurant);
 
     /**
@@ -135,12 +135,16 @@ class MenuControllerTest {
     /**
      * Создает тестового пользователя-ресторана
      */
-    private User createRestaurantUser(Long id) {
-        User user = new User("restaurant@example.com", "Test Restaurant",
-                "+79991234567", Role.RESTAURANT, "Пушкина 17");
-        if (id != null) {
-            user.setId(id);
-        }
+    private User createRestaurantUser() {
+        User user = new User(
+                "restaurant@example.com",
+                "Test Restaurant",
+                "+79991234567",
+                Role.RESTAURANT,
+                "Пушкина 17"
+        );
+        user.setId(1L);
+
         return user;
     }
 
@@ -148,8 +152,14 @@ class MenuControllerTest {
      * Создает тестовый пункт меню
      */
     private MenuItem createMenuItem(User restaurant) {
-        MenuItem item = new MenuItem("Pizza", "description", new BigDecimal(450), restaurant);
+        MenuItem item = new MenuItem(
+                "Pizza",
+                "description",
+                new BigDecimal(450),
+                restaurant
+        );
         item.setId(1L);
+
         return item;
     }
 
