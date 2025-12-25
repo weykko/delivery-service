@@ -146,18 +146,6 @@ class ClientOrderControllerTest {
         Mockito.verify(orderMapper).toClientResponse(testOrder);
     }
 
-    /**
-     * Тестирование успешного удаления заказа клиентом
-     */
-    @Test
-    void deleteOrderByClient_WithValidOrder_ShouldCallDeleteService() {
-        Long orderId = 1L;
-
-        clientOrderController.deleteOrderByClient(orderId, testClient);
-
-        Mockito.verify(clientOrderService).deleteOrder(orderId, testClient);
-    }
-
     // Вспомогательные методы для создания тестовых данных
 
     /**

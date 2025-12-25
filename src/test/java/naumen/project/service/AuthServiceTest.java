@@ -132,7 +132,8 @@ public class AuthServiceTest {
                 .authenticate(new UsernamePasswordAuthenticationToken(testUser.getEmail(), password))
         ).thenThrow(BadCredentialsException.class);
 
-        Assertions.assertThrows(BadCredentialsException.class, () -> authService.login(testUser.getEmail(), password));
+        Assertions.assertThrows(BadCredentialsException.class,
+                () -> authService.login(testUser.getEmail(), password));
     }
 
     // Вспомогательные методы для создания тестовых данных

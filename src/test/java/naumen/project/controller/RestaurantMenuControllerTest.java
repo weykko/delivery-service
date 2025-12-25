@@ -35,7 +35,7 @@ class RestaurantMenuControllerTest {
     @InjectMocks
     private RestaurantMenuController restaurantMenuController;
 
-    private final User testRestaurant = createRestaurantUser(1L);
+    private final User testRestaurant = createRestaurantUser();
 
     /**
      * Тестирование успешного создания новой позиции меню с валидными данными
@@ -125,12 +125,16 @@ class RestaurantMenuControllerTest {
     /**
      * Создает тестового пользователя-ресторана
      */
-    private User createRestaurantUser(Long id) {
-        User user = new User("restaurant@example.com", "Test Restaurant",
-                "+79991234567", Role.RESTAURANT, "Пушкина 17");
-        if (id != null) {
-            user.setId(id);
-        }
+    private User createRestaurantUser() {
+        User user = new User(
+                "restaurant@example.com",
+                "Test Restaurant",
+                "+79991234567",
+                Role.RESTAURANT,
+                "Пушкина 17"
+        );
+        user.setId(1L);
+
         return user;
     }
 
