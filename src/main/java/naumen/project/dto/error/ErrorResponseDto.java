@@ -1,5 +1,7 @@
 package naumen.project.dto.error;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.time.Instant;
 import java.util.List;
 
@@ -11,6 +13,7 @@ import java.util.List;
  * @param path       Путь, по которому произошла ошибка
  * @param violations Список ошибок валидации
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record ErrorResponseDto(
         Instant timestamp,
         String error,

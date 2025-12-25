@@ -50,7 +50,7 @@ class RestaurantOrderControllerTest {
      * Тестирование получения активных заказов ресторана
      */
     @Test
-    void getActiveOrders_ShouldReturnPagedOrders() {
+    void getActiveOrdersShouldReturnPagedOrders() {
         int page = 0;
         int size = 10;
 
@@ -80,18 +80,17 @@ class RestaurantOrderControllerTest {
      * Тестирование получения информации о заказе
      */
     @Test
-    void getOrder_ShouldReturnOrderInfo() {
-        Long orderId = 1L;
+    void getOrderShouldReturnOrderInfo() {
         OrderRestaurantResponseDto responseDto = createOrderRestaurantResponseDto(testOrder);
 
-        Mockito.when(restaurantOrderService.getOrder(orderId, testRestaurant)).thenReturn(testOrder);
+        Mockito.when(restaurantOrderService.getOrder(testOrder.getId(), testRestaurant)).thenReturn(testOrder);
         Mockito.when(orderMapper.toRestaurantResponse(testOrder)).thenReturn(responseDto);
 
-        OrderRestaurantResponseDto result = restaurantOrderController.getOrder(orderId, testRestaurant);
+        OrderRestaurantResponseDto result = restaurantOrderController.getOrder(testOrder.getId(), testRestaurant);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(responseDto, result);
-        Mockito.verify(restaurantOrderService).getOrder(orderId, testRestaurant);
+        Mockito.verify(restaurantOrderService).getOrder(testOrder.getId(), testRestaurant);
         Mockito.verify(orderMapper).toRestaurantResponse(testOrder);
     }
 

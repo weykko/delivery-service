@@ -42,12 +42,13 @@ public class ClientOrderService {
                 .allMatch(item -> item.getMenuItem().getRestaurant().getId().equals(restaurantId));
 
         if (!allItemsBelongToRestaurant) {
-            throw new InvalidInputException("Все позиции заказа должны принадлежать ресторану с id '%d'", restaurantId);
+            throw new InvalidInputException(
+                    "Все позиции заказа должны принадлежать ресторану с id '%d'", restaurantId);
         }
 
-        User restaurant = userService.getById(restaurantId)
-                .orElseThrow(() -> new InvalidInputException("Ошибка создания заказа, ресторан с id '%d' не найден",
-                        restaurantId));
+        User restaurant = userService.getUserById(restaurantId)
+                .orElseThrow(() -> new InvalidInputException(
+                        "Ошибка создания заказа, ресторан с id '%d' не найден", restaurantId));
 
         BigDecimal totalPrice = orderItems.stream()
                 .map(OrderItem::getItemPrice)
@@ -101,8 +102,7 @@ public class ClientOrderService {
     public void deleteOrder(Long orderId, User client) {
         Order order = orderService.getById(orderId)
                 .orElseThrow(() -> new InvalidInputException(
-                        "Не удалось удалить заказ. Причина: Заказ с id '%d' не найден",
-                        orderId));
+                        "Не удалось удалить заказ, причина: Заказ с id '%d' не найден", orderId));
 
         assertBelongsToClient(order, client);
         if (order.getStatus() != OrderStatus.CREATED

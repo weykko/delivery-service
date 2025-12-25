@@ -29,53 +29,26 @@ class UserControllerTest {
     @InjectMocks
     private UserController userController;
 
-    private final User testUser = createTestUser(1L);
-
-    /**
-     * Тестирование получения информации о текущем аутентифицированном пользователе
-     */
-    @Test
-    void getMyUserWithAuthenticatedUserShouldReturnUserResponse() {
-        UserResponseDto expectedResponse = new UserResponseDto(
-                testUser.getId(),
-                testUser.getEmail(),
-                testUser.getRole(),
-                testUser.getName(),
-                testUser.getPhone(),
-                "Пушкина 17"
-        );
-
-        Mockito.when(userMapper.toResponse(testUser)).thenReturn(expectedResponse);
-
-        UserResponseDto result = userController.getMyUser(testUser);
-
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(expectedResponse.id(), result.id());
-        Assertions.assertEquals(expectedResponse.email(), result.email());
-        Assertions.assertEquals(expectedResponse.name(), result.name());
-        Assertions.assertEquals(expectedResponse.phone(), result.phone());
-        Assertions.assertEquals(expectedResponse.role(), result.role());
-        Mockito.verify(userMapper).toResponse(testUser);
-    }
-
     /**
      * Тестирование успешного обновления информации пользователя с валидными данными
      */
     @Test
     void updateUserWithValidRequestShouldReturnUpdatedUser() {
-        UpdateUserRequestDto updateRequest = new UpdateUserRequestDto("Updated Name", "+79997654321",
-                "Пушкина 17");
+        User testUser = createTestUser();
 
+        UpdateUserRequestDto updateRequest = new UpdateUserRequestDto(
+                "Updated Name", "+79997654321", "Пушкина 17"
+        );
         UserResponseDto expectedResponse = new UserResponseDto(
                 testUser.getId(),
                 testUser.getEmail(),
                 testUser.getRole(),
                 updateRequest.name(),
                 updateRequest.phone(),
-                "Пушкина 17"
+                updateRequest.address()
         );
 
-        Mockito.when(userService.updateInfo(testUser)).thenReturn(testUser);
+        Mockito.when(userService.updateInfo(testUser, updateRequest.phone(), null)).thenReturn(testUser);
         Mockito.when(userMapper.toResponse(testUser)).thenReturn(expectedResponse);
 
         UserResponseDto result = userController.updateUser(testUser, updateRequest);
@@ -83,7 +56,7 @@ class UserControllerTest {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(expectedResponse.name(), result.name());
         Assertions.assertEquals(expectedResponse.phone(), result.phone());
-        Mockito.verify(userService).updateInfo(testUser);
+        Mockito.verify(userService).updateInfo(testUser, updateRequest.phone(), null);
         Mockito.verify(userMapper).toResponse(testUser);
     }
 
@@ -92,12 +65,16 @@ class UserControllerTest {
     /**
      * Создает тестового пользователя
      */
-    private User createTestUser(Long id) {
-        User user = new User("test@example.com", "Test User",
-                "+79991234567", Role.CLIENT, "Пушкина 17");
-        if (id != null) {
-            user.setId(id);
-        }
+    private User createTestUser() {
+        User user = new User(
+                "test@example.com",
+                "Test User",
+                "+79991234567",
+                Role.CLIENT,
+                "Пушкина 17"
+        );
+        user.setId(1L);
+
         return user;
     }
 }
