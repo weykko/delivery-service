@@ -11,7 +11,7 @@ import naumen.project.exception.EntityNotFoundException;
 import naumen.project.exception.InvalidInputException;
 import naumen.project.mapper.OrderMapper;
 import naumen.project.mapper.PageMapper;
-import naumen.project.service.order.OrderAdminService;
+import naumen.project.service.order.AdminOrderService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -25,7 +25,7 @@ import java.util.Optional;
  * Предоставляет endpoints для операций с заказами.
  * Требует аутентификации с JWT токеном.
  *
- * @see OrderAdminService
+ * @see AdminOrderService
  * @see OrderMapper
  * @see PageMapper
  */
@@ -34,12 +34,12 @@ import java.util.Optional;
 @RequestMapping("/api/v1/admin/orders")
 public class AdminOrderController {
 
-    private final OrderAdminService orderAdminService;
+    private final AdminOrderService adminOrderService;
     private final OrderMapper orderMapper;
     private final PageMapper pageMapper;
 
-    public AdminOrderController(OrderAdminService orderAdminService, OrderMapper orderMapper, PageMapper pageMapper) {
-        this.orderAdminService = orderAdminService;
+    public AdminOrderController(AdminOrderService adminOrderService, OrderMapper orderMapper, PageMapper pageMapper) {
+        this.adminOrderService = adminOrderService;
         this.orderMapper = orderMapper;
         this.pageMapper = pageMapper;
     }
@@ -60,7 +60,7 @@ public class AdminOrderController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        Page<OrderAdminShortResponseDto> orderPages = orderAdminService
+        Page<OrderAdminShortResponseDto> orderPages = adminOrderService
                 .getOrders(clientId, PageRequest.of(page, size))
                 .map(orderMapper::toAdminShortResponse);
 
@@ -77,7 +77,7 @@ public class AdminOrderController {
     @ResponseStatus(HttpStatus.OK)
     @Transactional(readOnly = true)
     public OrderAdminResponseDto getOrder(@PathVariable Long orderId) {
-        Order order = orderAdminService.getOrderById(orderId)
+        Order order = adminOrderService.getOrderById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Заказ с id '%d' не найден", orderId));
 
         return orderMapper.toAdminResponse(order);
@@ -95,17 +95,20 @@ public class AdminOrderController {
     @Transactional
     public OrderAdminResponseDto updateOrder(@PathVariable Long orderId,
                                              @RequestBody @Valid OrderAdminUpdateRequestDto request) {
-        Order order = orderAdminService.getOrderById(orderId)
+        Order order = adminOrderService.getOrderById(orderId)
                 .orElseThrow(() ->
-                        new InvalidInputException("Не удалось обновить заказ, причина: Заказ с id '%d' не найден",
-                                orderId));
+                        new InvalidInputException(
+                                "Не удалось обновить заказ, причина: Заказ с id '%d' не найден",
+                                orderId
+                        ));
 
         Optional.ofNullable(request.status()).ifPresent(order::setStatus);
         Optional.ofNullable(request.totalPrice()).ifPresent(order::setTotalPrice);
         Optional.ofNullable(request.courierId()).ifPresent(courierId ->
-                orderAdminService.setCourierById(order, courierId));
+                adminOrderService.setCourierById(order, courierId)
+        );
 
-        orderAdminService.saveOrder(order);
+        adminOrderService.saveOrder(order);
 
         return orderMapper.toAdminResponse(order);
     }
@@ -119,6 +122,6 @@ public class AdminOrderController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Transactional
     public void deleteOrder(@PathVariable Long orderId) {
-        orderAdminService.deleteOrder(orderId);
+        adminOrderService.deleteOrder(orderId);
     }
 }

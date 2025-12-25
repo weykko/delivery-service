@@ -57,8 +57,10 @@ public class RestaurantOrderService {
     public void prepareOrder(Long orderId, User restaurant) {
         Order order = orderService.getById(orderId)
                 .orElseThrow(() ->
-                        new InvalidInputException("Нельзя приготовить заказ, причина: Заказ с id '%d' не найден",
-                                orderId));
+                        new InvalidInputException(
+                                "Нельзя приготовить заказ, причина: Заказ с id '%d' не найден",
+                                orderId
+                        ));
 
         assertBelongsToRestaurant(order, restaurant);
 
@@ -81,8 +83,10 @@ public class RestaurantOrderService {
     public void readyOrder(Long orderId, User restaurant) {
         Order order = orderService.getById(orderId)
                 .orElseThrow(() ->
-                        new InvalidInputException("Нельзя пометить заказ готовым, причина: Заказ с id '%d' не найден",
-                                orderId));
+                        new InvalidInputException(
+                                "Нельзя пометить заказ готовым, причина: Заказ с id '%d' не найден",
+                                orderId
+                        ));
 
         assertBelongsToRestaurant(order, restaurant);
 
@@ -105,7 +109,10 @@ public class RestaurantOrderService {
     private void assertBelongsToRestaurant(Order order, User restaurant) {
         if (order.getRestaurant() == null
             || !order.getRestaurant().getId().equals(restaurant.getId())) {
-            throw new PermissionCheckFailedException("Заказ с id '%d' не принадлежит вашему ресторану", order.getId());
+            throw new PermissionCheckFailedException(
+                    "Заказ с id '%d' не принадлежит вашему ресторану",
+                    order.getId()
+            );
         }
     }
 }

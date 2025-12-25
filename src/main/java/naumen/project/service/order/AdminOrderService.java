@@ -20,12 +20,12 @@ import java.util.Optional;
  * @see UserService
  */
 @Service
-public class OrderAdminService {
+public class AdminOrderService {
 
     private final OrderService orderService;
     private final UserService userService;
 
-    OrderAdminService(OrderService orderService, UserService userService) {
+    AdminOrderService(OrderService orderService, UserService userService) {
         this.orderService = orderService;
         this.userService = userService;
     }
@@ -68,8 +68,10 @@ public class OrderAdminService {
      */
     public void deleteOrder(Long orderId) {
         Order order = orderService.getById(orderId)
-                .orElseThrow(() -> new InvalidInputException("Не удалось удалить заказ. Заказ с id '%d' не найден",
-                        orderId));
+                .orElseThrow(() -> new InvalidInputException(
+                        "Не удалось удалить заказ. Причина: Заказ с id '%d' не найден",
+                        orderId
+                ));
 
         if (order.getStatus() == OrderStatus.COMPLETED) {
             throw new InvalidInputException("Невозможно удалить завершенный заказ c id '%d'", orderId);
@@ -89,11 +91,16 @@ public class OrderAdminService {
     public void setCourierById(Order order, Long courierId) {
         User courier = userService.getUserById(courierId)
                 .orElseThrow(() ->
-                        new InvalidInputException("Не удалось назначить курьера: Пользователь с id '%d' не найден",
-                                courierId));
+                        new InvalidInputException(
+                                "Не удалось назначить курьера, причина: Пользователь с id '%d' не найден",
+                                courierId
+                        ));
 
         if (courier.getRole() != Role.COURIER) {
-            throw new InvalidInputException("Пользователь с id '%d' не является курьером", courierId);
+            throw new InvalidInputException(
+                    "Не удалось назначить курьера, причина: Пользователь с id '%d' не является курьером",
+                    courierId
+            );
         }
 
         order.setCourier(courier);

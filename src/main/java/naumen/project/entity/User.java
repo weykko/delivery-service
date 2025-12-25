@@ -2,6 +2,7 @@ package naumen.project.entity;
 
 import jakarta.persistence.*;
 import naumen.project.entity.enums.Role;
+import naumen.project.exception.InvalidInputException;
 
 import java.util.List;
 
@@ -77,7 +78,7 @@ public class User extends IdEntity {
      */
     public User(String email, String name, String phone, Role role, String address) {
         if (role == Role.RESTAURANT && address == null) {
-            throw new IllegalArgumentException(
+            throw new InvalidInputException(
                     "Ошибка при создании пользователя: для роли RESTAURANT адрес обязателен"
             );
         }

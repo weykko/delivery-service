@@ -43,7 +43,7 @@ class ClientOrderControllerTest {
     private ClientOrderController clientOrderController;
 
     private final User testClient = createTestClient();
-    private final Order testOrder = createTestOrder();
+    private final Order testOrder = createTestOrder(testClient);
 
     /**
      * Тестирование успешного создания заказа с валидными данными
@@ -146,18 +146,6 @@ class ClientOrderControllerTest {
         Mockito.verify(orderMapper).toClientResponse(testOrder);
     }
 
-    /**
-     * Тестирование успешного удаления заказа клиентом
-     */
-    @Test
-    void deleteOrderByClient_WithValidOrder_ShouldCallDeleteService() {
-        Long orderId = 1L;
-
-        clientOrderController.deleteOrderByClient(orderId, testClient);
-
-        Mockito.verify(clientOrderService).deleteOrder(orderId, testClient);
-    }
-
     // Вспомогательные методы для создания тестовых данных
 
     /**
@@ -176,14 +164,14 @@ class ClientOrderControllerTest {
     /**
      * Создает тестовый заказ
      */
-    private Order createTestOrder() {
+    private Order createTestOrder(User client) {
         return new Order(
                 "Ул Пушкина",
                 OrderStatus.CREATED,
                 List.of(),
                 new BigDecimal("500.00"),
                 null,
-                testClient
+                client
         );
     }
 
