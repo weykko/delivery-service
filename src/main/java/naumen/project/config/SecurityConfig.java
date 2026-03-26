@@ -3,6 +3,7 @@ package naumen.project.config;
 import naumen.project.auth.JwtFilter;
 import naumen.project.auth.handler.AccessDeniedHandlerImpl;
 import naumen.project.auth.handler.AuthenticationEntryPointImpl;
+import naumen.project.entity.enums.Role;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -39,6 +40,14 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/v1/auth/logout").authenticated()
                         .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers("/api/v1/restaurant/**").hasAuthority(Role.RESTAURANT.name())
+                        .requestMatchers("/api/v1/courier/**").hasAuthority(Role.COURIER.name())
+                        .requestMatchers("/api/v1/client/**").hasAuthority(Role.CLIENT.name())
+                        .requestMatchers("/api/v1/menu/**").hasAnyAuthority(
+                                Role.RESTAURANT.name(),
+                                Role.CLIENT.name(),
+                                Role.ADMIN.name())
+                        .requestMatchers("/api/v1/admin/**").hasAuthority(Role.ADMIN.name())
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

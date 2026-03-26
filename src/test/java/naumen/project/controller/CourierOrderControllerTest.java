@@ -48,7 +48,7 @@ class CourierOrderControllerTest {
      * Тестирование получения доступных заказов для курьера
      */
     @Test
-    void getAvailableOrders_ShouldReturnPagedOrders() {
+    void getAvailableOrdersShouldReturnPagedOrders() {
         int page = 0;
         int size = 10;
 
@@ -78,7 +78,7 @@ class CourierOrderControllerTest {
      * Тестирование получения активных заказов курьера
      */
     @Test
-    void getActiveOrders_ShouldReturnListOfOrders() {
+    void getActiveOrdersShouldReturnListOfOrders() {
         OrderCourierResponseDto responseDto = createOrderCourierResponseDto(testOrder);
 
         Mockito.when(courierOrderService.getActiveOrders(testCourier)).thenReturn(List.of(testOrder));

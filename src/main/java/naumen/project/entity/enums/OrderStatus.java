@@ -31,7 +31,7 @@ public enum OrderStatus {
     COMPLETED,
 
     /**
-     * Заказ удален
+     * Заказ удален (отменен)
      */
     DELETED,
 }

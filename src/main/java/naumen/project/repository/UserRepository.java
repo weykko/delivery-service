@@ -1,6 +1,8 @@
 package naumen.project.repository;
 
 import naumen.project.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -43,4 +45,12 @@ public interface UserRepository extends CrudRepository<User, Long> {
      * @return Optional с найденным пользователем
      */
     Optional<User> findByPhone(String phone);
+
+    /**
+     * Находит всех пользователей с пагинацией.
+     *
+     * @param pageable параметры пагинации
+     * @return страница пользователей
+     */
+    Page<User> findAll(Pageable pageable);
 }

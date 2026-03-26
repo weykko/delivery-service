@@ -19,7 +19,7 @@ import java.util.List;
  * @param courierId       id курьера. Может быть null, если ещё не в доставке
  * @param items           состав заказа
  */
-public record OrderClientInfoResponseDto(
+public record OrderClientResponseDto(
         Long id,
         OrderStatus status,
         BigDecimal totalPrice,

@@ -57,4 +57,13 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
      * @return страница с заказами клиента
      */
     List<Order> findOrdersByClient(User client);
+
+    /**
+     * Поиск заказов по идентификатору клиента с пагинацией
+     *
+     * @param clientId идентификатор клиента
+     * @param pageable параметры пагинации
+     * @return страница с заказами клиента
+     */
+    Page<Order> findOrdersByClientId(Long clientId, Pageable pageable);
 }

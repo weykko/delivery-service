@@ -45,8 +45,8 @@ class AuthTokenServiceTest {
     @InjectMocks
     private AuthTokenService authTokenService;
 
-    private final User testUser = createTestUser(1L);
-    private final AuthToken testRefreshToken = createRefreshToken("valid-refresh-token", testUser);
+    private final User testUser = createTestUser();
+    private final AuthToken testRefreshToken = createRefreshToken(testUser);
 
     /**
      * Тестирование проверки допустимости токена
@@ -197,21 +197,31 @@ class AuthTokenServiceTest {
     /**
      * Создание тестового пользователя
      */
-    private User createTestUser(Long id) {
-        User user = new User("test@example.com", "Test User",
-                "+79991234567", Role.CLIENT, "Пушкина 17");
-        if (id != null) {
-            user.setId(id);
-        }
+    private User createTestUser() {
+        User user = new User(
+                "test@example.com",
+                "Test User",
+                "+79991234567",
+                Role.CLIENT,
+                "Пушкина 17"
+        );
+        user.setId(1L);
+
         return user;
     }
 
     /**
      * Создание тестового токена
      */
-    private AuthToken createRefreshToken(String token, User user) {
-        AuthToken authToken = new AuthToken(token, TokenType.REFRESH, Instant.now().plusSeconds(3600), user);
+    private AuthToken createRefreshToken(User user) {
+        AuthToken authToken = new AuthToken(
+                "valid-refresh-token",
+                TokenType.REFRESH,
+                Instant.now().plusSeconds(3600),
+                user
+        );
         authToken.setId(1L);
+
         return authToken;
     }
 }

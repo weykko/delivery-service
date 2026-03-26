@@ -88,4 +88,19 @@ class OrderService {
     Page<Order> getActiveOrdersByRestaurant(User restaurant, Pageable pageable) {
         return orderRepository.findActiveOrdersByRestaurant(restaurant, pageable);
     }
+
+    /**
+     * Получение заказов по идентификатору клиента с пагинацией
+     *
+     * @param clientId идентификатор клиента
+     * @param pageable параметры пагинации
+     * @return страница с заказами клиента
+     */
+    Page<Order> getOrdersByClientId(Long clientId, Pageable pageable) {
+        if (clientId == null) {
+            return orderRepository.findAll(pageable);
+        }
+
+        return orderRepository.findOrdersByClientId(clientId, pageable);
+    }
 }
